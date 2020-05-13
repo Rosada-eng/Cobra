@@ -5,6 +5,8 @@ import random
 
 pygame.init()
 
+#uhuhuhoojojoj@
+
 # ---- Gerar tela principal
 WIDTH = 600
 HEIGHT = 600
