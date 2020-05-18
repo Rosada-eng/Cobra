@@ -85,7 +85,7 @@ class Fruit(pygame.sprite.Sprite):
         self.speedy = 0
         
 
-
+        
 class Orbe(pygame.sprite.Sprite):
     def __init__(self, anim):
         # Construtor da classe mãe
@@ -148,7 +148,8 @@ all_sprites.add(orbes)
 all_orbs.add(orbes)
 
 score = 0
-
+colisao = 0
+delay_orbe = 30000 #30 seg 
 # ====== LOOP PRINCIPAL =====
 while game:
     clock.tick(FPS)
@@ -162,9 +163,9 @@ while game:
         # ---- Verifica as Teclas:
         # ABAIXAR A TECLA
         if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_LEFT and player.speedx != 6:
+            if event.key == pygame.K_LEFT and player.speedx != 6: #não permite andar p/ trás
                 player.speedx = -6
-                player.speedy = 0
+                player.speedy = 0 #não permite andar na diagonal
             if event.key == pygame.K_RIGHT and player.speedx != -6:
                 player.speedx = 6
                 player.speedy = 0
@@ -194,6 +195,26 @@ while game:
             all_fruits.add(cherry)
             all_sprites.add(cherry)
 
+    #verifica se houve colisão com o orbe
+    hits = pygame.sprite.spritecollide (player, all_orbs, True)
+    
+    if len(hits)>0:
+        colisao = 1
+        last_update = pygame.time.get_ticks()
+
+    if colisao != 0:
+        now = pygame.time.get_ticks()
+        elapsed_ticks = now - last_update
+        if elapsed_ticks < delay_orbe:
+            now = pygame.time.get_ticks()
+            elapsed_ticks = now - last_update
+        elif elapsed_ticks >= delay_orbe:
+            orbes = Orbe(orbs_anim)
+            all_orbs.add(orbes)
+            all_sprites.add(orbes)
+            colisao = 0
+
+       
 
     # ---- Gera Saídas:
     window.fill ((0,0,0))                   # preenche a tela com a cor preta
