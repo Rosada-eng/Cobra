@@ -84,9 +84,6 @@ class Fruit(pygame.sprite.Sprite):
         self.speedx = 0
         self.speedy = 0
         
-    def update(self):
-        self.rect.x = self.rect.x
-        self.rect.y = self.rect.y
 
 
 class Orbe(pygame.sprite.Sprite):
@@ -100,12 +97,12 @@ class Orbe(pygame.sprite.Sprite):
         self.frame = 0                         # Guarda índice atual na animação
         self.image = self.anim[self.frame]     # Pega a primeira imagem
         self.rect = self.image.get_rect()
-        self.rect.x = random.randint(0, WIDTH - object_WIDTH)
-        self.rect.y = random.randint(0, HEIGHT - object_HEIGHT)
+        self.rect.x = random.randint(0, WIDTH - (object_WIDTH + 50))
+        self.rect.y = random.randint(0, HEIGHT - (object_HEIGHT + 50))
         # Guarda o tick que a imagem foi mostrada
         self.last_update = pygame.time.get_ticks()
         # Próxima imagem da animação (intervalo)
-        self.frame_ticks = 50
+        self.frame_ticks = 100
 
     def update(self):
         # Verifica o tick atual
@@ -123,11 +120,8 @@ class Orbe(pygame.sprite.Sprite):
                 # Se terminou: começa de novo
                 self.frame = 0
             else:
-                # Se não, passa para próxima imagem
-                self.image = self.anim[self.frame]
-                self.rect = self.image.get_rect()
-                self.rect.x = self.rect.x
-                self.rect.y = self.rect.y
+             #Se não, passa para próxima imagem
+               self.image = self.anim[self.frame]
 
 
 # ----- Cria grupos
