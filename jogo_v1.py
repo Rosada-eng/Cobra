@@ -13,27 +13,36 @@ window = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption ('The SNAKE is gonna SMOKE!! ')
 
 # ----- Carrega os Assets:
-bixinho_WIDTH = 30
-bixinho_HEIGHT = 30
+bixinho_WIDTH = 25
+bixinho_HEIGHT = 25
 object_WIDTH = 20
 object_HEIGHT = 20
 assets = {}
 
 background = pygame.image.load ('assets/img/terra_solo.jpg').convert()
 background = pygame.transform.scale (background, (WIDTH, HEIGHT))
-bixinho = pygame.image.load ('assets/img/lindwurm.png').convert_alpha()
+bixinho = pygame.image.load ('assets/img/head_img.png').convert_alpha()
 bixinho = pygame.transform.scale (bixinho, (bixinho_WIDTH, bixinho_HEIGHT))
 cereja = pygame.image.load ('assets/img/cereja.png').convert_alpha()
 cereja = pygame.transform.scale (cereja, (object_WIDTH, object_HEIGHT))
 maca = pygame.image.load ('assets/img/maca.png').convert_alpha()
 maca = pygame.transform.scale (maca, (object_WIDTH, object_HEIGHT))
+body_image = pygame.image.load('assets/img/body1_img.png').convert_alpha()
+body_image = pygame.transform.scale(body_image, (object_WIDTH, object_HEIGHT))
 # Carrega orbs para animação
 orbs_anim = []
 for i in range(1, 6):
     nome_arquivo = 'assets/img/orb{}.png'.format(i)
     img = pygame.image.load(nome_arquivo).convert_alpha()
-    img = pygame.transform.scale (img, (20, 20))
+    img = pygame.transform.scale (img, (object_WIDTH, object_HEIGHT))
     orbs_anim.append(img)
+# Carrega imagens da barra de vida
+health_barr = []
+for i in range(0, 21):
+    nome_arquivo = 'assets/img/health/VIDA_{0}.png'.format(i)
+    img = pygame.image.load(nome_arquivo).convert_alpha()
+    img = pygame.transform.scale(img, (int(img.get_width()/2), int(img.get_height()/2)))
+    health_barr.append(img)
 
 score_font = pygame.font.SysFont (None, 26) # Falta adicionar estilo da fonte do placar
 
@@ -56,10 +65,10 @@ class Snake(pygame.sprite.Sprite):
         self.rect.centerx = random.randint(0, WIDTH - bixinho_WIDTH)
         self.rect.centery = random.randint(0, HEIGHT - bixinho_HEIGHT)
         self.speedx = 0
-        self.speedy = -6 # Começa com velocidade para cima
+        self.speedy = 0 # Começa com velocidade zero (jogador decide como começar)
 
     def update(self):
-        # Atualiza a posição da cobrinha:
+        # Atualiza a posição da cabeça da cobrinha:
         self.rect.x += self.speedx
         self.rect.y += self.speedy
         # Limita posições em que pode andar:
@@ -71,6 +80,17 @@ class Snake(pygame.sprite.Sprite):
             self.rect.bottom = HEIGHT
         if self.rect.top <0:
             self.rect.top =0
+
+class Snake_Body(pygame.sprite.Sprite):
+    def __init__(self, img, parte_seguinte, player): # 'parte_seguinte' é o pedaço a frente do que será criado
+        # Construtor da classe mãe
+        pygame.sprite.Sprite.__init__(self)
+
+        self.image = img
+        self.rect = self.image.get_rect()
+        self.player = player
+
+
 
 class Fruit(pygame.sprite.Sprite):
     def __init__(self, img):
@@ -84,7 +104,6 @@ class Fruit(pygame.sprite.Sprite):
         self.speedx = 0
         self.speedy = 0
         
-
         
 class Orbe(pygame.sprite.Sprite):
     def __init__(self, anim):
@@ -124,17 +143,40 @@ class Orbe(pygame.sprite.Sprite):
                self.image = self.anim[self.frame]
 
 
+class Life(pygame.sprite.Sprite):
+    def __init__(self, barr, vida):
+        # Construtor da classe mãe
+        pygame.sprite.Sprite.__init__(self)
 
-# ----- Cria grupos
+        self.barr = health_barr
+        self.frame = 20  # Começa com vida cheia
+        self.image = self.barr[self.frame]
+        self.rect = self.image.get_rect()
+        self.rect.x = 0
+        self.rect.y = 0
+        # Guarda valor da vida
+        self.vida = vida
+
+    def update(self):
+        # Verifica valor da vida e atualiza barra de vida
+        self.vida = vida
+        self.frame = (2*vida)
+        self.image = self.barr[self.frame]
+                
+
+
+# ----- Cria grupos de sprite
 all_sprites = pygame.sprite.Group()
 all_fruits = pygame.sprite.Group()
 all_orbs = pygame.sprite.Group()
+snake_body = pygame.sprite.Group()
 
-# ----- Cria jogador:
+# ----- Cria jogador e o adiciona nos grupos:
 player = Snake(bixinho)
 all_sprites.add(player)
+snake_body.add(player)
 
-# ----- Cria frutas
+# ----- Cria frutas e as adiciona nos grupos
 apple = Fruit(maca)
 cherry = Fruit(cereja)
 for i in range (2):
@@ -143,15 +185,23 @@ for i in range (2):
     all_fruits.add(cherry)
     all_sprites.add(cherry)
 
-# ----- Cria orbs
+# ----- Cria barra de vida e a adiciona em all_sprites
+vida = 10
+barra_vida = Life(health_barr, vida)
+all_sprites.add(barra_vida)
+
+# ----- Cria orbs e adiciona nos sprites
 orbes = Orbe(orbs_anim)
 all_sprites.add(orbes)
 all_orbs.add(orbes)
 
+
 score = 0
 colisao = 0
 delay_orbe = 30000 #30 seg 
-# ====== LOOP PRINCIPAL =====
+
+
+# ============ LOOP PRINCIPAL ============
 while game:
     clock.tick(FPS)
 
@@ -178,7 +228,6 @@ while game:
                 player.speedx = 0
             
 
-
     # ----- Atualiza estado do jogo
     # Atualizando posição do Player
     all_sprites.update()        
@@ -202,6 +251,9 @@ while game:
     if len(hits)>0:
         colisao = 1
         last_update = pygame.time.get_ticks()
+        vida -= 1
+        if vida == 0: # Se a vida zerar, game over
+            game = False
 
     if colisao != 0:
         now = pygame.time.get_ticks()
@@ -214,16 +266,13 @@ while game:
             all_orbs.add(orbes)
             all_sprites.add(orbes)
             colisao = 0
-
-       
+  
 
     # ---- Gera Saídas:
     window.fill ((0,0,0))                   # preenche a tela com a cor preta
-    #window.blit (background, (0, 0))        # insere imagem background
     window.blit (player.image, player.rect) # insere imagem player
     
     # Desenha os objetos:
-
 
     # Desenha o placar
     text_surface = score_font.render ("{:08d}".format(score), True, (255, 255, 255))
@@ -237,6 +286,5 @@ while game:
     pygame.display.update()
 
 
-
-# ===== FINALIZAÇÃO =====
+# ========== FINALIZAÇÃO ==========
 pygame.quit()
