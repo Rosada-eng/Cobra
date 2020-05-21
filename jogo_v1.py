@@ -7,8 +7,8 @@ pygame.init()
 
 
 # ---- Gerar tela principal
-WIDTH = 600
-HEIGHT = 600
+WIDTH = 20*32
+HEIGHT = 30*32
 window = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption ('The SNAKE is gonna SMOKE!! ')
 
@@ -122,6 +122,7 @@ class Orbe(pygame.sprite.Sprite):
             else:
              #Se não, passa para próxima imagem
                self.image = self.anim[self.frame]
+
 
 
 # ----- Cria grupos
