@@ -5,14 +5,16 @@ import random
 
 pygame.init()
 
-
+Delay_movimentos = 3
 # ---- Gerar tela principal
 WIDTH = 20*32
-HEIGHT = 30*32
+HEIGHT = 20*32
 window = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption ('The SNAKE is gonna SMOKE!! ')
 
 # ----- Carrega os Assets:
+snake_WIDHT = 10
+snake_HEIGHT = 10
 bixinho_WIDTH = 25
 bixinho_HEIGHT = 25
 object_WIDTH = 20
@@ -22,13 +24,13 @@ assets = {}
 background = pygame.image.load ('assets/img/terra_solo.jpg').convert()
 background = pygame.transform.scale (background, (WIDTH, HEIGHT))
 bixinho = pygame.image.load ('assets/img/head_img.png').convert_alpha()
-bixinho = pygame.transform.scale (bixinho, (bixinho_WIDTH, bixinho_HEIGHT))
+bixinho = pygame.transform.scale (bixinho, (snake_WIDHT, snake_HEIGHT))
 cereja = pygame.image.load ('assets/img/cereja.png').convert_alpha()
 cereja = pygame.transform.scale (cereja, (object_WIDTH, object_HEIGHT))
 maca = pygame.image.load ('assets/img/maca.png').convert_alpha()
 maca = pygame.transform.scale (maca, (object_WIDTH, object_HEIGHT))
 body_image = pygame.image.load('assets/img/body1_img.png').convert_alpha()
-body_image = pygame.transform.scale(body_image, (object_WIDTH, object_HEIGHT))
+body_image = pygame.transform.scale(body_image, (snake_WIDHT, snake_HEIGHT))
 # Carrega orbs para animação
 orbs_anim = []
 for i in range(1, 6):
@@ -66,6 +68,7 @@ class Snake(pygame.sprite.Sprite):
         self.rect.centery = random.randint(0, HEIGHT - bixinho_HEIGHT)
         self.speedx = 0
         self.speedy = 0 # Começa com velocidade zero (jogador decide como começar)
+        self.ultimas_posicoes = [] # Guarda últimas posições
 
     def update(self):
         # Atualiza a posição da cabeça da cobrinha:
@@ -80,6 +83,9 @@ class Snake(pygame.sprite.Sprite):
             self.rect.bottom = HEIGHT
         if self.rect.top <0:
             self.rect.top =0
+        # Adiciona última posição na lista e limpa lista mantendo as adições mais recentes
+        self.ultimas_posicoes.append(self.rect.center)
+        self.ultimas_posicoes = self.ultimas_posicoes[-Delay_movimentos:]
 
 class Snake_Body(pygame.sprite.Sprite):
     def __init__(self, img, parte_seguinte, player): # 'parte_seguinte' é o pedaço a frente do que será criado
@@ -89,6 +95,16 @@ class Snake_Body(pygame.sprite.Sprite):
         self.image = img
         self.rect = self.image.get_rect()
         self.player = player
+        self.parte_seguinte = parte_seguinte
+        self.rect.center = parte_seguinte.ultimas_posicoes[0]
+        self.ultimas_posicoes = []
+
+    def update(self):
+        # Atualiza posição com a posição mais antiga da parte da frente
+        self.rect.center = self.parte_seguinte.ultimas_posicoes[0]
+        self.ultimas_posicoes.append(self.rect.center)
+        # Guarda as últimas posições e joga fora o resto
+        self.ultimas_posicoes = self.ultimas_posicoes[-Delay_movimentos:]
 
 
 
@@ -175,6 +191,7 @@ snake_body = pygame.sprite.Group()
 player = Snake(bixinho)
 all_sprites.add(player)
 snake_body.add(player)
+ultima_parte = player # Guarda última parte criada para a cobrinha
 
 # ----- Cria frutas e as adiciona nos grupos
 apple = Fruit(maca)
@@ -235,6 +252,12 @@ while game:
     # Verifica se houve colisão do jogador com frutas
     hits = pygame.sprite.spritecollide (player, all_fruits, True)
     if len(hits) > 0:
+        nova_parte = Snake_Body(body_image, ultima_parte, player)
+        all_sprites.add(nova_parte)
+        snake_body.add(nova_parte)
+        # Atualiza última parte 
+        ultima_parte = nova_parte
+
         score += 50
         if hits[0] == apple:
             apple = Fruit(maca)
