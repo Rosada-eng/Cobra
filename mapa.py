@@ -3,10 +3,13 @@
 import pygame
 import random
 from os import path
-from tilemap import *
+import pytmx
+from pytmx.util_pygame import load_pygame
+
 
 # Inicializa pygame
 pygame.init()
+
 
 # ---- Gerar tela principal
 WIDTH = 20*32
@@ -15,12 +18,10 @@ screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption ('The SNAKE is gonna SMOKE!! ')
 
 
-
-
 class TiledMap:
     def __init__ (self, filename):
         # Lê o arquivo .tmx e deixa os tiles transparentes
-        tm = pytmx.load_pygame(filename, pixelalpha = True) 
+        tm = load_pygame(filename, pixelalpha = True) 
         # configurações:
         self.width = tm.width * tm.tilewidth # Num. de Tiles * Tamanho dos Tiles (em X)
         self.height = tm.height * tm.tileheight # Num. de Tiles * Tamanho dos Tiles (em Y)
@@ -39,7 +40,7 @@ class TiledMap:
                     tile = ti(gid)
                     if tile:
                         # Desenha o tile 
-                        surface.blit(tile, (x*self.tmxdata.tilewidth, y*self.tmxdata.tileheight)
+                        surface.blit(tile, (x*self.tmxdata.tilewidth, y*self.tmxdata.tileheight))
     
     def make_map(self):
         temp_surface = pygame.Surface((self.width, self.height))
@@ -47,23 +48,11 @@ class TiledMap:
         return temp_surface
     
 
-
-
-
-# -- Gerar o mapa:
-
-# game_folder = path.dirname(__file__)
-# map_folder = path.join(game_folder, 'maps')
-# map = TiledMap(path.join(map_folder, 'tilemap.tmx'))
-# map_img = map.make_map()
-# map_rect = map_img.get_rect()
+#carregar o Mapa:
+map_folder = path.join(path.dirname(__file__), 'maps')
+map = TiledMap(path.join(map_folder, 'tilemap.tmx'))
+map_img = map.make_map()
+map_rect = map_img.get_rect()
 
 # blit
-screen.blit(map_img, (WIDTH/2, HEIGHT/2))
-
-
-
-
-        
-
-
+screen.blit(map_img, (WIDTH//2, HEIGHT//2))
