@@ -4,9 +4,9 @@ import sys
 from os import path
 #from config import *
 #from sprites import *
-WIDTH = 300
-HEIGHT = 300
-PLAYER_SPEED = 5
+WIDTH = 700
+HEIGHT = 450
+PLAYER_SPEED = 8
 FPS = 60
 clock = pygame.time.Clock()
 dt = clock.tick(FPS)/1000
@@ -99,7 +99,7 @@ class Game:
     def __init__(self):
         pygame.init()
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT)) #cria uma screen com o tamanho pedido
-        pygame.display.set_caption ('Teste mAPA') #muda o título da screen
+        pygame.display.set_caption ('Teste Tiled Map') #muda o título da screen
         self.clock = pygame.time.Clock() #salva na variável o Clock
         pygame.key.set_repeat(500,100) # Inicia a função de repetir (tempo de espera, tempo para repetir cada ação)
         self.load_data()
@@ -109,7 +109,7 @@ class Game:
         game_folder = path.dirname(__file__)
         map_folder = path.join(game_folder, 'maps')
         img_folder = path.join(game_folder, 'assets/img')
-        self.map = TiledMap((path.join(map_folder, 'temporary_map.tmx')))
+        self.map = TiledMap((path.join(map_folder, 'mapa1.tmx')))
         self.map_img = self.map.make_map()
         self.map_rect = self.map_img.get_rect()
         self.cobra =  pygame.image.load(path.join(img_folder, 'cobra_fumando.png')).convert_alpha()
