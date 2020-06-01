@@ -4,7 +4,7 @@
   <export format="tmx"/>
  </editorsettings>
  <tileset firstgid="1" name="terrain" tilewidth="32" tileheight="32" tilecount="483" columns="21">
-  <image source="../../Downloads/Tiles/img/terrain.png" width="672" height="736"/>
+  <image source="../assets/img/terrain.png" width="672" height="736"/>
   <terraintypes>
    <terrain name="Pedra_light" tile="64"/>
    <terrain name="Pedra _ medium" tile="67"/>
