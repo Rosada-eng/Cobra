@@ -75,7 +75,7 @@ class Player(pygame.sprite.Sprite):
                 if self.vy >0:
                     self.y = hits[0].rect.top - self.rect.height
                 if self.vy <0:
-                    self.x = hits[0].rect.bottom
+                    self.y = hits[0].rect.bottom
                 self.vy = 0
                 self.rect.y = self.y    
             ## bugg detected: O personagem teleporta quando colide de baixo para cima
@@ -137,24 +137,24 @@ class Game:
         
 
     def load_data(self):
-        game_folder = path.dirname(__file__)
-        map_folder = path.join(game_folder, 'maps')
-        img_folder = path.join(game_folder, 'assets/img')
-        self.map = TiledMap((path.join(map_folder, 'mapa1.tmx')))
+        game_DIR = path.dirname(__file__)
+        map_DIR = path.join(game_DIR, 'maps')
+        img_DIR = path.join(game_DIR, 'assets/img')
+        self.map = TiledMap((path.join(map_DIR, 'mapa1.tmx')))
         self.map_img = self.map.make_map()
         self.map_rect = self.map_img.get_rect()
-        self.cobra =  pygame.image.load(path.join(img_folder, 'cobra_fumando.png')).convert_alpha()
-        self.cobra_img = pygame.transform.scale(self.cobra, (25, 25))
+        self.snake =  pygame.image.load(path.join(img_DIR, 'cobra_fumando.png')).convert_alpha()
+        self.snake_img = pygame.transform.scale(self.snake, (25, 25))
     
     def new(self):
-        #self.player = Player(self, self.cobra_img, 5, 5)
+        #self.player = Player(self, self.snake_img, 5, 5)
         #cria os grupos:
         self.walls = pygame.sprite.Group()
         # Spawna as barreiras
         for tile_object in self.map.tmxdata.objects:
             
             if tile_object.name == 'player':
-                self.player = Player (self, self.cobra_img, tile_object.x, tile_object.y )
+                self.player = Player (self, self.snake_img, tile_object.x, tile_object.y )
             if tile_object.name == 'Wall':
                 Obstacle(self, tile_object.x, tile_object.y, tile_object.width, tile_object.height)
         # cria câmera
