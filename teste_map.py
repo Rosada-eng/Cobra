@@ -6,10 +6,11 @@ from os import path
 #from sprites import *
 WIDTH = 700
 HEIGHT = 450
-PLAYER_SPEED = 8
+PLAYER_SPEED = 20
 FPS = 60
 clock = pygame.time.Clock()
 dt = clock.tick(FPS)/1000
+
 class TiledMap:
     def __init__ (self, filename):
         tm = pytmx.load_pygame(filename, pixelalpha=True)
@@ -30,13 +31,13 @@ class TiledMap:
         temp_surface = pygame.Surface((self.width, self.height))
         self.render(temp_surface)
         return temp_surface
-
+    
 class Player(pygame.sprite.Sprite):
     def __init__(self, jogo, img, x, y):
         pygame.sprite.Sprite.__init__(self)
         self.jogo = jogo
-        self.x = x*32
-        self.y = y*32
+        self.x = x
+        self.y = y
         self.img = img
         self.rect = self.img.get_rect()
         self.vx, self.vy = 0,0
@@ -57,17 +58,47 @@ class Player(pygame.sprite.Sprite):
             self.vx *= 0.7071 #(multiplica pelo inverso da raiz de 2)
             self.vy *= 0.7071
 
-
+    # Essa função permitiria ao personagem deslizar no eixo em que ele não colide.
+    def collide_with_walls (self, dir):
+        if dir == 'x':
+            hits = pygame.sprite.spritecollide (self, self.jogo.walls, False)
+            if hits:
+                if self.vx >0:
+                    self.x = hits[0].rect.left - self.rect.width
+                if self.vx <0:
+                    self.x = hits[0].rect.right
+                self.vx = 0
+                self.rect.x = self.x
+        if dir == 'y':
+            hits = pygame.sprite.spritecollide (self, self.jogo.walls, False)
+            if hits:
+                if self.vy >0:
+                    self.y = hits[0].rect.top - self.rect.height
+                if self.vy <0:
+                    self.x = hits[0].rect.bottom
+                self.vy = 0
+                self.rect.y = self.y    
+            ## bugg detected: O personagem teleporta quando colide de baixo para cima
     def update(self):   
         self.get_keys()
         self.x += self.vx*dt #delta X = vx*deltaT
         self.y += self.vy*dt #delta Y = vy*deltaT
         #obs.: Aqui, devem ser x e y, e nao rect, pois serão numeros FLOAT e não INT
         self.rect.x = self.x
-        #self.collide_with_walls ('x')#checa condições de colisao em X
+        self.collide_with_walls ('x') #checa condições de colisao em X
         self.rect.y = self.y
-        #self.collide_with_walls('y') #checa condições de colisao em Y
+        self.collide_with_walls('y') #checa condições de colisao em Y
 
+class Obstacle (pygame.sprite.Sprite):
+    def __init__(self, game, x,y, width, height):
+        self.groups = game.walls 
+        pygame.sprite.Sprite.__init__(self, self.groups)
+        self.game = game
+        self.rect = pygame.Rect(x, y, width, height)
+        self.x = x
+        self.y = y
+        self.rect.x = x
+        self.rect.y = y
 
 
 class Camera:
@@ -116,7 +147,17 @@ class Game:
         self.cobra_img = pygame.transform.scale(self.cobra, (25, 25))
     
     def new(self):
-        self.player = Player(self, self.cobra_img, 5, 5)
+        #self.player = Player(self, self.cobra_img, 5, 5)
+        #cria os grupos:
+        self.walls = pygame.sprite.Group()
+        # Spawna as barreiras
+        for tile_object in self.map.tmxdata.objects:
+            
+            if tile_object.name == 'player':
+                self.player = Player (self, self.cobra_img, tile_object.x, tile_object.y )
+            if tile_object.name == 'Wall':
+                Obstacle(self, tile_object.x, tile_object.y, tile_object.width, tile_object.height)
+        # cria câmera
         self.camera = Camera(self.map.width, self.map.height)
 
     def run(self):
