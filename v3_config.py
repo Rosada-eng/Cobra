@@ -16,8 +16,13 @@ img_DIR = path.join(game_DIR, 'assets/img')
 song_DIR = path.join(game_DIR, 'assets', 'song')
 font_DIR = path.join(game_DIR, 'assets', 'fontes')
 
+# Layers: -- Faz o jogo dar blit numa sequência específica
+WALL_LAYER = 1
+PLAYER_LAYER = 3
+FRUITS_LAYER = 2
+
 # Jogador
-PLAYER_SPEED = 20
+PLAYER_SPEED = 15
 delay_movimentos = 3
 
 # Tamanho da cobrinha
@@ -28,6 +33,9 @@ snake_HEIGHT = 10
 object_WIDTH = 20
 object_HEIGHT = 20
 
+
+# LISTA DE FRUTAS
+LISTA_FRUTAS = ['abacaxi.png', 'cereja.png', 'laranja.png', 'limao.png', 'maca.png', 'morango.png', 'uva.png']
 # Cores
 BLACK = (0, 0, 0)
 

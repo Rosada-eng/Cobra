@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.2" tiledversion="1.3.5" orientation="orthogonal" renderorder="right-down" width="50" height="50" tilewidth="32" tileheight="32" infinite="0" nextlayerid="12" nextobjectid="22">
+<map version="1.2" tiledversion="1.3.5" orientation="orthogonal" renderorder="right-down" width="50" height="50" tilewidth="32" tileheight="32" infinite="0" nextlayerid="13" nextobjectid="56">
  <editorsettings>
-  <export format="tmx"/>
+  <export target="mapa_com_frutas.tmx" format="tmx"/>
  </editorsettings>
  <tileset firstgid="1" name="terrain" tilewidth="32" tileheight="32" tilecount="483" columns="21">
   <image source="../assets/img/terrain.png" width="672" height="736"/>
@@ -661,5 +661,37 @@
   <object id="19" name="Wall" x="1250.37" y="609.834" width="25.9167" height="27.6663"/>
   <object id="20" name="Wall" x="0.784074" y="1595.57" width="1598.92" height="4.33297"/>
   <object id="21" name="Wall" x="1.20667" y="0.3335" width="1596.17" height="5.333"/>
+ </objectgroup>
+ <objectgroup id="12" name="frutas">
+  <object id="25" name="fruit" x="30.8692" y="354.996" width="30.8692" height="27.6198"/>
+  <object id="27" name="fruit" x="223.396" y="388.302" width="30.8692" height="27.6198"/>
+  <object id="28" name="fruit" x="378.554" y="320.065" width="30.8692" height="27.6198"/>
+  <object id="29" name="fruit" x="545.898" y="288.383" width="30.8692" height="27.6198"/>
+  <object id="30" name="fruit" x="320.877" y="31.6816" width="30.8692" height="27.6198"/>
+  <object id="31" name="fruit" x="571.893" y="65.8002" width="30.8692" height="27.6198"/>
+  <object id="32" name="fruit" x="892.145" y="69.3156" width="30.8692" height="27.6198"/>
+  <object id="33" name="fruit" x="1185.35" y="33.0427" width="30.8692" height="27.6198"/>
+  <object id="34" name="fruit" x="1248.07" y="97.276" width="30.8692" height="27.6198"/>
+  <object id="35" name="fruit" x="1347.82" y="39.0882" width="30.8692" height="27.6198"/>
+  <object id="36" name="fruit" x="1060.66" y="391.994" width="30.8692" height="27.6198"/>
+  <object id="37" name="fruit" x="1254.87" y="228.765" width="30.8692" height="27.6198"/>
+  <object id="38" name="fruit" x="1410.55" y="258.993" width="30.8692" height="27.6198"/>
+  <object id="39" name="fruit" x="1409.79" y="319.448" width="30.8692" height="27.6198"/>
+  <object id="40" name="fruit" x="1477.8" y="123.725" width="30.8692" height="27.6198"/>
+  <object id="41" name="fruit" x="1542.79" y="998.054" width="30.8692" height="27.6198"/>
+  <object id="42" name="fruit" x="1406.01" y="1183.2" width="30.8692" height="27.6198"/>
+  <object id="43" name="fruit" x="1412.06" y="1382.7" width="30.8692" height="27.6198"/>
+  <object id="44" name="fruit" x="1471.76" y="1507.39" width="30.8692" height="27.6198"/>
+  <object id="45" name="fruit" x="1288.88" y="1538.37" width="30.8692" height="27.6198"/>
+  <object id="46" name="fruit" x="547.552" y="1312.42" width="30.8692" height="27.6198"/>
+  <object id="47" name="fruit" x="803.73" y="1283.7" width="30.8692" height="27.6198"/>
+  <object id="48" name="fruit" x="800.707" y="1344.16" width="30.8692" height="27.6198"/>
+  <object id="49" name="fruit" x="191.624" y="1057.75" width="30.8692" height="27.6198"/>
+  <object id="50" name="fruit" x="282.306" y="993.52" width="30.8692" height="27.6198"/>
+  <object id="51" name="fruit" x="422.108" y="999.566" width="30.8692" height="27.6198"/>
+  <object id="52" name="fruit" x="413.04" y="891.503" width="30.8692" height="27.6198"/>
+  <object id="53" name="fruit" x="518.836" y="835.582" width="30.8692" height="27.6198"/>
+  <object id="54" name="fruit" x="32.1737" y="31.5313" width="30.8692" height="27.6198"/>
+  <object id="55" name="fruit" x="164.419" y="962.537" width="30.8692" height="27.6198"/>
  </objectgroup>
 </map>

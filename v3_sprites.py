@@ -7,13 +7,16 @@ from v3_config import *
 class Snake(pygame.sprite.Sprite):
     def __init__ (self, jogo, img, x, y): #será criado no proprio objeto 'jogo'
         # Construtor da classe mãe:
-        pygame.sprite.Sprite.__init__(self)
-
+        self._layer = PLAYER_LAYER
+        self.groups = jogo.all_sprites 
+        
+        pygame.sprite.Sprite.__init__(self, self.groups)
         self.jogo = jogo       
         self.image = img
         self.x = x #declara as posições (x,y) em que o player será spawnado
         self.y = y
         self.rect = self.image.get_rect()
+        self.rect.center = (x,y)
         self.speedx = 0
         self.speedy = 0 # Começa com velocidade zero 
         self.ultimas_posicoes = [] # Guarda últimas posições
@@ -80,6 +83,8 @@ class Snake(pygame.sprite.Sprite):
 class Snake_Body(pygame.sprite.Sprite):
     def __init__(self, jogo, img, parte_seguinte): # 'parte_seguinte' é o pedaço a frente do que será criado
         # Construtor da classe mãe
+        self._layer = PLAYER_LAYER
+
         pygame.sprite.Sprite.__init__(self)
         self.jogo = jogo
         self.image = img
@@ -98,16 +103,19 @@ class Snake_Body(pygame.sprite.Sprite):
 
 # Arrumar classe para sortear as imagens das frutas
 class Fruit(pygame.sprite.Sprite):
-    def __init__(self, img):
+    def __init__(self, jogo, img, x, y):
+        self.groups = jogo.all_sprites, jogo.fruits
+        self._layer = FRUITS_LAYER
         # Construtor da classe mãe
-        pygame.sprite.Sprite.__init__(self)
-
+        pygame.sprite.Sprite.__init__(self, self.groups)
+        self.jogo = jogo
         self.image = img
+        self.image = pygame.transform.scale(self.image, (object_WIDTH, object_HEIGHT))
         self.rect = self.image.get_rect()
-        self.rect.x = random.randint(0, WIDTH - object_WIDTH)
-        self.rect.y = random.randint(0, HEIGHT - object_HEIGHT)
-        self.speedx = 0
-        self.speedy = 0
+        self.x = x
+        self.y = y
+        self.rect.center = (x,y)
+
                
 class Orbe(pygame.sprite.Sprite):
     def __init__(self, list_img):
@@ -226,10 +234,11 @@ class Player(pygame.sprite.Sprite):
         self.collide_with_walls('y') #checa condições de colisao em Y
 
 class Obstacle (pygame.sprite.Sprite):
-    def __init__(self, game, x,y, width, height):
-        self.groups = game.walls 
+    def __init__(self, jogo, x,y, width, height):
+        self.groups = jogo.walls 
+        self._layer = WALL_LAYER
         pygame.sprite.Sprite.__init__(self, self.groups)
-        self.game = game
+        self.jogo = jogo
         self.rect = pygame.Rect(x, y, width, height)
         self.x = x
         self.y = y
