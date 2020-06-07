@@ -11,6 +11,7 @@ from v3_sprites import *
 class Game:
     def __init__(self):
         pygame.init()
+        pygame.mixer.init()
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT)) #cria uma screen com o tamanho pedido
         pygame.display.set_caption ('Teste Tiled Map') #muda o título da screen
         self.clock = pygame.time.Clock() #salva na variável o Clock
@@ -20,30 +21,21 @@ class Game:
         
 
     def load_data(self):
-        #self.assets = Assets()
-        
+        # cria mapa       
         self.map = TiledMap((path.join(map_DIR, 'mapa1.tmx')))
         self.map_img = self.map.make_map()
         self.map_rect = self.map_img.get_rect()
-
+        # carrega imagens para a cobrinha
         self.SNAKE_HEAD_IMG = pygame.image.load(path.join(img_DIR, 'head_img.png')).convert_alpha()
-        self.SNAKE_HEAD_IMG = pygame.transform.scale(self.SNAKE_HEAD_IMG, (snake_WIDTH, snake_HEIGHT))
-       
+        
+       # imagem para testes
         self.snake =  pygame.image.load(path.join(img_DIR, 'cobra_fumando.png')).convert_alpha()
         self.snake_img = pygame.transform.scale(self.snake, (25, 25))
-
-
+        # carrega as frutas
         self.fruit_images = []
         for fruta in LISTA_FRUTAS:
             self.fruit_images.append((pygame.image.load(path.join(img_DIR, 'fruits', fruta)).convert_alpha()))
 
-        #self.maca_img = pygame.image.load (path.join(img_DIR, 'maca.png')).convert_alpha()
-        #self.maca_img = pygame.transform.scale(self.maca_img, (object_WIDTH, object_HEIGHT))
- 
-       # self.cereja_img = pygame.image.load (path.join(img_DIR, 'cereja.png')).convert_alpha()
-        #self.cereja_img = pygame.transform.scale(self.cereja_img, (object_WIDTH, object_HEIGHT))
-
-        #self.lista_frutas = [self.maca_img, self.cereja_img]
     
     def new(self):
         

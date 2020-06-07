@@ -1,5 +1,6 @@
 import pygame
 from os import path
+from math import pi
 # Configurações da Tela
 WIDTH = 700
 HEIGHT = 450
@@ -34,8 +35,13 @@ object_WIDTH = 20
 object_HEIGHT = 20
 
 
-# LISTA DE FRUTAS
+# FRUTAS
 LISTA_FRUTAS = ['abacaxi.png', 'cereja.png', 'laranja.png', 'limao.png', 'maca.png', 'morango.png', 'uva.png']
+# Configuração do MHS:
+A = 10 # amplitude do movimento
+T = 20000  # período em milisseg
+OMEGA = 2*pi/T
+
 # Cores
 BLACK = (0, 0, 0)
 
@@ -44,3 +50,6 @@ INIT = 0
 GAME = 1
 QUIT = 2
 
+# REFERÊNCIAS
+https://opengameart.org/content/2d-fruits  #tile de frutas
+https://opengameart.org/content/lpc-terrain-repack # tile de terrenos

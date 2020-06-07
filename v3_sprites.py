@@ -3,6 +3,7 @@ import pytmx
 import random
 #from v3_assets import assets
 from v3_config import *
+from math import pi, sin
 
 class Snake(pygame.sprite.Sprite):
     def __init__ (self, jogo, img, x, y): #será criado no proprio objeto 'jogo'
@@ -13,6 +14,7 @@ class Snake(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.jogo = jogo       
         self.image = img
+        self.image = pygame.transform.scale(self.image, (snake_WIDTH, snake_HEIGHT))
         self.x = x #declara as posições (x,y) em que o player será spawnado
         self.y = y
         self.rect = self.image.get_rect()
@@ -115,6 +117,16 @@ class Fruit(pygame.sprite.Sprite):
         self.x = x
         self.y = y
         self.rect.center = (x,y)
+        self.y_0 = y
+
+
+    def update(self):
+        t = pygame.time.get_ticks()
+        phi_0 = 2*pi / (random.randint (1,5)) #phi_inicial: Porção de uma volta.
+        argumento = (OMEGA*t + phi_0)%360 # desconsidera o número de voltas já dadas
+        self.y = self.y_0 + A*sin(argumento)
+        self.rect.center = (self.x, self.y)
+
 
                
 class Orbe(pygame.sprite.Sprite):
