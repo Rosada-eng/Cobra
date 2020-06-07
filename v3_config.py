@@ -51,5 +51,5 @@ GAME = 1
 QUIT = 2
 
 # REFERÊNCIAS
-https://opengameart.org/content/2d-fruits  #tile de frutas
-https://opengameart.org/content/lpc-terrain-repack # tile de terrenos
+#https://opengameart.org/content/2d-fruits  tile de frutas
+#https://opengameart.org/content/lpc-terrain-repack  tile de terrenos
