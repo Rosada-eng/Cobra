@@ -6,7 +6,7 @@ from v3_config import *
 from math import pi, sin
 
 class Snake(pygame.sprite.Sprite):
-    def __init__ (self, jogo, img, x, y): #será criado no proprio objeto 'jogo'
+    def __init__ (self, jogo, img, x, y, tam_total): #será criado no proprio objeto 'jogo'
         # Construtor da classe mãe:
         self._layer = PLAYER_LAYER
         self.groups = jogo.all_sprites 
@@ -14,27 +14,32 @@ class Snake(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.jogo = jogo       
         self.image = img
-        self.image = pygame.transform.scale(self.image, (snake_WIDTH, snake_HEIGHT))
+        self.image = pygame.transform.scale(self.image, (snake_HEAD_WIDTH, snake_HEAD_HEIGHT))
         self.x = x #declara as posições (x,y) em que o player será spawnado
         self.y = y
         self.rect = self.image.get_rect()
-        self.rect.center = (x,y)
+        self.rect.center = (x + snake_HEAD_WIDTH/2 ,y + snake_HEAD_HEIGHT/2)
         self.speedx = 0
         self.speedy = 0 # Começa com velocidade zero 
-        self.ultimas_posicoes = [] # Guarda últimas posições
-
+        self.tam_total = tam_total
+        self.position = [(x,y)]*self.tam_total
+        self.set_direction = []
+        
     def get_keys(self):
         self.speedx, self.speedy = 0,0
         keys = pygame.key.get_pressed() #Salva uma dicionario de keys q estão sendo pressionadas
         if keys[pygame.K_LEFT]:
             self.speedx = -PLAYER_SPEED
+            self.set_direction.append(LEFT)
         if keys[pygame.K_RIGHT]:
             self.speedx = PLAYER_SPEED
+            self.set_direction.append(RIGHT)
         if keys[pygame.K_UP]:
             self.speedy = -PLAYER_SPEED
+            self.set_direction.append(UP)
         if keys[pygame.K_DOWN]:
             self.speedy = PLAYER_SPEED
-
+            self.set_direction.append(DOWN)
 
     def collide_with_walls (self, dir):
         if dir == 'x':
@@ -57,7 +62,7 @@ class Snake(pygame.sprite.Sprite):
                 self.rect.y = self.y  
 
     def update(self):
-        
+        self.last_position = (self.rect.x, self.rect.y) #guarda o (x,y) antes de se mover
         self.get_keys()
         self.x += self.speedx*dt #delta X = vx*deltaT
         self.y += self.speedy*dt #delta Y = vy*deltaT
@@ -67,6 +72,11 @@ class Snake(pygame.sprite.Sprite):
         self.collide_with_walls ('x') #checa condições de colisao em X
         self.rect.y = self.y
         self.collide_with_walls('y') #checa condições de colisao em Y
+        # agora, já temos o novo rect (x,y)
+
+        if (self.rect.x, self.rect.y) != self.last_position:
+                self.position.append ((self.rect.x, self.rect.y))
+                print (self.position[-5:])
                     
               # Não precisa mais dessas limitações (tem barreiras no mapa)      
                     # Limita posições em que pode andar:
@@ -79,19 +89,94 @@ class Snake(pygame.sprite.Sprite):
                     # if self.rect.top <0:
                     #     self.rect.top =0
         # Adiciona última posição na lista e limpa lista mantendo as adições mais recentes
-        self.ultimas_posicoes.append(self.rect.center)
-        self.ultimas_posicoes = self.ultimas_posicoes[-delay_movimentos:] #pega somente os #delay numero de posiçoes
+       
+"""
+Lógica do Movimento:
+a Cabeça vai criar uma lista com as posições toda vez que ela muda de coordenada:
+    Cada parte do corpo deve fazer o mesmo movimento da cabeça, mas com um determinado numero de atrasos.
+        ex.:
+            Suponha que a cabeça seja o elemento 0, a primeira parte do corpo o elemento 1 e, assim sucessivamente..
+            a lista de movimentação vai ser [(x,y) (x2,y2) ....]
+            a cabeça está no elemento n dessa lista (sempre)
+            a parte 1 no elemento [n-1]
+            a parte 2 no elemento [n-2]
+            ...
+            a parte n no elemento [-n]
+"""
+        
+
+class First_Body(pygame.sprite.Sprite):
+    def __init__(self, jogo, img, ref, number): # Ref é a parte do corpo que vem antes da nova entidade
+        # number: é o numero de movimentos que a parte está atrasada em relação à cabeça.
+        # Construtor da classe mãe
+        self._layer = PLAYER_LAYER
+        self.groups = jogo.all_sprites
+
+        pygame.sprite.Sprite.__init__(self, self.groups)
+        self.jogo = jogo
+        self.image = img
+        self.ref = ref
+        self.image = pygame.transform.scale(self.image, (snake_BODY_WIDTH, snake_BODY_HEIGHT))
+        self.rect = self.image.get_rect()
+        self.number = number
+        self.x = self.ref.rect.x  - snake_BODY_WIDTH/2 # O programa está levando em consideração o centro da imagem p/ dar blit
+        self.y = self.ref.rect.y + snake_BODY_HEIGHT/2 #    Isso é consequência da Câmera
+        self.rect.center = (self.x, self.y)
+
+        self.set_direction = STILL
+
+
+    def update(self):
+        self.rect.center = (self.jogo.player.position[-self.number][0] - snake_BODY_WIDTH/2 , self.jogo.player.position[-self.number][1] + snake_BODY_HEIGHT/2)
+        #self.y = self.ref.last_position_y[-1] # Move para a última posição da referencia antes de ela ter se movido
+
+       # if self.rect.center != self.last_position[-1]:
+       #         self.last_position.append (self.rect.center)
+        #self.last_position_y.append (self.y) # Guarda as últimas posições x,y antes de mover
+
+class Body(pygame.sprite.Sprite):
+    def __init__(self, jogo, img, ref, number): # Ref é a parte do corpo que vem antes da nova entidade
+        # number: é o numero de movimentos que a parte está atrasada em relação à cabeça.
+        # Construtor da classe mãe
+        self._layer = PLAYER_LAYER
+        self.groups = jogo.all_sprites
+
+        pygame.sprite.Sprite.__init__(self, self.groups)
+        self.jogo = jogo
+        self.image = img
+        self.ref = ref
+        self.image = pygame.transform.scale(self.image, (snake_BODY_WIDTH, snake_BODY_HEIGHT))
+        self.rect = self.image.get_rect()
+        self.number = number
+        self.x = self.ref.rect.x  - (2*self.number -1)*snake_BODY_WIDTH/2 # O programa está levando em consideração o centro da imagem p/ dar blit
+        self.y = self.ref.rect.y + snake_BODY_HEIGHT/2 #    Isso é consequência da Câmera
+        self.rect.center = (self.x, self.y)
+
+        self.set_direction = STILL
+
+
+    def update(self):
+        self.rect.center = (self.jogo.player.position[-self.number][0] -(2*self.number - 1)* snake_BODY_WIDTH/2 , self.jogo.player.position[-self.number][1] + snake_BODY_HEIGHT/2)
+        #self.y = self.ref.last_position_y[-1] # Move para a última posição da referencia antes de ela ter se movido
+
+       # if self.rect.center != self.last_position[-1]:
+       #         self.last_position.append (self.rect.center)
+        #self.last_position_y.append (self.y) # Guarda as últimas posições x,y antes de mover
+
+      
+  
 
 class Snake_Body(pygame.sprite.Sprite):
     def __init__(self, jogo, img, parte_seguinte): # 'parte_seguinte' é o pedaço a frente do que será criado
         # Construtor da classe mãe
         self._layer = PLAYER_LAYER
+        self.groups = jogo.all_sprites
 
-        pygame.sprite.Sprite.__init__(self)
+        pygame.sprite.Sprite.__init__(self, self.groups)
         self.jogo = jogo
         self.image = img
+        self.image = pygame.transform.scale(self.image, (snake_BODY_WIDTH, snake_BODY_HEIGHT))
         self.rect = self.image.get_rect()
-        #self.player = player
         self.parte_seguinte = parte_seguinte #salva a lista com as últimas posições
         self.rect.center = parte_seguinte.ultimas_posicoes[0] #adota a coordenada da #delayº última posição
         self.ultimas_posicoes = [] #zera a lista 
@@ -103,7 +188,6 @@ class Snake_Body(pygame.sprite.Sprite):
         # Guarda as últimas posições e joga fora o resto
         self.ultimas_posicoes = self.ultimas_posicoes[-delay_movimentos:]
 
-# Arrumar classe para sortear as imagens das frutas
 class Fruit(pygame.sprite.Sprite):
     def __init__(self, jogo, img, x, y):
         self.groups = jogo.all_sprites, jogo.fruits
@@ -121,12 +205,11 @@ class Fruit(pygame.sprite.Sprite):
 
 
     def update(self):
-        t = pygame.time.get_ticks()
+        t = pygame.time.get_ticks()/1000
         phi_0 = 2*pi / (random.randint (1,5)) #phi_inicial: Porção de uma volta.
         argumento = (OMEGA*t + phi_0)%360 # desconsidera o número de voltas já dadas
         self.y = self.y_0 + A*sin(argumento)
         self.rect.center = (self.x, self.y)
-
 
                
 class Orbe(pygame.sprite.Sprite):
@@ -185,7 +268,7 @@ class Life(pygame.sprite.Sprite):
         # Verifica valor da vida e atualiza barra de vida
         self.frame = (2*self.vida)
         self.image = self.barr[self.frame]
- 
+
 
 class Player(pygame.sprite.Sprite):
 

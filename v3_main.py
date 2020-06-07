@@ -27,10 +27,11 @@ class Game:
         self.map_rect = self.map_img.get_rect()
         # carrega imagens para a cobrinha
         self.SNAKE_HEAD_IMG = pygame.image.load(path.join(img_DIR, 'head_img.png')).convert_alpha()
-        
-       # imagem para testes
+        self.snake_body_img = pygame.image.load(path.join(img_DIR, 'body1_img.png')).convert_alpha()
+        # imagem para testes
         self.snake =  pygame.image.load(path.join(img_DIR, 'cobra_fumando.png')).convert_alpha()
         self.snake_img = pygame.transform.scale(self.snake, (25, 25))
+        self.orb3_img = pygame.image.load(path.join(img_DIR, 'orb3.png')).convert_alpha()
         # carrega as frutas
         self.fruit_images = []
         for fruta in LISTA_FRUTAS:
@@ -45,13 +46,19 @@ class Game:
         self.fruits = pygame.sprite.Group()
         # Spawna as barreiras
         for tile_object in self.map.tmxdata.objects:
-            
+            #object_centerx = (tile_object.x + tile_object.width/2)
+            #object_centery = (tile_object.y + tile_object.height/2) 
             if tile_object.name == 'player':
-                self.player = Snake(self, self.SNAKE_HEAD_IMG, tile_object.x, tile_object.y)
-                #self.player_body = 
+                self.player = Snake(self, self.SNAKE_HEAD_IMG, tile_object.x, tile_object.y,3)
+                self.player_body1 = First_Body(self, self.snake_body_img,self.player, 1)
+                self.player_body2 = Body(self, self.snake_body_img, self.player_body1, 2)
+                #self.player_body3 = Body(self, self.snake_body_img,self.player_body2, 3)
+
                 #self.player = Player (self, self.snake_img, tile_object.x, tile_object.y )
             if tile_object.name == 'Wall':
                 Obstacle(self, tile_object.x, tile_object.y, tile_object.width, tile_object.height)
+
+            
             if tile_object.name == 'fruit':
                 #Fruta(self, tile_object.x, tile_object.y)
                 Fruit (self, random.choice(self.fruit_images), tile_object.x, tile_object.y)
@@ -73,7 +80,6 @@ class Game:
 
     def update(self):
         self.all_sprites.update()
-        self.player.update()
         self.camera.update(self.player)
 
         # Player colide com a frutas:
@@ -86,7 +92,12 @@ class Game:
     def draw(self):
         self.screen.blit(self.map_img, self.camera.apply_rect(self.map_rect))
         for sprite in self.all_sprites: #Analisa cada um dos sprites do grupo e mandar imprimir
-            self.screen.blit(sprite.image, self.camera.apply(sprite))
+            if isinstance (sprite, Fruit): # se for relacionado a classe Fruit
+                quad_dist_to_player = (self.player.x - sprite.x)**2 + (self.player.y - sprite.y)**2
+                if quad_dist_to_player <= PLAYER_VISION**2: #spawna a fruta somente se ela estiver dentro do alcance da visão
+                    self.screen.blit(sprite.image, self.camera.apply(sprite))
+            else:
+                self.screen.blit(sprite.image, self.camera.apply(sprite))
 
 
         pygame.display.flip()
