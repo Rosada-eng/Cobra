@@ -4,6 +4,7 @@ import random
 #from v3_assets import assets
 from v3_config import *
 from math import pi, sin
+vect = pygame.math.Vector2
 
 class Snake(pygame.sprite.Sprite):
     def __init__ (self, jogo, img, x, y, tam_total): #será criado no proprio objeto 'jogo'
@@ -15,62 +16,60 @@ class Snake(pygame.sprite.Sprite):
         self.jogo = jogo       
         self.image = img
         self.image = pygame.transform.scale(self.image, (snake_HEAD_WIDTH, snake_HEAD_HEIGHT))
-        self.x = x #declara as posições (x,y) em que o player será spawnado
-        self.y = y
+        self.pos = vect (0, 0)
         self.rect = self.image.get_rect()
-        self.rect.center = (x + snake_HEAD_WIDTH/2 ,y + snake_HEAD_HEIGHT/2)
-        self.speedx = 0
-        self.speedy = 0 # Começa com velocidade zero 
+        self.rect.center = (x + snake_HEAD_WIDTH/2, y + snake_HEAD_HEIGHT/2)
+        self.speed = vect (0, 0) 
         self.tam_total = tam_total
-        self.position = [(x,y)]*self.tam_total
+        self.position = self.pos * self.tam_total
         self.set_direction = []
         
     def get_keys(self):
-        self.speedx, self.speedy = 0,0
+        self.speed = vect (0, 0)
         keys = pygame.key.get_pressed() #Salva uma dicionario de keys q estão sendo pressionadas
         if keys[pygame.K_LEFT]:
-            self.speedx = -PLAYER_SPEED
+            self.speed.x = -PLAYER_SPEED
             self.set_direction.append(LEFT)
         if keys[pygame.K_RIGHT]:
-            self.speedx = PLAYER_SPEED
+            self.speed.x = PLAYER_SPEED
             self.set_direction.append(RIGHT)
         if keys[pygame.K_UP]:
-            self.speedy = -PLAYER_SPEED
+            self.speed.y = -PLAYER_SPEED
             self.set_direction.append(UP)
         if keys[pygame.K_DOWN]:
-            self.speedy = PLAYER_SPEED
+            self.speed.y = PLAYER_SPEED
             self.set_direction.append(DOWN)
 
     def collide_with_walls (self, dir):
         if dir == 'x':
             hits = pygame.sprite.spritecollide (self, self.jogo.walls, False) # retorna uma lista com os elementos do grupo q colidiram
             if hits:
-                if self.speedx >0:
-                    self.x = hits[0].rect.left - self.rect.width
-                if self.speedx <0:
-                    self.x = hits[0].rect.right
-                self.speedx = 0
-                self.rect.x = self.x
+                if self.speed.x >0:
+                    self.pos.x = hits[0].rect.left - self.rect.width
+                if self.speed.x <0:
+                    self.pos.x = hits[0].rect.right
+                self.speed.x = 0
+                self.rect.x = self.pos.x
         if dir == 'y':
             hits = pygame.sprite.spritecollide (self, self.jogo.walls, False)
             if hits:
-                if self.speedy >0:
-                    self.y = hits[0].rect.top - self.rect.height
-                if self.speedy <0:
-                    self.y = hits[0].rect.bottom
-                self.speedy = 0
-                self.rect.y = self.y  
+                if self.speed.y >0:
+                    self.pos.y = hits[0].rect.top - self.rect.height
+                if self.speed.y <pos.0:
+                    self.pos.y = hits[0].rect.bottom
+                self.speed.y = 0
+                self.rect.y = self.pos.y  
 
     def update(self):
         self.last_position = (self.rect.x, self.rect.y) #guarda o (x,y) antes de se mover
         self.get_keys()
-        self.x += self.speedx*dt #delta X = vx*deltaT
-        self.y += self.speedy*dt #delta Y = vy*deltaT
+        self.pos.x += self.speed.x * dt #delta X = vx*deltaT
+        self.pos.y += self.speed.y * dt #delta Y = vy*deltaT
         #obs.1: Usar dt garante que o personagem ande proporcionalmente à velocidade de processamento da maquina
         
-        self.rect.x = self.x
+        self.rect.x = self.pos.x
         self.collide_with_walls ('x') #checa condições de colisao em X
-        self.rect.y = self.y
+        self.rect.y = self.pos.y
         self.collide_with_walls('y') #checa condições de colisao em Y
         # agora, já temos o novo rect (x,y)
 
@@ -121,7 +120,8 @@ class First_Body(pygame.sprite.Sprite):
         self.number = number
         self.x = self.ref.rect.x  - snake_BODY_WIDTH/2 # O programa está levando em consideração o centro da imagem p/ dar blit
         self.y = self.ref.rect.y + snake_BODY_HEIGHT/2 #    Isso é consequência da Câmera
-        self.rect.center = (self.x, self.y)
+        self.pos = vect (self.x, self.y)
+        self.rect.center = self.pos
 
         self.set_direction = STILL
 
@@ -150,7 +150,8 @@ class Body(pygame.sprite.Sprite):
         self.number = number
         self.x = self.ref.rect.x  - (2*self.number -1)*snake_BODY_WIDTH/2 # O programa está levando em consideração o centro da imagem p/ dar blit
         self.y = self.ref.rect.y + snake_BODY_HEIGHT/2 #    Isso é consequência da Câmera
-        self.rect.center = (self.x, self.y)
+        self.pos = vect (self.x, self.y)
+        self.rect.center = self.pos
 
         self.set_direction = STILL
 
@@ -198,9 +199,8 @@ class Fruit(pygame.sprite.Sprite):
         self.image = img
         self.image = pygame.transform.scale(self.image, (object_WIDTH, object_HEIGHT))
         self.rect = self.image.get_rect()
-        self.x = x
-        self.y = y
-        self.rect.center = (x,y)
+        self.pos = vect (x, y)
+        self.rect.center = self.pos
         self.y_0 = y
 
 
@@ -208,8 +208,8 @@ class Fruit(pygame.sprite.Sprite):
         t = pygame.time.get_ticks()/1000
         phi_0 = 2*pi / (random.randint (1,5)) #phi_inicial: Porção de uma volta.
         argumento = (OMEGA*t + phi_0)%360 # desconsidera o número de voltas já dadas
-        self.y = self.y_0 + A*sin(argumento)
-        self.rect.center = (self.x, self.y)
+        self.pos.y = self.y_0 + A*sin(argumento)
+        self.rect.center = (self.pos.x, self.pos.y)
 
                
 class Orbe(pygame.sprite.Sprite):
@@ -275,57 +275,56 @@ class Player(pygame.sprite.Sprite):
     def __init__(self, jogo, img, x, y):
         pygame.sprite.Sprite.__init__(self)
         self.jogo = jogo
-        self.x = x
-        self.y = y
+        self.pos = vect (x, y)
         self.img = img
         self.rect = self.img.get_rect()
-        self.vx, self.vy = 0,0
+        self.speed = vect (0, 0)
 
     def get_keys(self): #Cuida da movimentação
-        self.vx, self.vy = 0,0
+        self.speed = vect (0, 0)
         keys = pygame.key.get_pressed() #Salva uma dicionario de keys q estão sendo pressionadas
         if keys[pygame.K_LEFT]:
-            self.vx = -PLAYER_SPEED
+            self.speed.x = -PLAYER_SPEED
         if keys[pygame.K_RIGHT]:
-            self.vx = PLAYER_SPEED
+            self.speed.x = PLAYER_SPEED
         if keys[pygame.K_UP]:
-            self.vy = -PLAYER_SPEED
+            self.speed.y = -PLAYER_SPEED
         if keys[pygame.K_DOWN]:
-            self.vy = PLAYER_SPEED
+            self.speed.y = PLAYER_SPEED
         # Se eu utilizar elif ao invés do if, a movimentação na diagonal fica bloqueada
-        if self.vx != 0 and self.vy != 0: #ou seja, vx = 100 e vy = 100. Logo, v = 100(raiz(2))
-            self.vx *= 0.7071 #(multiplica pelo inverso da raiz de 2)
-            self.vy *= 0.7071
+        if self.speed.x != 0 and self.speed.y != 0: #ou seja, vx = 100 e vy = 100. Logo, v = 100(raiz(2))
+            self.speed.x *= 0.7071 #(multiplica pelo inverso da raiz de 2)
+            self.speed.y *= 0.7071
 
     # Essa função permitiria ao personagem deslizar no eixo em que ele não colide.
     def collide_with_walls (self, dir):
         if dir == 'x':
             hits = pygame.sprite.spritecollide (self, self.jogo.walls, False)
             if hits:
-                if self.vx >0:
-                    self.x = hits[0].rect.left - self.rect.width
-                if self.vx <0:
-                    self.x = hits[0].rect.right
-                self.vx = 0
-                self.rect.x = self.x
+                if self.speed.x >0:
+                    self.pos.x = hits[0].rect.left - self.rect.width
+                if self.speed.x <0:
+                    self.pos.x = hits[0].rect.right
+                self.speed.x = 0
+                self.rect.x = self.pos.x
         if dir == 'y':
             hits = pygame.sprite.spritecollide (self, self.jogo.walls, False)
             if hits:
-                if self.vy >0:
-                    self.y = hits[0].rect.top - self.rect.height
-                if self.vy <0:
-                    self.y = hits[0].rect.bottom
-                self.vy = 0
-                self.rect.y = self.y    
+                if self.speed.y >0:
+                    self.pos.y = hits[0].rect.top - self.rect.height
+                if self.speed.y <0:
+                    self.pos.y = hits[0].rect.bottom
+                self.speed.y = 0
+                self.rect.y = self.pos.y    
             
     def update(self):   
         self.get_keys()
-        self.x += self.vx*dt #delta X = vx*deltaT
-        self.y += self.vy*dt #delta Y = vy*deltaT
+        self.pos.x += self.speed.x * dt #delta X = vx*deltaT
+        self.pos.y += self.speed.y * dt #delta Y = vy*deltaT
         #obs.: Aqui, devem ser x e y, e nao rect, pois serão numeros FLOAT e não INT
-        self.rect.x = self.x
+        self.rect.x = self.pos.x
         self.collide_with_walls ('x') #checa condições de colisao em X
-        self.rect.y = self.y
+        self.rect.y = self.pos.y
         self.collide_with_walls('y') #checa condições de colisao em Y
 
 class Obstacle (pygame.sprite.Sprite):
@@ -335,10 +334,8 @@ class Obstacle (pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.jogo = jogo
         self.rect = pygame.Rect(x, y, width, height)
-        self.x = x
-        self.y = y
-        self.rect.x = x
-        self.rect.y = y
+        self.pos = vect (x, y)
+        self.rect = self.pos
 
 class Camera:
     def __init__(self, width, height):
