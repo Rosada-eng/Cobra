@@ -11,11 +11,11 @@ FPS = 60
 dt = clock.tick(FPS)/1000
 
 # Identifica diretórios de imagens, sons e fontes
-game_DIR = path.dirname(__file__)
-map_DIR = path.join(game_DIR, 'maps')
-img_DIR = path.join(game_DIR, 'assets/img')
-song_DIR = path.join(game_DIR, 'assets', 'song')
-font_DIR = path.join(game_DIR, 'assets', 'fontes')
+GAME_DIR = path.dirname(__file__)
+MAP_DIR = path.join(GAME_DIR, 'maps')
+IMG_DIR = path.join(GAME_DIR, 'assets/img')
+SONG_DIR = path.join(GAME_DIR, 'assets', 'song')
+FONT_DIR = path.join(GAME_DIR, 'assets', 'fontes')
 
 # Layers: -- Faz o jogo dar blit numa sequência específica
 WALL_LAYER = 1
@@ -32,20 +32,20 @@ PLAYER_VISION = 150
 
 
 # Tamanho da cobrinha
-snake_WIDTH = 64
-snake_HEIGHT = 64
+SNAKE_WIDTH = 64
+SNAKE_HEIGHT = 64
 
 # Tamanho dos objetos
-object_WIDTH = 20
-object_HEIGHT = 20
+OBJECT_WIDTH = 20
+OBJECT_HEIGHT = 20
 
 # === Lista de Imagens p/ carregar
 # FRUTAS
 LISTA_FRUTAS = ['abacaxi.png', 'cereja.png', 'laranja.png', 'limao.png', 'maca.png', 'morango.png', 'uva.png']
-WalkLeft = ['L0.png', 'L1.png', 'L2.png']
-WalkRight = ['R0.png', 'R1.png', 'R2.png']
-WalkUp = ['U0.png', 'U1.png', 'U2.png']
-WalkDown = ['D0.png', 'D1.png', 'D2.png']
+WALK_LEFT = ['L0.png', 'L1.png', 'L2.png']
+WALK_RIGHT = ['R0.png', 'R1.png', 'R2.png']
+WALK_UP = ['U0.png', 'U1.png', 'U2.png']
+WALK_DOWN = ['D0.png', 'D1.png', 'D2.png']
 
 # Configuração do MHS:
 A = 10 # amplitude do movimento
@@ -54,6 +54,10 @@ OMEGA = 2*pi/T
 
 # Cores
 BLACK = (0, 0, 0)
+YELLOW = ()
+GREEN = ()
+RED = ()
+WHITE = (255, 255, 255)
 
 # Estados para controle do fluxo
 INIT = 0
