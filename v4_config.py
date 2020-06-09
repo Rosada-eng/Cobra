@@ -71,7 +71,7 @@ QUIT = 2
 
 # Configurações do mob Bird
 BIRD_IMG = 'tile004.png'
-BIRD_SPEEDS = [20, 15, 10, 5, 10]
+BIRD_SPEEDS = [7, 12, 10, 5, 9]
 BIRD_HEALTH = 100
 BIRD_DAMAGE = 10 # dano que o pássaro causa
 BIRD_KNOCKBACK = 30 # repulsão quando atinge player
@@ -79,7 +79,7 @@ BIRD_HIT_RECT = pygame.Rect (0, 0, 30, 30) #ret. de colisão
 BIRD_ZONE = 100 # círculo que evita superposição de pássaros
 
 # Configurações do veneno da cobra
-VENENO_SPEED = 400
+VENENO_SPEED = 50
 #VENENO_ANIM = []
 VENENO_IMG = 'veneno0.png'
 VENENO_DURATION = 2000

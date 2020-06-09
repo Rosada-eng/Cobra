@@ -26,6 +26,9 @@ class Snake(pygame.sprite.Sprite):
         self.RIGHT = False
         self.UP = False
         self.DOWN = False
+        self.last_shoot = 0 # no começo, não houve disparos
+
+        self.angulo = 0
 
         
     def get_keys(self):
@@ -33,24 +36,28 @@ class Snake(pygame.sprite.Sprite):
         keys = pygame.key.get_pressed() #Salva uma dicionario de keys q estão sendo pressionadas
         if keys[pygame.K_LEFT]:
             self.speed.x = -PLAYER_SPEED
+            self.angulo = 180
             self.LEFT = True
             self.RIGHT = False
             self.UP = False
             self.DOWN = False
         elif keys[pygame.K_RIGHT]:
             self.speed.x = PLAYER_SPEED
+            self.angulo = 0
             self.LEFT = False
             self.RIGHT = True
             self.UP = False
             self.DOWN = False
         elif keys[pygame.K_UP]:
             self.speed.y = -PLAYER_SPEED
+            self.angulo = 90
             self.LEFT = False
             self.RIGHT = False
             self.UP = True
             self.DOWN = False
         elif keys[pygame.K_DOWN]:
             self.speed.y = PLAYER_SPEED
+            self.angulo = 270
             self.LEFT = False
             self.RIGHT = False
             self.UP = False
@@ -60,6 +67,26 @@ class Snake(pygame.sprite.Sprite):
             self.DOWN = False
             self.LEFT = False
             self.RIGHT = False
+        # Configura disparo do veneno
+        if keys[pygame.K_SPACE]:
+            now_time = pygame.time.get_ticks() # grava instante atual
+            if now_time - self.last_shoot > VENENO_FREQUENCY:
+                self.last_shoot = now_time # se passou tempo mínimo, grava novo 'último tiro'
+                if self.LEFT:
+                    dir = vect (-1, 0)
+                elif self.RIGHT:
+                    dir = vect (1, 0)
+                elif self.UP:
+                    dir = vect (0, -1)
+                elif self.LEFT:
+                    dir = vect (0, 1)
+                else:
+                    dir = vect (0, 1) ######## FAZER CORREÇÃO #########               
+                # Posição do tiro: tem que ajustar à boca da cobra quando anda na horizontal
+                pos = self.pos + VENENO_DESLOC_POS.rotate (-self.angulo)
+                Veneno (self.jogo, pos, dir)
+                # Pequeno impulso para trás do disparo
+                self.vel = vect (-KICKBACK, 0)
 
     def collide_with_walls (self, dir):
         if dir == 'x':
@@ -134,7 +161,7 @@ class Snake(pygame.sprite.Sprite):
 
 # ------------ VENENO DA COBRA ------------
 class Veneno (pygame.sprite.Sprite):
-    def __init__ (self, game, pos, dir): # recebe posição e direção do player
+    def __init__ (self, jogo, pos, dir): # recebe posição e direção do player
         self.groups = jogo.all_sprites, jogo.veneno
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.jogo = jogo
@@ -144,8 +171,8 @@ class Veneno (pygame.sprite.Sprite):
         self.hit_rect = self.rect
         self.posic = vect (pos) # corrige erro da cobra e disparo atualizarem com mesma posição
         self.rect.center = self.posic
-        spread = uniform (-VENENO_SPEED, VENENO_SPEED)
-        self.veloc = dir.rotate(spread) * VENENO_DESVIO # desvia vetor velocidade
+        spread = random.uniform (-VENENO_DESVIO, VENENO_DESVIO)
+        self.veloc = dir.rotate(spread) * VENENO_SPEED # pequeno desvio vetor velocidade
         self.spawn_time = pygame.time.get_ticks() # instante que foi criado
 
     def update (self):
