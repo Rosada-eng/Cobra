@@ -1,6 +1,8 @@
 import pygame
 from os import path
 from math import pi
+vect = pygame.math.Vector2
+
 # Configurações da Tela
 WIDTH = 700
 HEIGHT = 450
@@ -75,6 +77,17 @@ BIRD_DAMAGE = 10 # dano que o pássaro causa
 BIRD_KNOCKBACK = 30 # repulsão quando atinge player
 BIRD_HIT_RECT = pygame.Rect (0, 0, 30, 30) #ret. de colisão
 BIRD_ZONE = 100 # círculo que evita superposição de pássaros
+
+# Configurações do veneno da cobra
+VENENO_SPEED = 400
+#VENENO_ANIM = []
+VENENO_IMG = 'veneno0.png'
+VENENO_DURATION = 2000
+VENENO_FREQUENCY = 2000 # frequência de disparos
+VENENO_DESLOC_POS = vect (30, 10) # deslocamento no veneno no disparo (precisa ser ajustado pra cada direção)
+VENENO_DAMAGE = 10 # dano que o veneno causa
+KICKBACK = 75 # recuo de disparo no player
+VENENO_DESVIO = 5 # desvio aleatório do veneno
 
 # REFERÊNCIAS
 """

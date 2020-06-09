@@ -131,6 +131,31 @@ class Snake(pygame.sprite.Sprite):
                 if self.snake_count > 2:
                     self.snake_count = 0
 
+
+# ------------ VENENO DA COBRA ------------
+class Veneno (pygame.sprite.Sprite):
+    def __init__ (self, game, pos, dir): # recebe posição e direção do player
+        self.groups = jogo.all_sprites, jogo.veneno
+        pygame.sprite.Sprite.__init__(self, self.groups)
+        self.jogo = jogo
+        self.image = jogo.veneno_img
+
+        self.rect = self.image.get_rect()
+        self.hit_rect = self.rect
+        self.posic = vect (pos) # corrige erro da cobra e disparo atualizarem com mesma posição
+        self.rect.center = self.posic
+        spread = uniform (-VENENO_SPEED, VENENO_SPEED)
+        self.veloc = dir.rotate(spread) * VENENO_DESVIO # desvia vetor velocidade
+        self.spawn_time = pygame.time.get_ticks() # instante que foi criado
+
+    def update (self):
+        self.posic += self.veloc * dt
+        self.rect.center = self.posic
+        if pygame.sprite.spritecollideany(self, self.jogo.walls):
+            self.kill() # se colide com parede, já era
+        self.time_now = pygame.time.get_ticks()
+        if self.time_now - self.spawn_time > VENENO_DURATION:
+            self.kill() # vida útil do disparo
         
 # ------------ PÁSSARO ------------
 class Bird (pygame.sprite.Sprite):

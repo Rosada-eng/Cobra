@@ -52,7 +52,10 @@ class Game:
             self.fruit_images.append((pygame.image.load(path.join(IMG_DIR, 'fruits', fruta)).convert_alpha()))
 
         # --- Pássaro ---
-        self.bird_img = pygame.image.load(path.join(IMG_DIR, 'tile004.png')).convert_alpha()
+        self.bird_img = pygame.image.load(path.join(IMG_DIR, BIRD_IMG)).convert_alpha()
+
+        # --- Veneno da cobra ---
+        self.veneno_img = pygame.image.load(path.join(IMG_DIR, VENENO_IMG)).convert_alpha()
     
     def new(self):   
         #cria os grupos:
@@ -60,6 +63,7 @@ class Game:
         self.walls = pygame.sprite.Group()
         self.fruits = pygame.sprite.Group()
         self.birds = pygame.sprite.Group ()
+        self.veneno = pygame.sprite.Group()
         # Spawna as barreiras
         for tile_object in self.map.tmxdata.objects:
             if tile_object.name == 'player':
