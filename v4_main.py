@@ -24,39 +24,42 @@ class Game:
         self.map_img = self.map.make_map()
         self.map_rect = self.map_img.get_rect()
 
-        # carrega as imagens para a Snake
+        # --- Cobra ---
+        # Esquerda
         self.snake_left = {}
         for img in WALK_LEFT:
             self.snake_left[img] =  pygame.image.load(path.join(IMG_DIR, 'King Snake', img)).convert_alpha()
             self.snake_left[img] =  pygame.transform.scale(self.snake_left[img], (SNAKE_WIDTH, SNAKE_HEIGHT))
-        
+        # Direita
         self.snake_right = {}
         for img in WALK_RIGHT:
             self.snake_right[img] =  pygame.image.load(path.join(IMG_DIR, 'King Snake', img)).convert_alpha()
             self.snake_right[img] =  pygame.transform.scale(self.snake_right[img], (SNAKE_WIDTH, SNAKE_HEIGHT))
-        
+        # Cima
         self.snake_up = {}
         for img in WALK_UP:
             self.snake_up[img] =  pygame.image.load(path.join(IMG_DIR, 'King Snake', img)).convert_alpha()
             self.snake_up[img] =  pygame.transform.scale(self.snake_up[img], (SNAKE_WIDTH, SNAKE_HEIGHT))
-        
+        # Baixo
         self.snake_down = {}
         for img in WALK_DOWN:
             self.snake_down[img] =  pygame.image.load(path.join(IMG_DIR, 'King Snake', img)).convert_alpha()
             self.snake_down[img] =  pygame.transform.scale(self.snake_down[img], (SNAKE_WIDTH, SNAKE_HEIGHT))
-
         
-        # carrega as frutas
+        # --- Frutas ---
         self.fruit_images = []
         for fruta in LISTA_FRUTAS:
             self.fruit_images.append((pygame.image.load(path.join(IMG_DIR, 'fruits', fruta)).convert_alpha()))
 
+        # --- Pássaro ---
+        self.bird_img = pygame.image.load(path.join(IMG_DIR, 'tile004.png')).convert_alpha()
     
     def new(self):   
         #cria os grupos:
         self.all_sprites = pygame.sprite.LayeredUpdates()
         self.walls = pygame.sprite.Group()
         self.fruits = pygame.sprite.Group()
+        self.birds = pygame.sprite.Group ()
         # Spawna as barreiras
         for tile_object in self.map.tmxdata.objects:
             if tile_object.name == 'player':
@@ -64,7 +67,9 @@ class Game:
             if tile_object.name == 'Wall':
                 Obstacle(self, tile_object.x, tile_object.y, tile_object.width, tile_object.height) 
             if tile_object.name == 'fruit':
-                Fruit (self, random.choice(self.fruit_images), tile_object.x, tile_object.y)             
+                Fruit (self, random.choice(self.fruit_images), tile_object.x, tile_object.y)
+            if tile_object.name == 'Passaro':
+                Bird (self, tile_object.x, tile_object.y)             
         # cria câmera
         self.camera = Camera(self.map.width, self.map.height)
 
@@ -92,6 +97,10 @@ class Game:
     def draw(self):
         self.screen.blit(self.map_img, self.camera.apply_rect(self.map_rect))
         for sprite in self.all_sprites: #Analisa cada um dos sprites do grupo e mandar imprimir
+            # -- Pássaro --
+            if isinstance (sprite, Bird):
+                sprite.draw_life_bar()
+            # -- Fruta --
             if isinstance (sprite, Fruit): # se for relacionado a classe Fruit
                 quad_dist_to_player = (self.player.pos.x - sprite.pos.x)**2 + (self.player.pos.y - sprite.pos.y)**2
                 if quad_dist_to_player <= PLAYER_VISION**2: #spawna a fruta somente se ela estiver dentro do alcance da visão

@@ -22,10 +22,11 @@ WALL_LAYER = 1
 PLAYER_LAYER = 3
 FRUITS_LAYER = 2
 
-# Jogador
+# Configurações do player
 PLAYER_SPEED = 15
-delay_movimentos = 3
+PLAYER_HEALTH = 100
 PLAYER_VISION = 150
+PLAYER_HIT_RECT = pygame.Rect (0, 0, 35, 35)
 
 # DIREÇÃO DE MOVIMENTO
 
@@ -52,17 +53,28 @@ A = 10 # amplitude do movimento
 T = 2000  # período em milisseg
 OMEGA = 2*pi/T
 
-# Cores
+# Arsenal de cores
 BLACK = (0, 0, 0)
-YELLOW = ()
-GREEN = ()
-RED = ()
+YELLOW = (255, 255, 0)
+GREEN = (0, 255, 0)
+RED = (255, 0, 0)
 WHITE = (255, 255, 255)
+BROWN = (106, 55, 5)
+ORANGE = [255, 140, 0]
 
 # Estados para controle do fluxo
 INIT = 0
 GAME = 1
 QUIT = 2
+
+# Configurações do mob Bird
+BIRD_IMG = 'tile004.png'
+BIRD_SPEEDS = [20, 15, 10, 5, 10]
+BIRD_HEALTH = 100
+BIRD_DAMAGE = 10 # dano que o pássaro causa
+BIRD_KNOCKBACK = 30 # repulsão quando atinge player
+BIRD_HIT_RECT = pygame.Rect (0, 0, 30, 30) #ret. de colisão
+BIRD_ZONE = 100 # círculo que evita superposição de pássaros
 
 # REFERÊNCIAS
 """

@@ -5,6 +5,7 @@ from v4_config import *
 from math import pi, sin
 vect = pygame.math.Vector2
 
+# ------------ COBRA ------------
 class Snake(pygame.sprite.Sprite):
     def __init__ (self, jogo, img, x, y): #será criado no proprio objeto 'jogo'
         # Construtor da classe mãe:
@@ -130,8 +131,70 @@ class Snake(pygame.sprite.Sprite):
                 if self.snake_count > 2:
                     self.snake_count = 0
 
-    
+        
+# ------------ PÁSSARO ------------
+class Bird (pygame.sprite.Sprite):
+    def __init__ (self, jogo, x, y):
+        self.groups = jogo.all_sprites, jogo.birds
+        pygame.sprite.Sprite.__init__(self, self.groups)
+        self.jogo = jogo
+        self.image = jogo.bird_img
+        self.rect = self.image.get_rect()
+        self.hit_rect = BIRD_HIT_RECT.copy() # faz cópia do ret. de col. pra cada pássaro
+        self.hit_rect.center = self.rect.center
+        self.posic = vect (x, y) # pos. inicial
+        self.veloc = vect (0, 0) # vel. inicial
+        self.acel = vect (0, 0) # acel. inicial
+        self.rect.center = self.posic
+        self.angulo = 0 # rotação inicial
+        self.health = BIRD_HEALTH
+        self.speed = random.choice (BIRD_SPEEDS)
 
+    def dist_birds (self): # distância entre pássaros
+        for bird in self.jogo.birds:
+            if bird != self:
+                # mede distância
+                dist = self.posic - bird.posic
+                # Se está dentro do círculo, gera aceleração de repulsão
+                if 0 < dist.length() < BIRD_ZONE:
+                    self.acel += dist.normalize()
+
+    def update (self):
+        # -- rotação --
+        self.angulo = (self.jogo.player.pos - self.posic).angle_to(vect(1, 0)) # subtração de vetores: pássaro sempre aponta pro player
+        self.image = pygame.transform.rotate (self.jogo.bird_img, self.angulo) # gira imagem no ângulo acima
+        # -- vetores --
+        self.rect.center = self.posic
+        self.acel = vect (1, 0).rotate(-self.angulo)
+        self.dist_birds() # verifica distância de outros pássaros para ajustar a acel.
+        self.acel.scale_to_length(self.speed)
+        self.acel += self.veloc * (-1) # limita velocidade máxima
+        self.veloc += self.acel * dt
+        self.posic += self.veloc * dt + 0.5*self.acel*dt**2 # s = s0 + v*t + (1/2)*a*t**2
+        # -- colisão com barreiras (não tem)
+        # -- Saúde --
+        if self.health <= 0:
+            self.kill()
+
+    def draw_life_bar (self):
+        # -- Configura cor --
+        if self.health > 75 * BIRD_HEALTH / 100: # 75%
+            color = GREEN
+        elif self.health > 50 * BIRD_HEALTH / 100: # 50%
+            color = YELLOW
+        elif self.health > 25 * BIRD_HEALTH / 100: # 25%
+            color = ORANGE
+        else: 
+            color = RED
+        # -- Configura retângulo --
+        width_bar = int (self.rect.width * self.health / BIRD_HEALTH) # tamanho da barra proporcional à vida
+        self.health_bar = pygame.Rect (0, 0, width_bar, 6)
+        # Só desenha barra quando leva primeiro dano
+        if self.health < BIRD_HEALTH:
+            pygame.draw.rect (self.image, color, self.health_bar)
+
+    
+# ------------ FRUTA ------------
 class Fruit(pygame.sprite.Sprite):
     def __init__(self, jogo, img, x, y):
         self.groups = jogo.all_sprites, jogo.fruits
@@ -159,7 +222,8 @@ class Fruit(pygame.sprite.Sprite):
             delta_t = 0                
         self.pos.y = self.y_0 + A*sin(self.argumento)
         self.rect.center = self.pos
-  
+
+# ------------ ORBE ------------  
 class Orbe(pygame.sprite.Sprite):
     def __init__(self, list_img):
         # Construtor da classe mãe
@@ -218,7 +282,7 @@ class Life(pygame.sprite.Sprite):
         self.image = self.barr[self.frame]
 
 
-
+# ------------ OBSTÁCULO ------------
 class Obstacle (pygame.sprite.Sprite):
     def __init__(self, jogo, x,y, width, height):
         self.groups = jogo.walls 
@@ -231,7 +295,7 @@ class Obstacle (pygame.sprite.Sprite):
         self.rect.x = x
         self.rect.y = y
 
-
+# ------------ CÂMERA ------------
 class Camera:
     def __init__(self, width, height):
         self.camera = pygame.Rect(0, 0, width, height)
@@ -256,6 +320,7 @@ class Camera:
 
         self.camera = pygame.Rect(x, y, self.width, self.height) #ajusta a posição da câmera
 
+# ------------ MAPA ------------
 class TiledMap:
 
     def __init__ (self, filename):
