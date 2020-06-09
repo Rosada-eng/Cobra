@@ -28,7 +28,8 @@ class Snake(pygame.sprite.Sprite):
         self.DOWN = False
         self.last_shoot = 0 # no começo, não houve disparos
 
-        self.angulo = 0
+        self.dir = vect (1, 0) # começa virado pra direita
+        self.last_dir = self.dir
 
         
     def get_keys(self):
@@ -36,28 +37,28 @@ class Snake(pygame.sprite.Sprite):
         keys = pygame.key.get_pressed() #Salva uma dicionario de keys q estão sendo pressionadas
         if keys[pygame.K_LEFT]:
             self.speed.x = -PLAYER_SPEED
-            self.angulo = 180
+            self.dir = vect (-1, 0)
             self.LEFT = True
             self.RIGHT = False
             self.UP = False
             self.DOWN = False
         elif keys[pygame.K_RIGHT]:
             self.speed.x = PLAYER_SPEED
-            self.angulo = 0
+            self.dir = vect (1, 0)
             self.LEFT = False
             self.RIGHT = True
             self.UP = False
             self.DOWN = False
         elif keys[pygame.K_UP]:
             self.speed.y = -PLAYER_SPEED
-            self.angulo = 90
+            self.dir = vect (0, -1)
             self.LEFT = False
             self.RIGHT = False
             self.UP = True
             self.DOWN = False
         elif keys[pygame.K_DOWN]:
             self.speed.y = PLAYER_SPEED
-            self.angulo = 270
+            self.dir = vect (0, 1)
             self.LEFT = False
             self.RIGHT = False
             self.UP = False
@@ -67,23 +68,33 @@ class Snake(pygame.sprite.Sprite):
             self.DOWN = False
             self.LEFT = False
             self.RIGHT = False
+        self.last_dir = self.dir # guarda última direção
         # Configura disparo do veneno
         if keys[pygame.K_SPACE]:
             now_time = pygame.time.get_ticks() # grava instante atual
             if now_time - self.last_shoot > VENENO_FREQUENCY:
                 self.last_shoot = now_time # se passou tempo mínimo, grava novo 'último tiro'
+                # Ajusta posição do disparo dependendo da movimentação que a cobra tava
                 if self.LEFT:
-                    dir = vect (-1, 0)
+                    pos = self.pos + VENENO_DESLOC_LEFT
                 elif self.RIGHT:
-                    dir = vect (1, 0)
+                    pos = self.pos + VENENO_DESLOC_RIGHT
                 elif self.UP:
-                    dir = vect (0, -1)
-                elif self.LEFT:
-                    dir = vect (0, 1)
+                    pos = self.pos + VENENO_DESLOC_UP
+                elif self.DOWN:
+                    pos = self.pos + VENENO_DESLOC_DOWN
                 else:
-                    dir = vect (0, 1) ######## FAZER CORREÇÃO #########               
+                    # Ajusta posição do tiro quando a cobra tava parada
+                    if self.last_dir == vect (1, 0):
+                        pos = self.pos + VENENO_DESLOC_RIGHT            
+                    elif self.last_dir == vect (-1, 0):
+                        pos = self.pos + VENENO_DESLOC_LEFT            
+                    elif self.last_dir == vect (0, -1):
+                        pos = self.pos + VENENO_DESLOC_UP            
+                    else: 
+                        pos = self.pos + VENENO_DESLOC_DOWN            
+                dir = self.last_dir  
                 # Posição do tiro: tem que ajustar à boca da cobra quando anda na horizontal
-                pos = self.pos + VENENO_DESLOC_POS.rotate (-self.angulo)
                 Veneno (self.jogo, pos, dir)
                 # Pequeno impulso para trás do disparo
                 self.vel = vect (-KICKBACK, 0)

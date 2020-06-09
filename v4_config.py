@@ -28,7 +28,7 @@ FRUITS_LAYER = 2
 PLAYER_SPEED = 15
 PLAYER_HEALTH = 100
 PLAYER_VISION = 150
-PLAYER_HIT_RECT = pygame.Rect (0, 0, 35, 35)
+PLAYER_HIT_RECT = pygame.Rect (0, 0, 62, 62)
 
 # DIREÇÃO DE MOVIMENTO
 
@@ -84,7 +84,12 @@ VENENO_SPEED = 50
 VENENO_IMG = 'veneno0.png'
 VENENO_DURATION = 2000
 VENENO_FREQUENCY = 2000 # frequência de disparos
-VENENO_DESLOC_POS = vect (30, 10) # deslocamento no veneno no disparo (precisa ser ajustado pra cada direção)
+
+VENENO_DESLOC_LEFT = vect (15, 10) 
+VENENO_DESLOC_RIGHT = vect (50, 10) 
+VENENO_DESLOC_UP = vect (32, 0) 
+VENENO_DESLOC_DOWN = vect (32, 64) 
+
 VENENO_DAMAGE = 10 # dano que o veneno causa
 KICKBACK = 75 # recuo de disparo no player
 VENENO_DESVIO = 5 # desvio aleatório do veneno
