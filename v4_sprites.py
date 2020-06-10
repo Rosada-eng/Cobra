@@ -16,7 +16,7 @@ class Snake(pygame.sprite.Sprite):
         self.jogo = jogo       
         self.image = img
 
-        self.posit = vect (x, y) #declara as posições (x,y) em que o player será spawnado
+        self.posic = vect (x, y) #declara as posições (x,y) em que o player será spawnado
         self.rect = self.image.get_rect()
         self.rect.center = (x + SNAKE_WIDTH/2 ,y + SNAKE_HEIGHT/2)
         self.veloc = vect (0, 0) # Começa com velocidade zero 
@@ -76,23 +76,23 @@ class Snake(pygame.sprite.Sprite):
                 self.last_shoot = now_time # se passou tempo mínimo, grava novo 'último tiro'
                 # Ajusta posição do disparo dependendo da movimentação que a cobra tava
                 if self.LEFT:
-                    pos = self.posit + VENENO_DESLOC_LEFT
+                    pos = self.posic + VENENO_DESLOC_LEFT
                 elif self.RIGHT:
-                    pos = self.posit + VENENO_DESLOC_RIGHT
+                    pos = self.posic + VENENO_DESLOC_RIGHT
                 elif self.UP:
-                    pos = self.posit + VENENO_DESLOC_UP
+                    pos = self.posic + VENENO_DESLOC_UP
                 elif self.DOWN:
-                    pos = self.posit + VENENO_DESLOC_DOWN
+                    pos = self.posic + VENENO_DESLOC_DOWN
                 else:
                     # Ajusta posição do tiro quando a cobra tava parada
                     if self.last_dir == vect (1, 0):
-                        pos = self.posit + VENENO_DESLOC_RIGHT            
+                        pos = self.posic + VENENO_DESLOC_RIGHT            
                     elif self.last_dir == vect (-1, 0):
-                        pos = self.posit + VENENO_DESLOC_LEFT            
+                        pos = self.posic + VENENO_DESLOC_LEFT            
                     elif self.last_dir == vect (0, -1):
-                        pos = self.posit + VENENO_DESLOC_UP            
+                        pos = self.posic + VENENO_DESLOC_UP            
                     else: 
-                        pos = self.posit + VENENO_DESLOC_DOWN            
+                        pos = self.posic + VENENO_DESLOC_DOWN            
                 dir = self.last_dir  
                 # Posição do tiro: tem que ajustar à boca da cobra quando anda na horizontal
                 Veneno (self.jogo, pos, dir)
@@ -104,31 +104,31 @@ class Snake(pygame.sprite.Sprite):
             hits = pygame.sprite.spritecollide (self, self.jogo.walls, False) # retorna uma lista com os elementos do grupo q colidiram
             if hits:
                 if self.veloc.x >0:
-                    self.posit.x = hits[0].rect.left - self.rect.width
+                    self.posic.x = hits[0].rect.left - self.rect.width
                 if self.veloc.x <0:
-                    self.posit.x = hits[0].rect.right
+                    self.posic.x = hits[0].rect.right
                 self.veloc.x = 0
-                self.rect.x = self.posit.x
+                self.rect.x = self.posic.x
         if dir == 'y':
             hits = pygame.sprite.spritecollide (self, self.jogo.walls, False)
             if hits:
                 if self.veloc.y >0:
-                    self.posit.y = hits[0].rect.top - self.rect.height
+                    self.posic.y = hits[0].rect.top - self.rect.height
                 if self.veloc.y <0:
-                    self.posit.y = hits[0].rect.bottom
+                    self.posic.y = hits[0].rect.bottom
                 self.veloc.y = 0
-                self.rect.y = self.posit.y  
+                self.rect.y = self.posic.y  
 
     def update(self):
 
         self.get_keys()
-        self.posit.x += self.veloc.x * dt #delta X = vx*deltaT
-        self.posit.y += self.veloc.y * dt #delta Y = vy*deltaT
+        self.posic.x += self.veloc.x * dt #delta X = vx*deltaT
+        self.posic.y += self.veloc.y * dt #delta Y = vy*deltaT
         #obs.1: Usar dt garante que o personagem ande proporcionalmente à velocidade de processamento da maquina
         
-        self.rect.x = self.posit.x
+        self.rect.x = self.posic.x
         self.collide_with_walls ('x') #checa condições de colisao em X
-        self.rect.y = self.posit.y
+        self.rect.y = self.posic.y
         self.collide_with_walls('y') #checa condições de colisao em Y
 
         now = pygame.time.get_ticks()
@@ -225,13 +225,16 @@ class Bird (pygame.sprite.Sprite):
 
     def update (self):
         # -- rotação --
-        self.angulo = (self.jogo.player.posit - self.posic).angle_to(vect(1, 0)) # subtração de vetores: pássaro sempre aponta pro player
+        if self.jogo.player.posic != self.posic:
+            self.angulo = (self.jogo.player.posic - self.posic).angle_to(vect(1, 0)) # subtração de vetores: pássaro sempre aponta pro player
+        else:
+            self.angulo = 0
         self.image = pygame.transform.rotate (self.jogo.bird_img, self.angulo) # gira imagem no ângulo acima
         # -- vetores --
         self.rect.center = self.posic
         self.acel = vect (1, 0).rotate(-self.angulo)
         self.dist_birds() # verifica distância de outros pássaros para ajustar a acel.
-        self.acel.scale_to_length(5)
+        self.acel.scale_to_length(choice(BIRD_SPEEDS))
         self.acel += self.veloc * (-1) # limita velocidade máxima
         self.veloc += self.acel * dt
         self.posic += self.veloc * dt + 0.5*self.acel*dt**2 # s = s0 + v*t + (1/2)*a*t**2
