@@ -7,6 +7,25 @@ from v4_config import *
 from v4_sprites import *
 
 
+def health_player_bar(surf, x, y, fracao): # (sup. de desesnho, x, y, porcentagem)
+    if fracao < 0:
+        fracao = 0
+    BAR_LENGTH = 150
+    BAR_HEIGHT = 15
+    preench = fracao * BAR_LENGTH # preenchimento depende da porcentagem
+    contorno_rect = pygame.Rect (x, y, BAR_LENGTH, BAR_HEIGHT) # retangulo (contorno) da barra de vida 
+    preench_rect = pygame.Rect(x, y, preench, BAR_HEIGHT) # retangulo preenchimento
+    if fracao > 0.75:
+        color = GREEN
+    elif fracao > 0.5:
+        color = YELLOW
+    elif fracao > 0.25:
+        color = ORANGE
+    else: 
+        color = RED
+    pygame.draw.rect(surf, color, preench_rect) # desenha 
+    pygame.draw.rect(surf, WHITE, contorno_rect, 3)
+
 class Game:
     def __init__(self):
         pygame.init()
@@ -97,20 +116,30 @@ class Game:
         for hit in hits:
             # coloca alguma função (aumentar stamina, ex.)
             hit.kill()
+        hits = pygame.sprite.spritecollide (self.player, self.birds, False)
+        for hit in hits:
+            self.player.health -= BIRD_DAMAGE
+            hit.speed = vect (0, 0)
+            if self.player.health <= 0:
+                self.playing = False
+        if hits:
+            self.player.posit += vect (BIRD_KNOCKBACK, 0).rotate(-hits[0].angulo)
+        
         
     def draw(self):
         self.screen.blit(self.map_img, self.camera.apply_rect(self.map_rect))
         for sprite in self.all_sprites: #Analisa cada um dos sprites do grupo e mandar imprimir
             # -- Pássaro --
-            if isinstance (sprite, Bird):
-                sprite.draw_life_bar()
+            # if isinstance (sprite, Bird):
+            #     sprite.draw_life_bar()
             # -- Fruta --
             if isinstance (sprite, Fruit): # se for relacionado a classe Fruit
-                quad_dist_to_player = (self.player.pos.x - sprite.pos.x)**2 + (self.player.pos.y - sprite.pos.y)**2
+                quad_dist_to_player = (self.player.posit.x - sprite.pos.x)**2 + (self.player.posit.y - sprite.pos.y)**2
                 if quad_dist_to_player <= PLAYER_VISION**2: #spawna a fruta somente se ela estiver dentro do alcance da visão
                     self.screen.blit(sprite.image, self.camera.apply(sprite))
             else:
                 self.screen.blit(sprite.image, self.camera.apply(sprite))
+        health_player_bar(self.screen, 10, 10, self.player.health / PLAYER_HEALTH)
         pygame.display.flip()
 
     def quit(self):

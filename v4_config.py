@@ -84,7 +84,7 @@ VENENO_SPEED = 50
 VENENO_IMG = 'veneno0.png'
 VENENO_DURATION = 2000
 VENENO_FREQUENCY = 2000 # frequência de disparos
-
+VENENO_HIT_RECT = pygame.Rect (0, 0, 16, 16)
 VENENO_DESLOC_LEFT = vect (15, 10) 
 VENENO_DESLOC_RIGHT = vect (50, 10) 
 VENENO_DESLOC_UP = vect (32, 0) 

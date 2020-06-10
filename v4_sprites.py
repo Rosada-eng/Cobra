@@ -1,6 +1,6 @@
 import pygame
 import pytmx
-import random
+from random import choice, randint, uniform
 from v4_config import *
 from math import pi, sin
 vect = pygame.math.Vector2
@@ -16,10 +16,10 @@ class Snake(pygame.sprite.Sprite):
         self.jogo = jogo       
         self.image = img
 
-        self.pos = vect (x, y) #declara as posições (x,y) em que o player será spawnado
+        self.posit = vect (x, y) #declara as posições (x,y) em que o player será spawnado
         self.rect = self.image.get_rect()
         self.rect.center = (x + SNAKE_WIDTH/2 ,y + SNAKE_HEIGHT/2)
-        self.speed = vect (0, 0) # Começa com velocidade zero 
+        self.veloc = vect (0, 0) # Começa com velocidade zero 
         self.last_update = pygame.time.get_ticks()
         self.snake_count = 0
         self.LEFT = False
@@ -27,37 +27,37 @@ class Snake(pygame.sprite.Sprite):
         self.UP = False
         self.DOWN = False
         self.last_shoot = 0 # no começo, não houve disparos
-
+        self.health = PLAYER_HEALTH
         self.dir = vect (1, 0) # começa virado pra direita
         self.last_dir = self.dir
 
         
     def get_keys(self):
-        self.speed = vect (0, 0)
+        self.veloc = vect (0, 0)
         keys = pygame.key.get_pressed() #Salva uma dicionario de keys q estão sendo pressionadas
         if keys[pygame.K_LEFT]:
-            self.speed.x = -PLAYER_SPEED
+            self.veloc.x = -PLAYER_SPEED
             self.dir = vect (-1, 0)
             self.LEFT = True
             self.RIGHT = False
             self.UP = False
             self.DOWN = False
         elif keys[pygame.K_RIGHT]:
-            self.speed.x = PLAYER_SPEED
+            self.veloc.x = PLAYER_SPEED
             self.dir = vect (1, 0)
             self.LEFT = False
             self.RIGHT = True
             self.UP = False
             self.DOWN = False
         elif keys[pygame.K_UP]:
-            self.speed.y = -PLAYER_SPEED
+            self.veloc.y = -PLAYER_SPEED
             self.dir = vect (0, -1)
             self.LEFT = False
             self.RIGHT = False
             self.UP = True
             self.DOWN = False
         elif keys[pygame.K_DOWN]:
-            self.speed.y = PLAYER_SPEED
+            self.veloc.y = PLAYER_SPEED
             self.dir = vect (0, 1)
             self.LEFT = False
             self.RIGHT = False
@@ -76,23 +76,23 @@ class Snake(pygame.sprite.Sprite):
                 self.last_shoot = now_time # se passou tempo mínimo, grava novo 'último tiro'
                 # Ajusta posição do disparo dependendo da movimentação que a cobra tava
                 if self.LEFT:
-                    pos = self.pos + VENENO_DESLOC_LEFT
+                    pos = self.posit + VENENO_DESLOC_LEFT
                 elif self.RIGHT:
-                    pos = self.pos + VENENO_DESLOC_RIGHT
+                    pos = self.posit + VENENO_DESLOC_RIGHT
                 elif self.UP:
-                    pos = self.pos + VENENO_DESLOC_UP
+                    pos = self.posit + VENENO_DESLOC_UP
                 elif self.DOWN:
-                    pos = self.pos + VENENO_DESLOC_DOWN
+                    pos = self.posit + VENENO_DESLOC_DOWN
                 else:
                     # Ajusta posição do tiro quando a cobra tava parada
                     if self.last_dir == vect (1, 0):
-                        pos = self.pos + VENENO_DESLOC_RIGHT            
+                        pos = self.posit + VENENO_DESLOC_RIGHT            
                     elif self.last_dir == vect (-1, 0):
-                        pos = self.pos + VENENO_DESLOC_LEFT            
+                        pos = self.posit + VENENO_DESLOC_LEFT            
                     elif self.last_dir == vect (0, -1):
-                        pos = self.pos + VENENO_DESLOC_UP            
+                        pos = self.posit + VENENO_DESLOC_UP            
                     else: 
-                        pos = self.pos + VENENO_DESLOC_DOWN            
+                        pos = self.posit + VENENO_DESLOC_DOWN            
                 dir = self.last_dir  
                 # Posição do tiro: tem que ajustar à boca da cobra quando anda na horizontal
                 Veneno (self.jogo, pos, dir)
@@ -103,32 +103,32 @@ class Snake(pygame.sprite.Sprite):
         if dir == 'x':
             hits = pygame.sprite.spritecollide (self, self.jogo.walls, False) # retorna uma lista com os elementos do grupo q colidiram
             if hits:
-                if self.speed.x >0:
-                    self.pos.x = hits[0].rect.left - self.rect.width
-                if self.speed.x <0:
-                    self.pos.x = hits[0].rect.right
-                self.speed.x = 0
-                self.rect.x = self.pos.x
+                if self.veloc.x >0:
+                    self.posit.x = hits[0].rect.left - self.rect.width
+                if self.veloc.x <0:
+                    self.posit.x = hits[0].rect.right
+                self.veloc.x = 0
+                self.rect.x = self.posit.x
         if dir == 'y':
             hits = pygame.sprite.spritecollide (self, self.jogo.walls, False)
             if hits:
-                if self.speed.y >0:
-                    self.pos.y = hits[0].rect.top - self.rect.height
-                if self.speed.y <0:
-                    self.pos.y = hits[0].rect.bottom
-                self.speed.y = 0
-                self.rect.y = self.pos.y  
+                if self.veloc.y >0:
+                    self.posit.y = hits[0].rect.top - self.rect.height
+                if self.veloc.y <0:
+                    self.posit.y = hits[0].rect.bottom
+                self.veloc.y = 0
+                self.rect.y = self.posit.y  
 
     def update(self):
 
         self.get_keys()
-        self.pos.x += self.speed.x * dt #delta X = vx*deltaT
-        self.pos.y += self.speed.y * dt #delta Y = vy*deltaT
+        self.posit.x += self.veloc.x * dt #delta X = vx*deltaT
+        self.posit.y += self.veloc.y * dt #delta Y = vy*deltaT
         #obs.1: Usar dt garante que o personagem ande proporcionalmente à velocidade de processamento da maquina
         
-        self.rect.x = self.pos.x
+        self.rect.x = self.posit.x
         self.collide_with_walls ('x') #checa condições de colisao em X
-        self.rect.y = self.pos.y
+        self.rect.y = self.posit.y
         self.collide_with_walls('y') #checa condições de colisao em Y
 
         now = pygame.time.get_ticks()
@@ -177,18 +177,19 @@ class Veneno (pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.jogo = jogo
         self.image = jogo.veneno_img
-
         self.rect = self.image.get_rect()
-        self.hit_rect = self.rect
+        self.hit_rect = VENENO_HIT_RECT
+        self.hit_rect.center = self.rect.center
         self.posic = vect (pos) # corrige erro da cobra e disparo atualizarem com mesma posição
         self.rect.center = self.posic
-        spread = random.uniform (-VENENO_DESVIO, VENENO_DESVIO)
+        spread = uniform (-VENENO_DESVIO, VENENO_DESVIO)
         self.veloc = dir.rotate(spread) * VENENO_SPEED # pequeno desvio vetor velocidade
         self.spawn_time = pygame.time.get_ticks() # instante que foi criado
 
     def update (self):
         self.posic += self.veloc * dt
         self.rect.center = self.posic
+        self.hit_rect.center = self.rect.center
         if pygame.sprite.spritecollideany(self, self.jogo.walls):
             self.kill() # se colide com parede, já era
         self.time_now = pygame.time.get_ticks()
@@ -210,8 +211,8 @@ class Bird (pygame.sprite.Sprite):
         self.acel = vect (0, 0) # acel. inicial
         self.rect.center = self.posic
         self.angulo = 0 # rotação inicial
-        self.health = BIRD_HEALTH
-        self.speed = random.choice (BIRD_SPEEDS)
+        #self.health = BIRD_HEALTH
+        self.speed = choice(BIRD_SPEEDS)
 
     def dist_birds (self): # distância entre pássaros
         for bird in self.jogo.birds:
@@ -224,37 +225,37 @@ class Bird (pygame.sprite.Sprite):
 
     def update (self):
         # -- rotação --
-        self.angulo = (self.jogo.player.pos - self.posic).angle_to(vect(1, 0)) # subtração de vetores: pássaro sempre aponta pro player
+        self.angulo = (self.jogo.player.posit - self.posic).angle_to(vect(1, 0)) # subtração de vetores: pássaro sempre aponta pro player
         self.image = pygame.transform.rotate (self.jogo.bird_img, self.angulo) # gira imagem no ângulo acima
         # -- vetores --
         self.rect.center = self.posic
         self.acel = vect (1, 0).rotate(-self.angulo)
         self.dist_birds() # verifica distância de outros pássaros para ajustar a acel.
-        self.acel.scale_to_length(self.speed)
+        self.acel.scale_to_length(5)
         self.acel += self.veloc * (-1) # limita velocidade máxima
         self.veloc += self.acel * dt
         self.posic += self.veloc * dt + 0.5*self.acel*dt**2 # s = s0 + v*t + (1/2)*a*t**2
         # -- colisão com barreiras (não tem)
         # -- Saúde --
-        if self.health <= 0:
-            self.kill()
+        # if self.health <= 0:
+        #     self.kill()
 
-    def draw_life_bar (self):
-        # -- Configura cor --
-        if self.health > 75 * BIRD_HEALTH / 100: # 75%
-            color = GREEN
-        elif self.health > 50 * BIRD_HEALTH / 100: # 50%
-            color = YELLOW
-        elif self.health > 25 * BIRD_HEALTH / 100: # 25%
-            color = ORANGE
-        else: 
-            color = RED
-        # -- Configura retângulo --
-        width_bar = int (self.rect.width * self.health / BIRD_HEALTH) # tamanho da barra proporcional à vida
-        self.health_bar = pygame.Rect (0, 0, width_bar, 6)
-        # Só desenha barra quando leva primeiro dano
-        if self.health < BIRD_HEALTH:
-            pygame.draw.rect (self.image, color, self.health_bar)
+    # def draw_life_bar (self):
+    #     # -- Configura cor --
+    #     if self.health > 75 * BIRD_HEALTH / 100: # 75%
+    #         color = GREEN
+    #     elif self.health > 50 * BIRD_HEALTH / 100: # 50%
+    #         color = YELLOW
+    #     elif self.health > 25 * BIRD_HEALTH / 100: # 25%
+    #         color = ORANGE
+    #     else: 
+    #         color = RED
+    #     # -- Configura retângulo --
+    #     width_bar = int (self.rect.width * self.health / BIRD_HEALTH) # tamanho da barra proporcional à vida
+    #     self.health_bar = pygame.Rect (0, 0, width_bar, 6)
+    #     # Só desenha barra quando leva primeiro dano
+    #     if self.health < BIRD_HEALTH:
+    #         pygame.draw.rect (self.image, color, self.health_bar)
 
     
 # ------------ FRUTA ------------
@@ -273,7 +274,7 @@ class Fruit(pygame.sprite.Sprite):
         self.y_0 = self.pos.y
         self.last_update = pygame.time.get_ticks()
         self.t = 0
-        self.phi_0 = 2*pi / (random.randint (1,5)) #phi_inicial: Porção de uma volta.
+        self.phi_0 = 2*pi / (randint (1,5)) #phi_inicial: Porção de uma volta.
         self.argumento = 0
 
 
@@ -298,8 +299,8 @@ class Orbe(pygame.sprite.Sprite):
         self.frame = 0                         # Guarda índice atual na animação
         self.image = self.anim[self.frame]     # Pega a primeira imagem
         self.rect = self.image.get_rect()
-        self.rect.x = random.randint(0, WIDTH - (OBJECT_WIDTH + 50))
-        self.rect.y = random.randint(0, HEIGHT - (OBJECT_HEIGHT + 50))
+        self.rect.x = randint(0, WIDTH - (OBJECT_WIDTH + 50))
+        self.rect.y = randint(0, HEIGHT - (OBJECT_HEIGHT + 50))
         # Guarda o tick que a imagem foi mostrada
         self.last_update = pygame.time.get_ticks()
         # Próxima imagem da animação (intervalo)
