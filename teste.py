@@ -1,6 +1,11 @@
-dic = {}
+import pygame
+vect = pygame.math.Vector2
 
-dic ['bunda'] = ['01']
-dic ['bunda'].append ('02')
+A = vect (3,4)
+B = vect (1,1)
 
-print (dic)
+dir = vect (1,0)
+e = dir.rotate_ip(-90)
+
+
+print (e)

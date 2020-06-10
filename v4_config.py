@@ -5,7 +5,7 @@ vect = pygame.math.Vector2
 
 # Configurações da Tela
 WIDTH = 700
-HEIGHT = 450
+HEIGHT = 700
 
 # Clock
 clock = pygame.time.Clock()
@@ -35,8 +35,8 @@ PLAYER_HIT_RECT = pygame.Rect (0, 0, 62, 62)
 
 
 # Tamanho da cobrinha
-SNAKE_WIDTH = 64
-SNAKE_HEIGHT = 64
+SNAKE_WIDTH = 30
+SNAKE_HEIGHT = 30
 
 # Tamanho dos objetos
 OBJECT_WIDTH = 20
@@ -45,10 +45,21 @@ OBJECT_HEIGHT = 20
 # === Lista de Imagens p/ carregar
 # FRUTAS
 LISTA_FRUTAS = ['abacaxi.png', 'cereja.png', 'laranja.png', 'limao.png', 'maca.png', 'morango.png', 'uva.png']
-WALK_LEFT = ['L0.png', 'L1.png', 'L2.png']
-WALK_RIGHT = ['R0.png', 'R1.png', 'R2.png']
-WALK_UP = ['U0.png', 'U1.png', 'U2.png']
-WALK_DOWN = ['D0.png', 'D1.png', 'D2.png']
+# SNAKE
+SNAKE_WALK_LEFT = ['L0.png', 'L1.png', 'L2.png']
+SNAKE_WALK_RIGHT = ['R0.png', 'R1.png', 'R2.png']
+SNAKE_WALK_UP = ['U0.png', 'U1.png', 'U2.png']
+SNAKE_WALK_DOWN = ['D0.png', 'D1.png', 'D2.png']
+
+# GUAXINIM
+GUAXI_WALK_LEFT = ['L0.png', 'L1.png', 'L2.png']
+GUAXI_WALK_RIGHT = ['R0.png', 'R1.png', 'R2.png']
+GUAXI_WALK_UP = ['U0.png', 'U1.png', 'U2.png']
+GUAXI_WALK_DOWN = ['D0.png', 'D1.png', 'D2.png']
+GUAXI_WIDTH = 40
+GUAXI_HEIGHT = 40
+GUAXI_HIT_RECT = pygame.Rect (0,0, 0.9*GUAXI_WIDTH, 0.9*GUAXI_HEIGHT)
+GUAXI_SPEED = 0.6*PLAYER_SPEED
 
 # Configuração do MHS:
 A = 10 # amplitude do movimento
@@ -77,6 +88,13 @@ BIRD_DAMAGE = 10 # dano que o pássaro causa
 BIRD_KNOCKBACK = 30 # repulsão quando atinge player
 BIRD_HIT_RECT = pygame.Rect (0, 0, 30, 30) #ret. de colisão
 BIRD_ZONE = 100 # círculo que evita superposição de pássaros
+# CORUJA
+OWL_WALK_LEFT = ['L0.png', 'L1.png', 'L2.png']
+OWL_WALK_RIGHT = ['R0.png', 'R1.png', 'R2.png']
+OWL_WALK_UP = ['U0.png', 'U1.png', 'U2.png']
+OWL_WALK_DOWN = ['D0.png', 'D1.png', 'D2.png']
+OWL_HEIGHT = 40
+OWL_WIDTH = 50
 
 # Configurações do veneno da cobra
 VENENO_SPEED = 50

@@ -32,7 +32,7 @@ class Game:
         pygame.mixer.init()
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT)) #cria uma screen com o tamanho pedido
         pygame.display.set_caption ('Teste Tiled Map') #muda o título da screen
-        self.clock = pygame.time.Clock() #salva na variável o Clock
+
         pygame.key.set_repeat(500,100) # Inicia a função de repetir (tempo de espera, tempo para repetir cada ação)
         self.load_data()
         
@@ -44,26 +44,71 @@ class Game:
         self.map_rect = self.map_img.get_rect()
 
         # --- Cobra ---
-        # Esquerda
+            # Esquerda
         self.snake_left = {}
-        for img in WALK_LEFT:
+        for img in SNAKE_WALK_LEFT:
             self.snake_left[img] =  pygame.image.load(path.join(IMG_DIR, 'King Snake', img)).convert_alpha()
             self.snake_left[img] =  pygame.transform.scale(self.snake_left[img], (SNAKE_WIDTH, SNAKE_HEIGHT))
-        # Direita
+            # Direita
         self.snake_right = {}
-        for img in WALK_RIGHT:
+        for img in SNAKE_WALK_RIGHT:
             self.snake_right[img] =  pygame.image.load(path.join(IMG_DIR, 'King Snake', img)).convert_alpha()
             self.snake_right[img] =  pygame.transform.scale(self.snake_right[img], (SNAKE_WIDTH, SNAKE_HEIGHT))
-        # Cima
+            # Cima
         self.snake_up = {}
-        for img in WALK_UP:
+        for img in SNAKE_WALK_UP:
             self.snake_up[img] =  pygame.image.load(path.join(IMG_DIR, 'King Snake', img)).convert_alpha()
             self.snake_up[img] =  pygame.transform.scale(self.snake_up[img], (SNAKE_WIDTH, SNAKE_HEIGHT))
-        # Baixo
+            # Baixo
         self.snake_down = {}
-        for img in WALK_DOWN:
+        for img in SNAKE_WALK_DOWN:
             self.snake_down[img] =  pygame.image.load(path.join(IMG_DIR, 'King Snake', img)).convert_alpha()
             self.snake_down[img] =  pygame.transform.scale(self.snake_down[img], (SNAKE_WIDTH, SNAKE_HEIGHT))
+
+        # --- Guaxinim ---
+            # Esquerda
+            self.guaxi_left = {}
+        for img in GUAXI_WALK_LEFT:
+            self.guaxi_left[img] =  pygame.image.load(path.join(IMG_DIR, 'guaxinim_cinza', img)).convert_alpha()
+            self.guaxi_left[img] =  pygame.transform.scale(self.guaxi_left[img], (GUAXI_WIDTH, GUAXI_HEIGHT))
+            # Direita
+        self.guaxi_right = {}
+        for img in GUAXI_WALK_RIGHT:
+            self.guaxi_right[img] =  pygame.image.load(path.join(IMG_DIR, 'guaxinim_cinza', img)).convert_alpha()
+            self.guaxi_right[img] =  pygame.transform.scale(self.guaxi_right[img], (GUAXI_WIDTH, GUAXI_HEIGHT))
+            # Cima
+        self.guaxi_up = {}
+        for img in GUAXI_WALK_UP:
+            self.guaxi_up[img] =  pygame.image.load(path.join(IMG_DIR, 'guaxinim_cinza', img)).convert_alpha()
+            self.guaxi_up[img] =  pygame.transform.scale(self.guaxi_up[img], (GUAXI_WIDTH, GUAXI_HEIGHT))
+            # Baixo
+        self.guaxi_down = {}
+        for img in GUAXI_WALK_DOWN:
+            self.guaxi_down[img] =  pygame.image.load(path.join(IMG_DIR, 'guaxinim_cinza', img)).convert_alpha()
+            self.guaxi_down[img] =  pygame.transform.scale(self.guaxi_down[img], (GUAXI_WIDTH, GUAXI_HEIGHT))
+       
+        # --- Coruja ---
+            # Esquerda
+        self.owl_left = {}
+        for img in OWL_WALK_LEFT:
+            self.owl_left[img] =  pygame.image.load(path.join(IMG_DIR, 'flying_owl', img)).convert_alpha()
+            self.owl_left[img] =  pygame.transform.scale(self.owl_left[img], (OWL_WIDTH, OWL_HEIGHT))
+            # Direita
+        self.owl_right = {}
+        for img in OWL_WALK_RIGHT:
+            self.owl_right[img] =  pygame.image.load(path.join(IMG_DIR, 'flying_owl', img)).convert_alpha()
+            self.owl_right[img] =  pygame.transform.scale(self.owl_right[img], (OWL_WIDTH, OWL_HEIGHT))
+            # Cima
+        self.owl_up = {}
+        for img in OWL_WALK_UP:
+            self.owl_up[img] =  pygame.image.load(path.join(IMG_DIR, 'flying_owl', img)).convert_alpha()
+            self.owl_up[img] =  pygame.transform.scale(self.owl_up[img], (OWL_WIDTH, OWL_HEIGHT))
+            # Baixo
+        self.owl_down = {}
+        for img in OWL_WALK_DOWN:
+            self.owl_down[img] =  pygame.image.load(path.join(IMG_DIR, 'flying_owl', img)).convert_alpha()
+            self.owl_down[img] =  pygame.transform.scale(self.owl_down[img], (OWL_WIDTH, OWL_HEIGHT))
+
         
         # --- Frutas ---
         self.fruit_images = []
@@ -92,7 +137,9 @@ class Game:
             if tile_object.name == 'fruit':
                 Fruit (self, random.choice(self.fruit_images), tile_object.x, tile_object.y)
             if tile_object.name == 'Passaro':
-                Bird (self, tile_object.x, tile_object.y)             
+                Bird (self, tile_object.x, tile_object.y)    
+            if tile_object.name == 'presa1':
+                self.guaxinim = Prey(self, self.guaxi_right['R1.png'], tile_object.x, tile_object.y)         
         # cria câmera
         self.camera = Camera(self.map.width, self.map.height)
 

@@ -213,6 +213,9 @@ class Bird (pygame.sprite.Sprite):
         self.angulo = 0 # rotação inicial
         #self.health = BIRD_HEALTH
         self.speed = choice(BIRD_SPEEDS)
+        self.last_update = pygame.time.get_ticks()
+        self.bird_count = 0
+
 
     def dist_birds (self): # distância entre pássaros
         for bird in self.jogo.birds:
@@ -229,7 +232,7 @@ class Bird (pygame.sprite.Sprite):
         self.image = pygame.transform.rotate (self.jogo.bird_img, self.angulo) # gira imagem no ângulo acima
         # -- vetores --
         self.rect.center = self.posic
-        self.acel = vect (1, 0).rotate(-self.angulo)
+        self.acel = vect (1, 0).rotate(-self.angulo) # declara aceleração de modulo unitario
         self.dist_birds() # verifica distância de outros pássaros para ajustar a acel.
         self.acel.scale_to_length(5)
         self.acel += self.veloc * (-1) # limita velocidade máxima
@@ -239,6 +242,18 @@ class Bird (pygame.sprite.Sprite):
         # -- Saúde --
         # if self.health <= 0:
         #     self.kill()
+
+        # -- Animação --
+        #now = pygame.time.get_ticks()
+        #delta_t = now - self.last_update
+        #self.image = self.jogo.owl_up['U{}.png'.format(self.bird_count)]
+        #if delta_t > 150:
+        #    delta_t = 0
+        #    self.last_update = now
+        #    self.bird_count += 1
+        #    if self.bird_count >2:
+        #        self.bird_count = 0
+
 
     # def draw_life_bar (self):
     #     # -- Configura cor --
@@ -257,7 +272,89 @@ class Bird (pygame.sprite.Sprite):
     #     if self.health < BIRD_HEALTH:
     #         pygame.draw.rect (self.image, color, self.health_bar)
 
+
+# ------------ PRESAS ------------
+class Prey (pygame.sprite.Sprite):
+    def __init__(self, jogo, img, x,y):
+        self.groups = jogo.all_sprites
+        pygame.sprite.Sprite.__init__(self, self.groups)
+        self.jogo = jogo
+        self.image = img
+        self.rect = self.image.get_rect()
+        self.hit_rect = GUAXI_HIT_RECT.copy() # PRECISA DESSE?
+        self.hit_rect.center = self.rect.center
+        self.posic = vect(x, y) # pos. de spawn
+        self.rect.center = self.posic
+        self.dir = vect(1,0) # Versor da velocidade
+        self.speed = GUAXI_SPEED
+        self.veloc = self.dir * self.speed
+
+        self.last_position = vect(x,y) # Ou trabalha com distancia ou com tempo
+        self.distance = vect(0,0) # distância que percorre antes de mudar de direção
+        # variáveis p/ guardar direção de movimento p/ animação
+        self.RIGHT = False
+        self.LEFT = False
+        self.UP = False
+        self.DOWN = False
+        self.last_update = pygame.time.get_ticks()
+        self.guaxi_count = 0
+
+
+    def update(self):
+        now = pygame.time.get_ticks()
+        delta_t = now - self.last_update
+
+        self.posic += self.veloc * dt
+        self.rect.center = self.posic
+        distance = self.posic - self.last_position
+        D = distance.length()
+        if D >= 4*32:
+            self.dir = self.dir.rotate(90)
+            self.veloc = self.dir * self.speed
+            self.last_position = (self.posic.x, self.posic.y)
+            D = 0
+
+        if self.dir == (1,0): #movendo para direita
+            self.image = self.jogo.guaxi_right['R{}.png'.format(self.guaxi_count)]
+            if delta_t > 150:
+                delta_t = 0
+                self.last_update = now
+                self.guaxi_count += 1
+                if self.guaxi_count > 2:
+                    self.guaxi_count = 0
+        
+        elif self.dir == (-1,0): #movendo para esquerda
+            self.image = self.jogo.guaxi_left['L{}.png'.format(self.guaxi_count)]
+            if delta_t > 150:
+                delta_t = 0
+                self.last_update = now
+                self.guaxi_count += 1
+                if self.guaxi_count > 2:
+                    self.guaxi_count = 0
+        
+        elif self.dir == (0,1): # movendo para baixo
+            self.image = self.jogo.guaxi_down['D{}.png'.format(self.guaxi_count)]
+            if delta_t > 150:
+                delta_t = 0
+                self.last_update = now
+                self.guaxi_count += 1
+                if self.guaxi_count > 2:
+                    self.guaxi_count = 0
+        
+        elif self.dir == (0,-1):  #movendo para cima
+            self.image = self.jogo.guaxi_up['U{}.png'.format(self.guaxi_count)]
+            if delta_t > 150:
+                delta_t = 0
+                self.last_update = now
+                self.guaxi_count += 1
+                if self.guaxi_count > 2:
+                    self.guaxi_count = 0
+
+        
+
+        
     
+
 # ------------ FRUTA ------------
 class Fruit(pygame.sprite.Sprite):
     def __init__(self, jogo, img, x, y):
@@ -281,9 +378,10 @@ class Fruit(pygame.sprite.Sprite):
     def update(self):        
         now = pygame.time.get_ticks()
         delta_t = now - self.last_update        
-        self.argumento = (OMEGA * delta_t + self.phi_0) % 360 # desconsidera o número de voltas já dadas
+        self.argumento = (OMEGA * delta_t + self.phi_0) 
         if delta_t > T:
-            delta_t = 0                
+            delta_t = 0  
+            self.last_update = now              
         self.pos.y = self.y_0 + A*sin(self.argumento)
         self.rect.center = self.pos
 
