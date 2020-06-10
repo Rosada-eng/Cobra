@@ -29,6 +29,7 @@ PLAYER_SPEED = 15
 PLAYER_HEALTH = 100
 PLAYER_VISION = 150
 PLAYER_HIT_RECT = pygame.Rect (0, 0, 62, 62)
+<<<<<<< HEAD
 
 # DIREÇÃO DE MOVIMENTO
 
@@ -37,6 +38,11 @@ PLAYER_HIT_RECT = pygame.Rect (0, 0, 62, 62)
 # Tamanho da cobrinha
 SNAKE_WIDTH = 30
 SNAKE_HEIGHT = 30
+=======
+SNAKE_WIDTH = 64
+SNAKE_HEIGHT = 64
+>>>>>>> 8a79fadcbee7d7b2fbc218daa0fe7cf5041e7cbc
+
 
 # Tamanho dos objetos
 OBJECT_WIDTH = 20
@@ -87,6 +93,7 @@ BIRD_HEALTH = 100
 BIRD_DAMAGE = 10 # dano que o pássaro causa
 BIRD_KNOCKBACK = 30 # repulsão quando atinge player
 BIRD_HIT_RECT = pygame.Rect (0, 0, 30, 30) #ret. de colisão
+<<<<<<< HEAD
 BIRD_ZONE = 100 # círculo que evita superposição de pássaros
 # CORUJA
 OWL_WALK_LEFT = ['L0.png', 'L1.png', 'L2.png']
@@ -95,6 +102,9 @@ OWL_WALK_UP = ['U0.png', 'U1.png', 'U2.png']
 OWL_WALK_DOWN = ['D0.png', 'D1.png', 'D2.png']
 OWL_HEIGHT = 40
 OWL_WIDTH = 50
+=======
+BIRD_ZONE = 25 # círculo que evita superposição de pássaros
+>>>>>>> 8a79fadcbee7d7b2fbc218daa0fe7cf5041e7cbc
 
 # Configurações do veneno da cobra
 VENENO_SPEED = 50

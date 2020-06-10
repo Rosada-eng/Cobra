@@ -170,7 +170,7 @@ class Game:
             if self.player.health <= 0:
                 self.playing = False
         if hits:
-            self.player.posit += vect (BIRD_KNOCKBACK, 0).rotate(-hits[0].angulo)
+            self.player.posic += vect (BIRD_KNOCKBACK, 0).rotate(-hits[0].angulo)
         
         
     def draw(self):
@@ -181,7 +181,7 @@ class Game:
             #     sprite.draw_life_bar()
             # -- Fruta --
             if isinstance (sprite, Fruit): # se for relacionado a classe Fruit
-                quad_dist_to_player = (self.player.posit.x - sprite.pos.x)**2 + (self.player.posit.y - sprite.pos.y)**2
+                quad_dist_to_player = (self.player.posic.x - sprite.pos.x)**2 + (self.player.posic.y - sprite.pos.y)**2
                 if quad_dist_to_player <= PLAYER_VISION**2: #spawna a fruta somente se ela estiver dentro do alcance da visão
                     self.screen.blit(sprite.image, self.camera.apply(sprite))
             else:
