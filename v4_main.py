@@ -6,14 +6,15 @@ from os import path
 from v4_config import *
 from v4_sprites import *
 
-
+# ========== HUD do jogo ==========
+# ----- Barra de vida do jogador
 def health_player_bar(surf, x, y, fracao): # (sup. de desesnho, x, y, porcentagem)
     if fracao < 0:
         fracao = 0
-    BAR_LENGTH = 150
+    BAR_WIDTH = 150
     BAR_HEIGHT = 15
-    preench = fracao * BAR_LENGTH # preenchimento depende da porcentagem
-    contorno_rect = pygame.Rect (x, y, BAR_LENGTH, BAR_HEIGHT) # retangulo (contorno) da barra de vida 
+    preench = fracao * BAR_WIDTH # preenchimento depende da porcentagem
+    contorno_rect = pygame.Rect (x, y, BAR_WIDTH, BAR_HEIGHT) # retangulo (contorno) da barra de vida 
     preench_rect = pygame.Rect(x, y, preench, BAR_HEIGHT) # retangulo preenchimento
     if fracao > 0.75:
         color = GREEN
@@ -24,8 +25,21 @@ def health_player_bar(surf, x, y, fracao): # (sup. de desesnho, x, y, porcentage
     else: 
         color = RED
     pygame.draw.rect(surf, color, preench_rect) # desenha 
-    pygame.draw.rect(surf, WHITE, contorno_rect, 3)
+    pygame.draw.rect(surf, BLACK, contorno_rect, 3)
 
+# ----- Barra de Stamina
+def stamine_player_bar (surf, x, y, stamina):
+    BAR_WIDTH = 150
+    BAR_HEIGHT = 10
+    preench = stamina * BAR_WIDTH
+    contorno_rect = pygame.Rect (x, y, BAR_WIDTH, BAR_HEIGHT)
+    preench_rect = pygame.Rect (x, y, preench, BAR_HEIGHT)
+    color = BLUE
+    pygame.draw.rect(surf, color, preench_rect) 
+    pygame.draw.rect(surf, BLACK, contorno_rect, 3)
+
+
+# ========== CENTRAL DE COMANDO ==========
 class Game:
     def __init__(self):
         pygame.init()
@@ -158,11 +172,15 @@ class Game:
     def update(self):
         self.all_sprites.update()
         self.camera.update(self.player)
-        # Player colide com a frutas:
+        # --- Player colide com a frutas:
         hits = pygame.sprite.spritecollide (self.player, self.fruits, False)
         for hit in hits:
-            # coloca alguma função (aumentar stamina, ex.)
+            # frutinha já era
             hit.kill()
+            # aumenta stamina
+            self.player.stamine += FRUTAS_STAMINA
+            if self.player.stamine > SNAKE_MAX_STAMINE:
+                self.player.stamine = SNAKE_MAX_STAMINE
         hits = pygame.sprite.spritecollide (self.player, self.birds, False)
         for hit in hits:
             self.player.health -= BIRD_DAMAGE
@@ -187,6 +205,7 @@ class Game:
             else:
                 self.screen.blit(sprite.image, self.camera.apply(sprite))
         health_player_bar(self.screen, 10, 10, self.player.health / PLAYER_HEALTH)
+        stamine_player_bar (self.screen, 10, 30, self.player.stamine / SNAKE_MAX_STAMINE)
         pygame.display.flip()
 
     def quit(self):

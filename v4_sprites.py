@@ -28,6 +28,7 @@ class Snake(pygame.sprite.Sprite):
         self.DOWN = False
         self.last_shoot = 0 # no começo, não houve disparos
         self.health = PLAYER_HEALTH
+        self.stamine = 0
         self.dir = vect (1, 0) # começa virado pra direita
         self.last_dir = self.dir
 
@@ -425,26 +426,6 @@ class Orbe(pygame.sprite.Sprite):
             else:
              #Se não, passa para próxima imagem
                self.image = self.anim[self.frame]
-
-# Falta importar vida do arquivo onde ficou salva e consertar erro do carregamento da vida
-class Life(pygame.sprite.Sprite):
-    def __init__(self, img, vida):
-        # Construtor da classe mãe
-        pygame.sprite.Sprite.__init__(self)
-
-        self.barr = img
-        self.frame = 20  # Começa com vida cheia
-        self.image = self.barr[self.frame]
-        self.rect = self.image.get_rect()
-        self.rect.x = 0
-        self.rect.y = 0
-        # Guarda valor da vida
-        self.vida = vida
-
-    def update(self):
-        # Verifica valor da vida e atualiza barra de vida
-        self.frame = (2*self.vida)
-        self.image = self.barr[self.frame]
 
 
 # ------------ OBSTÁCULO ------------
