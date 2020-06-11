@@ -38,6 +38,16 @@ def stamine_player_bar (surf, x, y, stamina):
     pygame.draw.rect(surf, color, preench_rect) 
     pygame.draw.rect(surf, BLACK, contorno_rect, 3)
 
+# ----- Barra de carga do disparo
+def poison_charge_bar (surf, x, y, charge):
+    BAR_WIDTH = 150
+    BAR_HEIGHT = 10
+    preench = charge
+    contorno_rect = pygame.Rect (x, y, BAR_WIDTH, BAR_HEIGHT)
+    preench_rect = pygame.Rect (x, y, preench, BAR_HEIGHT)
+    color = RED
+    pygame.draw.rect(surf, color, preench_rect) 
+    pygame.draw.rect(surf, BLACK, contorno_rect, 3)
 
 # ========== CENTRAL DE COMANDO ==========
 class Game:
@@ -50,7 +60,6 @@ class Game:
         pygame.key.set_repeat(500,100) # Inicia a função de repetir (tempo de espera, tempo para repetir cada ação)
         self.load_data()
         
-
     def load_data(self):
         # cria mapa       
         self.map = TiledMap((path.join(MAP_DIR, 'mapa1.tmx')))
@@ -189,8 +198,7 @@ class Game:
                 self.playing = False
         if hits:
             self.player.posic += vect (BIRD_KNOCKBACK, 0).rotate(-hits[0].angulo)
-        
-        
+               
     def draw(self):
         self.screen.blit(self.map_img, self.camera.apply_rect(self.map_rect))
         for sprite in self.all_sprites: #Analisa cada um dos sprites do grupo e mandar imprimir
@@ -206,6 +214,7 @@ class Game:
                 self.screen.blit(sprite.image, self.camera.apply(sprite))
         health_player_bar(self.screen, 10, 10, self.player.health / PLAYER_HEALTH)
         stamine_player_bar (self.screen, 10, 30, self.player.stamine / SNAKE_MAX_STAMINE)
+        poison_charge_bar (self.screen, 10, 45, self.player.charge)
         pygame.display.flip()
 
     def quit(self):

@@ -58,7 +58,7 @@ PLAYER_VISION = 150
 PLAYER_HIT_RECT = pygame.Rect (0, 0, 62, 62)
 SNAKE_WIDTH = 30
 SNAKE_HEIGHT = 30
-SNAKE_MAX_STAMINE = 1000
+SNAKE_MAX_STAMINE = 100
 
 # Configurações do mob Guaxinim
 GUAXI_WALK_LEFT = ['L0.png', 'L1.png', 'L2.png']
@@ -92,6 +92,7 @@ VENENO_DESLOC_DOWN = vect (32, 64)
 VENENO_DAMAGE = 10 # dano que o veneno causa
 KICKBACK = 75 # recuo de disparo no player
 VENENO_DESVIO = 5 # desvio aleatório do veneno
+VENENO_CHARGE = 150 # (igual ao comprimento da barra gerada no HUD)
 
 
 

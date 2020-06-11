@@ -31,6 +31,7 @@ class Snake(pygame.sprite.Sprite):
         self.stamine = 0
         self.dir = vect (1, 0) # começa virado pra direita
         self.last_dir = self.dir
+        self.charge = VENENO_CHARGE
 
         
     def get_keys(self):
@@ -72,9 +73,10 @@ class Snake(pygame.sprite.Sprite):
         self.last_dir = self.dir # guarda última direção
         # Configura disparo do veneno
         if keys[pygame.K_SPACE]:
-            now_time = pygame.time.get_ticks() # grava instante atual
+            now_time = pygame.time.get_ticks() # grava instante atual            
             if now_time - self.last_shoot > VENENO_FREQUENCY:
                 self.last_shoot = now_time # se passou tempo mínimo, grava novo 'último tiro'
+                self.charge = 0
                 # Ajusta posição do disparo dependendo da movimentação que a cobra tava
                 if self.LEFT:
                     pos = self.posic + VENENO_DESLOC_LEFT
@@ -99,6 +101,7 @@ class Snake(pygame.sprite.Sprite):
                 Veneno (self.jogo, pos, dir)
                 # Pequeno impulso para trás do disparo
                 self.vel = vect (-KICKBACK, 0)
+            
 
     def collide_with_walls (self, dir):
         if dir == 'x':
@@ -134,6 +137,10 @@ class Snake(pygame.sprite.Sprite):
 
         now = pygame.time.get_ticks()
         delta_t = now - self.last_update
+        
+        self.charge = (now - self.last_shoot)/VENENO_DURATION * VENENO_CHARGE
+        if self.charge > VENENO_CHARGE:
+            self.charge = VENENO_CHARGE
         
         if self.LEFT:
             self.image = self.jogo.snake_left['L{}.png'.format(self.snake_count)]
@@ -194,9 +201,11 @@ class Veneno (pygame.sprite.Sprite):
         if pygame.sprite.spritecollideany(self, self.jogo.walls):
             self.kill() # se colide com parede, já era
         self.time_now = pygame.time.get_ticks()
+
         if self.time_now - self.spawn_time > VENENO_DURATION:
             self.kill() # vida útil do disparo
-        
+
+
 # ------------ PÁSSARO ------------
 class Bird (pygame.sprite.Sprite):
     def __init__ (self, jogo, x, y):
@@ -355,10 +364,6 @@ class Prey (pygame.sprite.Sprite):
                     self.guaxi_count = 0
 
         
-
-        
-    
-
 # ------------ FRUTA ------------
 class Fruit(pygame.sprite.Sprite):
     def __init__(self, jogo, img, x, y):
@@ -388,6 +393,7 @@ class Fruit(pygame.sprite.Sprite):
             self.last_update = now              
         self.pos.y = self.y_0 + A*sin(self.argumento)
         self.rect.center = self.pos
+
 
 # ------------ ORBE ------------  
 class Orbe(pygame.sprite.Sprite):
@@ -441,6 +447,7 @@ class Obstacle (pygame.sprite.Sprite):
         self.rect.x = x
         self.rect.y = y
 
+
 # ------------ CÂMERA ------------
 class Camera:
     def __init__(self, width, height):
@@ -465,6 +472,7 @@ class Camera:
         y = max ((-self.height + HEIGHT), y) #fronteira inferior
 
         self.camera = pygame.Rect(x, y, self.width, self.height) #ajusta a posição da câmera
+
 
 # ------------ MAPA ------------
 class TiledMap:
