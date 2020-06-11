@@ -59,6 +59,7 @@ PLAYER_HIT_RECT = pygame.Rect (0, 0, 62, 62)
 SNAKE_WIDTH = 30
 SNAKE_HEIGHT = 30
 SNAKE_MAX_STAMINE = 100
+ATACK_RANGE = 100
 
 # Configurações do mob Guaxinim
 GUAXI_WALK_LEFT = ['L0.png', 'L1.png', 'L2.png']

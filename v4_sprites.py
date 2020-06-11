@@ -32,7 +32,15 @@ class Snake(pygame.sprite.Sprite):
         self.dir = vect (1, 0) # começa virado pra direita
         self.last_dir = self.dir
         self.charge = VENENO_CHARGE
-
+        # configurações para o ataque
+        self.ATACK = False
+        self.last_atack = 0
+        self.current_position = vect (0,0)
+        self.to_target = vect (0,0)
+        self.dist_to_target = 0
+        self.count_step = 0
+        self.kill_prey = False
+        self.latest_atack = 0
         
     def get_keys(self):
         self.veloc = vect (0, 0)
@@ -101,7 +109,21 @@ class Snake(pygame.sprite.Sprite):
                 Veneno (self.jogo, pos, dir)
                 # Pequeno impulso para trás do disparo
                 self.vel = vect (-KICKBACK, 0)
-            
+
+        if keys[pygame.K_x]:
+            # checa distância entre Player e a Presa:
+            to_target_0 = vect (self.jogo.guaxinim.posic.x - self.posic.x, self.jogo.guaxinim.posic.y - self.posic.y) # vetor Distância inicial
+            dist_to_target_0 = to_target_0.magnitude() # distância inicial (em pixels) entre Player e Presa
+
+            if dist_to_target_0 <= ATACK_RANGE: 
+                """ Especificar o target 
+                dist_to_target[LISTA]             """ 
+                self.last_atack = pygame.time.get_ticks()
+                self.current_position = vect(self.posic.x, self.posic.y) # guarda a posição inicial antes de dar o bote
+                self.ATACK = True # executa a animação de ataque qnd rodar o update
+                
+
+
 
     def collide_with_walls (self, dir):
         if dir == 'x':
@@ -123,59 +145,98 @@ class Snake(pygame.sprite.Sprite):
                 self.veloc.y = 0
                 self.rect.y = self.posic.y  
 
+
+    #def atack (self):
+        """ Como detectar a presa mais próximas? 
+        Temos que configurar uma lista com as presas [guaxinim, galinha, porco, raposa, etc...]
+        aí, eu coloco em self.[current_prey].posic
+
+        """
     def update(self):
 
         self.get_keys()
-        self.posic.x += self.veloc.x * dt #delta X = vx*deltaT
-        self.posic.y += self.veloc.y * dt #delta Y = vy*deltaT
-        #obs.1: Usar dt garante que o personagem ande proporcionalmente à velocidade de processamento da maquina
-        
-        self.rect.x = self.posic.x
-        self.collide_with_walls ('x') #checa condições de colisao em X
-        self.rect.y = self.posic.y
-        self.collide_with_walls('y') #checa condições de colisao em Y
+        if self.ATACK:
+            number_frames = 5 # numero de frames p/ animar o bote
+            self.to_target = vect (self.jogo.guaxinim.posic.x - self.posic.x, self.jogo.guaxinim.posic.y - self.posic.y)
+            move_step = self.to_target / number_frames 
+            
+            ## Consome STAMINA
+            now = pygame.time.get_ticks()
+            delta_t = now - self.last_atack
+            
+            
+            if delta_t > 30:
+                self.posic.x += move_step.x
+                self.posic.y += move_step.y
+                self.rect.center = (self.posic.x, self.posic.y)
+                self.count_step +=1
+                self.last_atack = now
+                                
+                if self.count_step >= number_frames:
+                    #self.latest_atack = pygame.time.get_ticks()
+                    #self.count_step += 1
+                    self.jogo.guaxinim.kill()
+                    self.count_step = 0
+                    self.ATACK = False
+                        
 
-        now = pygame.time.get_ticks()
-        delta_t = now - self.last_update
-        
-        self.charge = (now - self.last_shoot)/VENENO_DURATION * VENENO_CHARGE
-        if self.charge > VENENO_CHARGE:
-            self.charge = VENENO_CHARGE
-        
-        if self.LEFT:
-            self.image = self.jogo.snake_left['L{}.png'.format(self.snake_count)]
-            if delta_t > 150:
-                delta_t = 0
-                self.last_update = now
-                self.snake_count +=1
-                if self.snake_count > 2:
-                    self.snake_count = 0
-        elif self.RIGHT:
-            self.image = self.jogo.snake_right['R{}.png'.format(self.snake_count)]
-            if delta_t > 150:
-                delta_t = 0
-                self.last_update = now
-                self.snake_count +=1
-                if self.snake_count > 2:
-                    self.snake_count = 0
-        
-        elif self.DOWN:
-            self.image = self.jogo.snake_down['D{}.png'.format(self.snake_count)]
-            if delta_t > 150:
-                delta_t = 0
-                self.last_update = now
-                self.snake_count +=1
-                if self.snake_count > 2:
-                    self.snake_count = 0
-        
-        elif self.UP:
-            self.image = self.jogo.snake_up['U{}.png'.format(self.snake_count)]
-            if delta_t > 150:
-                delta_t = 0
-                self.last_update = now
-                self.snake_count +=1
-                if self.snake_count > 2:
-                    self.snake_count = 0
+            #wait_to_kill = now - self.latest_atack
+            #if wait_to_kill > 1000: #espera 1 segundo para dar kill
+                  #kill_prey (jogo.guaxinim)
+          
+
+
+        else:
+            self.kill_prey = False
+            self.posic.x += self.veloc.x * dt #delta X = vx*deltaT
+            self.posic.y += self.veloc.y * dt #delta Y = vy*deltaT
+            #obs.1: Usar dt garante que o personagem ande proporcionalmente à velocidade de processamento da maquina
+            
+            self.rect.x = self.posic.x
+            self.collide_with_walls ('x') #checa condições de colisao em X
+            self.rect.y = self.posic.y
+            self.collide_with_walls('y') #checa condições de colisao em Y
+
+            now = pygame.time.get_ticks()
+            delta_t = now - self.last_update
+            
+            self.charge = (now - self.last_shoot)/VENENO_DURATION * VENENO_CHARGE
+            if self.charge > VENENO_CHARGE:
+                self.charge = VENENO_CHARGE
+            
+            if self.LEFT:
+                self.image = self.jogo.snake_left['L{}.png'.format(self.snake_count)]
+                if delta_t > 150:
+                    delta_t = 0
+                    self.last_update = now
+                    self.snake_count +=1
+                    if self.snake_count > 2:
+                        self.snake_count = 0
+            elif self.RIGHT:
+                self.image = self.jogo.snake_right['R{}.png'.format(self.snake_count)]
+                if delta_t > 150:
+                    delta_t = 0
+                    self.last_update = now
+                    self.snake_count +=1
+                    if self.snake_count > 2:
+                        self.snake_count = 0      
+            elif self.DOWN:
+                self.image = self.jogo.snake_down['D{}.png'.format(self.snake_count)]
+                if delta_t > 150:
+                    delta_t = 0
+                    self.last_update = now
+                    self.snake_count +=1
+                    if self.snake_count > 2:
+                        self.snake_count = 0
+              
+            elif self.UP:
+                self.image = self.jogo.snake_up['U{}.png'.format(self.snake_count)]
+                if delta_t > 150:
+                    delta_t = 0
+                    self.last_update = now
+                    self.snake_count +=1
+                    if self.snake_count > 2:
+                        self.snake_count = 0
 
 
 # ------------ VENENO DA COBRA ------------
@@ -316,53 +377,60 @@ class Prey (pygame.sprite.Sprite):
     def update(self):
         now = pygame.time.get_ticks()
         delta_t = now - self.last_update
-
-        self.posic += self.veloc * dt
-        self.rect.center = self.posic
-        distance = self.posic - self.last_position
-        D = distance.length()
-        if D >= 4*32:
-            self.dir = self.dir.rotate(90)
+        if self.jogo.player.ATACK:
+            self.veloc = (0,0)
+            #self.kill() -- está configurado no ataque
+            
+        else:
             self.veloc = self.dir * self.speed
-            self.last_position = (self.posic.x, self.posic.y)
-            D = 0
+            self.posic += self.veloc * dt
+            self.rect.center = self.posic
+            distance = self.posic - self.last_position
+            D = distance.length()
+            if D >= 4*32:
+                self.dir = self.dir.rotate(90)
+                self.veloc = self.dir * self.speed
+                self.last_position = (self.posic.x, self.posic.y)
+                D = 0
 
-        if self.dir == (1,0): #movendo para direita
-            self.image = self.jogo.guaxi_right['R{}.png'.format(self.guaxi_count)]
-            if delta_t > 150:
-                delta_t = 0
-                self.last_update = now
-                self.guaxi_count += 1
-                if self.guaxi_count > 2:
-                    self.guaxi_count = 0
+            if self.dir == (1,0): #movendo para direita
+                self.image = self.jogo.guaxi_right['R{}.png'.format(self.guaxi_count)]
+                if delta_t > 150:
+                    delta_t = 0
+                    self.last_update = now
+                    self.guaxi_count += 1
+                    if self.guaxi_count > 2:
+                        self.guaxi_count = 0
+            
+            elif self.dir == (-1,0): #movendo para esquerda
+                self.image = self.jogo.guaxi_left['L{}.png'.format(self.guaxi_count)]
+                if delta_t > 150:
+                    delta_t = 0
+                    self.last_update = now
+                    self.guaxi_count += 1
+                    if self.guaxi_count > 2:
+                        self.guaxi_count = 0
+            
+            elif self.dir == (0,1): # movendo para baixo
+                self.image = self.jogo.guaxi_down['D{}.png'.format(self.guaxi_count)]
+                if delta_t > 150:
+                    delta_t = 0
+                    self.last_update = now
+                    self.guaxi_count += 1
+                    if self.guaxi_count > 2:
+                        self.guaxi_count = 0
+            
+            elif self.dir == (0,-1):  #movendo para cima
+                self.image = self.jogo.guaxi_up['U{}.png'.format(self.guaxi_count)]
+                if delta_t > 150:
+                    delta_t = 0
+                    self.last_update = now
+                    self.guaxi_count += 1
+                    if self.guaxi_count > 2:
+                        self.guaxi_count = 0
+    
+    #def kill_prey(self):
         
-        elif self.dir == (-1,0): #movendo para esquerda
-            self.image = self.jogo.guaxi_left['L{}.png'.format(self.guaxi_count)]
-            if delta_t > 150:
-                delta_t = 0
-                self.last_update = now
-                self.guaxi_count += 1
-                if self.guaxi_count > 2:
-                    self.guaxi_count = 0
-        
-        elif self.dir == (0,1): # movendo para baixo
-            self.image = self.jogo.guaxi_down['D{}.png'.format(self.guaxi_count)]
-            if delta_t > 150:
-                delta_t = 0
-                self.last_update = now
-                self.guaxi_count += 1
-                if self.guaxi_count > 2:
-                    self.guaxi_count = 0
-        
-        elif self.dir == (0,-1):  #movendo para cima
-            self.image = self.jogo.guaxi_up['U{}.png'.format(self.guaxi_count)]
-            if delta_t > 150:
-                delta_t = 0
-                self.last_update = now
-                self.guaxi_count += 1
-                if self.guaxi_count > 2:
-                    self.guaxi_count = 0
-
         
 # ------------ FRUTA ------------
 class Fruit(pygame.sprite.Sprite):
