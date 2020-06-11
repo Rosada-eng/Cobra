@@ -15,7 +15,7 @@ class Snake(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.jogo = jogo       
         self.image = img
-
+        self.mask = pygame.mask.from_surface(self.image)
         self.posic = vect (x, y) #declara as posições (x,y) em que o player será spawnado
         self.rect = self.image.get_rect()
         self.rect.center = (x + SNAKE_WIDTH/2 ,y + SNAKE_HEIGHT/2)
@@ -374,6 +374,7 @@ class Fruit(pygame.sprite.Sprite):
         self.jogo = jogo
         self.image = img
         self.image = pygame.transform.scale(self.image, (OBJECT_WIDTH, OBJECT_HEIGHT))
+        self.mask = pygame.mask.from_surface(self.image)
         self.rect = self.image.get_rect()
         self.pos = vect (x, y)
         self.rect.center = self.pos
@@ -497,22 +498,26 @@ class TiledMap:
         self.render(temp_surface)
         return temp_surface
 
+
 # ------------ PÁSSAROS NA HORIZONTAL ------------
-class CrazyBirdsHorizon (pygame.sprite.Sprite):
-    def __init__ (self, jogo, img, x, y, vx):
+class CrazyBirds(pygame.sprite.Sprite):
+    def __init__ (self, jogo, img, x, y, vx, vy):
         self.groups = jogo.all_sprites, jogo.crazy_birds
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.jogo = jogo
         self.image = img
+        self.mask = pygame.mask.from_surface(self.image)
         self.rect = self.image.get_rect()
         self.posic = vect (x, y)
         self.hit_rect = BIRD_HIT_RECT.copy()
         self.hit_rect.center = self.rect.center
-        self.speed = vect (vx, 0)
+        self.speed = vect (vx, vy)
+        self.acel = vect (self.speed.x/5, self.speed.y/5) # acel. pra quando colidir com player
         self.vx = vx
+        self.vy = vy
         self.rect.center = self.posic
         self.last_update = pygame.time.get_ticks()
-        self.bird_horizon_count = 0
+        self.bird_horizon_count = 0 # contador para troca de imagens
 
     def update (self):
         
@@ -527,9 +532,18 @@ class CrazyBirdsHorizon (pygame.sprite.Sprite):
         if self.posic.x < - OBJECT_WIDTH and self.vx < 0:
             self.posic.x = self.jogo.map.width + 30
             self.posic.y =  randint (OBJECT_HEIGHT, self.jogo.map.height - OBJECT_HEIGHT)
+        # Verifica se os que vão pra cima já atravessaram o mapa
+        if self.posic.y < - OBJECT_HEIGHT and self.vy < 0:
+            self.posic.y = self.jogo.map.height + 30
+            self.posic.x =  randint (OBJECT_WIDTH, self.jogo.map.width - OBJECT_WIDTH)
+        # Verifica se os que vão pra baixo já atravessaram o mapa
+        if (self.posic.y > OBJECT_HEIGHT + self.jogo.map.height) and self.vy > 0:
+            self.posic.y = - 30
+            self.posic.x =  randint (OBJECT_WIDTH, self.jogo.map.width - OBJECT_WIDTH)
 
         now = pygame.time.get_ticks()
         delta_t = now - self.last_update
+        # Se passou o tempo, troca de imagem
         if delta_t > 150:
             delta_t = 0
             self.last_update = now
@@ -540,5 +554,22 @@ class CrazyBirdsHorizon (pygame.sprite.Sprite):
         if self.vx > 0:
             self.image = self.jogo.bird_right_img['right00{}.png'.format(self.bird_horizon_count)]
         # Carrega imagem dos que vão pra esquerda
-        else:
+        elif self.vx < 0:
             self.image = self.jogo.bird_left_img['left00{}.png'.format(self.bird_horizon_count)]
+        else:
+            if self.vy > 0:
+                self.image = self.jogo.bird_down_img['down00{}.png'.format(self.bird_horizon_count)]
+            elif self.vy < 0:
+                self.image = self.jogo.bird_up_img['up00{}.png'.format(self.bird_horizon_count)]
+
+
+        if abs(self.speed.x) < abs(self.vx):
+            self.speed.x += self.acel.x * dt
+            self.posic.x += self.speed.x * dt
+            self.rect.center = self.posic
+            self.hit_rect.center = self.rect.center
+        if abs(self.speed.y) < abs(self.vy):
+            self.speed.y += self.acel.y * dt
+            self.posic.y += self.speed.y * dt
+            self.rect.center = self.posic
+            self.hit_rect.center = self.rect.center

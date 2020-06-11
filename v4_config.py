@@ -97,6 +97,8 @@ VENENO_CHARGE = 150 # (igual ao comprimento da barra gerada no HUD)
 # Configurações do mob Bird
 BIRD_RIGHT_IMG = ['right000.png', 'right001.png', 'right002.png', 'right003.png'] # direita
 BIRD_LEFT_IMG = ['left000.png', 'left001.png', 'left002.png', 'left003.png'] # esquerda
+BIRD_UP_IMG = ['up000.png', 'up001.png', 'up002.png', 'up003.png'] # cima
+BIRD_DOWN_IMG = ['down000.png', 'down001.png', 'down002.png', 'down003.png'] # baixo
 BIRD_DAMAGE = 10 # dano que o pássaro causa
 BIRD_KNOCKBACK = 30 # repulsão quando atinge player
 BIRD_HIT_RECT = pygame.Rect (0, 0, 30, 30) #ret. de colisão
