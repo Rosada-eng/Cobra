@@ -139,9 +139,14 @@ class Game:
             self.fruit_images.append((pygame.image.load(path.join(IMG_DIR, 'fruits', fruta)).convert_alpha()))
 
         # --- Pássaro ---
-        self.bird_img = {}
-        for img in BIRD_IMG:
-            self.bird_img[img] = pygame.image.load(path.join(IMG_DIR, img)).convert_alpha()
+        # Direita
+        self.bird_right_img = {}
+        for img in BIRD_RIGHT_IMG:
+            self.bird_right_img[img] = pygame.image.load(path.join(IMG_DIR, img)).convert_alpha()
+        # Esquerda
+        self.bird_left_img = {}
+        for img in BIRD_LEFT_IMG:
+            self.bird_left_img[img] = pygame.image.load(path.join(IMG_DIR, img)).convert_alpha()
 
         # --- Veneno da cobra ---
         self.veneno_img = pygame.image.load(path.join(IMG_DIR, VENENO_IMG)).convert_alpha()
@@ -167,7 +172,16 @@ class Game:
             if tile_object.name == 'presa1':
                 self.guaxinim = Prey(self, self.guaxi_right['R1.png'], tile_object.x, tile_object.y)    
         for i in range (8):
-            CrazyBirdsHorizon (self, self.bird_img['tile003.png'], -60, random.randint(0, self.map.height))     
+            # sorteio pra deixar aleatório a qtde de pássaros que vem de um lado e do outro
+            sorteio = random.choice([-4, 4])
+            if sorteio < 0:  # pássaros que vão pra direita
+                posx = random.randint (-300, -100)
+                speedx = random.choice(BIRD_SPEEDS)
+                CrazyBirdsHorizon (self, self.bird_right_img['right000.png'], posx, random.randint(0, self.map.height), speedx)     
+            elif sorteio > 0:  # pássaros que vão pra direita
+                posx = random.randint (self.map.width + 20, self.map.width + 100)
+                speedx = -random.choice(BIRD_SPEEDS)
+                CrazyBirdsHorizon (self, self.bird_left_img['left000.png'], posx, random.randint(0, self.map.height), speedx)     
         # cria câmera
         self.camera = Camera(self.map.width, self.map.height)
 

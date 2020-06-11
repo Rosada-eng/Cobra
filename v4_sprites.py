@@ -497,9 +497,9 @@ class TiledMap:
         self.render(temp_surface)
         return temp_surface
 
-
+# ------------ PÁSSAROS NA HORIZONTAL ------------
 class CrazyBirdsHorizon (pygame.sprite.Sprite):
-    def __init__ (self, jogo, img, x, y):
+    def __init__ (self, jogo, img, x, y, vx):
         self.groups = jogo.all_sprites, jogo.crazy_birds
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.jogo = jogo
@@ -508,19 +508,25 @@ class CrazyBirdsHorizon (pygame.sprite.Sprite):
         self.posic = vect (x, y)
         self.hit_rect = BIRD_HIT_RECT.copy()
         self.hit_rect.center = self.rect.center
-        self.speed = vect (30, 0)
+        self.speed = vect (vx, 0)
+        self.vx = vx
         self.rect.center = self.posic
         self.last_update = pygame.time.get_ticks()
-        self.bird_horizon_count = 3
+        self.bird_horizon_count = 0
 
     def update (self):
         
         self.posic += self.speed * dt
         self.rect.center = self.posic
         self.hit_rect.center = self.rect.center
-        if self.posic.x > self.jogo.map.width:
+        # Verifica se os que vão pra direita já atravessaram o mapa
+        if self.posic.x > self.jogo.map.width and self.vx > 0:
             self.posic.x = -30
             self.posic.y = randint (OBJECT_HEIGHT, self.jogo.map.height - OBJECT_HEIGHT)
+        # Verifica se os que vão pra esquerda já atravessaram o mapa
+        if self.posic.x < - OBJECT_WIDTH and self.vx < 0:
+            self.posic.x = self.jogo.map.width + 30
+            self.posic.y =  randint (OBJECT_HEIGHT, self.jogo.map.height - OBJECT_HEIGHT)
 
         now = pygame.time.get_ticks()
         delta_t = now - self.last_update
@@ -528,6 +534,11 @@ class CrazyBirdsHorizon (pygame.sprite.Sprite):
             delta_t = 0
             self.last_update = now
             self.bird_horizon_count += 1
-            if self.bird_horizon_count > 5:
-                self.bird_horizon_count = 3
-        self.image = self.jogo.bird_img['tile00{}.png'.format(self.bird_horizon_count)]
+            if self.bird_horizon_count > 3:
+                self.bird_horizon_count = 0
+        # Carrega imagem dos que vão pra direita
+        if self.vx > 0:
+            self.image = self.jogo.bird_right_img['right00{}.png'.format(self.bird_horizon_count)]
+        # Carrega imagem dos que vão pra esquerda
+        else:
+            self.image = self.jogo.bird_left_img['left00{}.png'.format(self.bird_horizon_count)]
