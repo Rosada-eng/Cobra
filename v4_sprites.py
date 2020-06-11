@@ -15,7 +15,7 @@ class Snake(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.jogo = jogo       
         self.image = img
-
+        self.mask = pygame.mask.from_surface(self.image)
         self.posic = vect (x, y) #declara as posições (x,y) em que o player será spawnado
         self.rect = self.image.get_rect()
         self.rect.center = (x + SNAKE_WIDTH/2 ,y + SNAKE_HEIGHT/2)
@@ -268,50 +268,50 @@ class Veneno (pygame.sprite.Sprite):
 
 
 # ------------ PÁSSARO ------------
-class Bird (pygame.sprite.Sprite):
-    def __init__ (self, jogo, x, y):
-        self.groups = jogo.all_sprites, jogo.birds
-        pygame.sprite.Sprite.__init__(self, self.groups)
-        self.jogo = jogo
-        self.image = jogo.bird_img
-        self.rect = self.image.get_rect()
-        self.hit_rect = BIRD_HIT_RECT.copy() # faz cópia do ret. de col. pra cada pássaro
-        self.hit_rect.center = self.rect.center
-        self.posic = vect (x, y) # pos. inicial
-        self.veloc = vect (0, 0) # vel. inicial
-        self.acel = vect (0, 0) # acel. inicial
-        self.rect.center = self.posic
-        self.angulo = 0 # rotação inicial
-        #self.health = BIRD_HEALTH
-        self.speed = choice(BIRD_SPEEDS)
-        self.last_update = pygame.time.get_ticks()
-        self.bird_count = 0
+# class Bird (pygame.sprite.Sprite):
+#     def __init__ (self, jogo, x, y):
+#         self.groups = jogo.all_sprites, jogo.birds
+#         pygame.sprite.Sprite.__init__(self, self.groups)
+#         self.jogo = jogo
+#         self.image = jogo.bird_img
+#         self.rect = self.image.get_rect()
+#         self.hit_rect = BIRD_HIT_RECT.copy() # faz cópia do ret. de col. pra cada pássaro
+#         self.hit_rect.center = self.rect.center
+#         self.posic = vect (x, y) # pos. inicial
+#         self.veloc = vect (0, 0) # vel. inicial
+#         self.acel = vect (0, 0) # acel. inicial
+#         self.rect.center = self.posic
+#         self.angulo = 0 # rotação inicial
+#         #self.health = BIRD_HEALTH
+#         self.speed = choice(BIRD_SPEEDS)
+#         self.last_update = pygame.time.get_ticks()
+#         self.bird_count = 0
 
 
-    def dist_birds (self): # distância entre pássaros
-        for bird in self.jogo.birds:
-            if bird != self:
-                # mede distância
-                dist = self.posic - bird.posic
-                # Se está dentro do círculo, gera aceleração de repulsão
-                if 0 < dist.length() < BIRD_ZONE:
-                    self.acel += dist.normalize()
+#     def dist_birds (self): # distância entre pássaros
+#         for bird in self.jogo.birds:
+#             if bird != self:
+#                 # mede distância
+#                 dist = self.posic - bird.posic
+#                 # Se está dentro do círculo, gera aceleração de repulsão
+#                 if 0 < dist.length() < BIRD_ZONE:
+#                     self.acel += dist.normalize()
 
-    def update (self):
-        # -- rotação --
-        if self.jogo.player.posic != self.posic:
-            self.angulo = (self.jogo.player.posic - self.posic).angle_to(vect(1, 0)) # subtração de vetores: pássaro sempre aponta pro player
-        else:
-            self.angulo = 0
-        self.image = pygame.transform.rotate (self.jogo.bird_img, self.angulo) # gira imagem no ângulo acima
-        # -- vetores --
-        self.rect.center = self.posic
-        self.acel = vect (1, 0).rotate(-self.angulo) # declara aceleração de modulo unitario
-        self.dist_birds() # verifica distância de outros pássaros para ajustar a acel.
-        self.acel.scale_to_length(choice(BIRD_SPEEDS))
-        self.acel += self.veloc * (-1) # limita velocidade máxima
-        self.veloc += self.acel * dt
-        self.posic += self.veloc * dt + 0.5*self.acel*dt**2 # s = s0 + v*t + (1/2)*a*t**2
+#     def update (self):
+#         # -- rotação --
+#         if self.jogo.player.posic != self.posic:
+#             self.angulo = (self.jogo.player.posic - self.posic).angle_to(vect(1, 0)) # subtração de vetores: pássaro sempre aponta pro player
+#         else:
+#             self.angulo = 0
+#         self.image = pygame.transform.rotate (self.jogo.bird_img, self.angulo) # gira imagem no ângulo acima
+#         # -- vetores --
+#         self.rect.center = self.posic
+#         self.acel = vect (1, 0).rotate(-self.angulo) # declara aceleração de modulo unitario
+#         self.dist_birds() # verifica distância de outros pássaros para ajustar a acel.
+#         self.acel.scale_to_length(choice(BIRD_SPEEDS))
+#         self.acel += self.veloc * (-1) # limita velocidade máxima
+#         self.veloc += self.acel * dt
+#         self.posic += self.veloc * dt + 0.5*self.acel*dt**2 # s = s0 + v*t + (1/2)*a*t**2
         # -- colisão com barreiras (não tem)
         # -- Saúde --
         # if self.health <= 0:
@@ -442,6 +442,7 @@ class Fruit(pygame.sprite.Sprite):
         self.jogo = jogo
         self.image = img
         self.image = pygame.transform.scale(self.image, (OBJECT_WIDTH, OBJECT_HEIGHT))
+        self.mask = pygame.mask.from_surface(self.image)
         self.rect = self.image.get_rect()
         self.pos = vect (x, y)
         self.rect.center = self.pos
@@ -564,3 +565,79 @@ class TiledMap:
         temp_surface = pygame.Surface((self.width, self.height))
         self.render(temp_surface)
         return temp_surface
+
+
+# ------------ PÁSSAROS NA HORIZONTAL ------------
+class CrazyBirds(pygame.sprite.Sprite):
+    def __init__ (self, jogo, img, x, y, vx, vy):
+        self.groups = jogo.all_sprites, jogo.crazy_birds
+        pygame.sprite.Sprite.__init__(self, self.groups)
+        self.jogo = jogo
+        self.image = img
+        self.mask = pygame.mask.from_surface(self.image)
+        self.rect = self.image.get_rect()
+        self.posic = vect (x, y)
+        self.hit_rect = BIRD_HIT_RECT.copy()
+        self.hit_rect.center = self.rect.center
+        self.speed = vect (vx, vy)
+        self.acel = vect (self.speed.x/5, self.speed.y/5) # acel. pra quando colidir com player
+        self.vx = vx
+        self.vy = vy
+        self.rect.center = self.posic
+        self.last_update = pygame.time.get_ticks()
+        self.bird_horizon_count = 0 # contador para troca de imagens
+
+    def update (self):
+        
+        self.posic += self.speed * dt
+        self.rect.center = self.posic
+        self.hit_rect.center = self.rect.center
+        # Verifica se os que vão pra direita já atravessaram o mapa
+        if self.posic.x > self.jogo.map.width and self.vx > 0:
+            self.posic.x = -30
+            self.posic.y = randint (OBJECT_HEIGHT, self.jogo.map.height - OBJECT_HEIGHT)
+        # Verifica se os que vão pra esquerda já atravessaram o mapa
+        if self.posic.x < - OBJECT_WIDTH and self.vx < 0:
+            self.posic.x = self.jogo.map.width + 30
+            self.posic.y =  randint (OBJECT_HEIGHT, self.jogo.map.height - OBJECT_HEIGHT)
+        # Verifica se os que vão pra cima já atravessaram o mapa
+        if self.posic.y < - OBJECT_HEIGHT and self.vy < 0:
+            self.posic.y = self.jogo.map.height + 30
+            self.posic.x =  randint (OBJECT_WIDTH, self.jogo.map.width - OBJECT_WIDTH)
+        # Verifica se os que vão pra baixo já atravessaram o mapa
+        if (self.posic.y > OBJECT_HEIGHT + self.jogo.map.height) and self.vy > 0:
+            self.posic.y = - 30
+            self.posic.x =  randint (OBJECT_WIDTH, self.jogo.map.width - OBJECT_WIDTH)
+
+        now = pygame.time.get_ticks()
+        delta_t = now - self.last_update
+        # Se passou o tempo, troca de imagem
+        if delta_t > 150:
+            delta_t = 0
+            self.last_update = now
+            self.bird_horizon_count += 1
+            if self.bird_horizon_count > 3:
+                self.bird_horizon_count = 0
+        # Carrega imagem dos que vão pra direita
+        if self.vx > 0:
+            self.image = self.jogo.bird_right_img['right00{}.png'.format(self.bird_horizon_count)]
+        # Carrega imagem dos que vão pra esquerda
+        elif self.vx < 0:
+            self.image = self.jogo.bird_left_img['left00{}.png'.format(self.bird_horizon_count)]
+        else:
+            if self.vy > 0:
+                self.image = self.jogo.bird_down_img['down00{}.png'.format(self.bird_horizon_count)]
+            elif self.vy < 0:
+                self.image = self.jogo.bird_up_img['up00{}.png'.format(self.bird_horizon_count)]
+
+
+        if abs(self.speed.x) < abs(self.vx):
+            self.speed.x += self.acel.x * dt
+            self.posic.x += self.speed.x * dt
+            self.rect.center = self.posic
+            self.hit_rect.center = self.rect.center
+        if abs(self.speed.y) < abs(self.vy):
+            self.speed.y += self.acel.y * dt
+            self.posic.y += self.speed.y * dt
+            self.rect.center = self.posic
+            self.hit_rect.center = self.rect.center
