@@ -207,50 +207,50 @@ class Veneno (pygame.sprite.Sprite):
 
 
 # ------------ PÁSSARO ------------
-class Bird (pygame.sprite.Sprite):
-    def __init__ (self, jogo, x, y):
-        self.groups = jogo.all_sprites, jogo.birds
-        pygame.sprite.Sprite.__init__(self, self.groups)
-        self.jogo = jogo
-        self.image = jogo.bird_img
-        self.rect = self.image.get_rect()
-        self.hit_rect = BIRD_HIT_RECT.copy() # faz cópia do ret. de col. pra cada pássaro
-        self.hit_rect.center = self.rect.center
-        self.posic = vect (x, y) # pos. inicial
-        self.veloc = vect (0, 0) # vel. inicial
-        self.acel = vect (0, 0) # acel. inicial
-        self.rect.center = self.posic
-        self.angulo = 0 # rotação inicial
-        #self.health = BIRD_HEALTH
-        self.speed = choice(BIRD_SPEEDS)
-        self.last_update = pygame.time.get_ticks()
-        self.bird_count = 0
+# class Bird (pygame.sprite.Sprite):
+#     def __init__ (self, jogo, x, y):
+#         self.groups = jogo.all_sprites, jogo.birds
+#         pygame.sprite.Sprite.__init__(self, self.groups)
+#         self.jogo = jogo
+#         self.image = jogo.bird_img
+#         self.rect = self.image.get_rect()
+#         self.hit_rect = BIRD_HIT_RECT.copy() # faz cópia do ret. de col. pra cada pássaro
+#         self.hit_rect.center = self.rect.center
+#         self.posic = vect (x, y) # pos. inicial
+#         self.veloc = vect (0, 0) # vel. inicial
+#         self.acel = vect (0, 0) # acel. inicial
+#         self.rect.center = self.posic
+#         self.angulo = 0 # rotação inicial
+#         #self.health = BIRD_HEALTH
+#         self.speed = choice(BIRD_SPEEDS)
+#         self.last_update = pygame.time.get_ticks()
+#         self.bird_count = 0
 
 
-    def dist_birds (self): # distância entre pássaros
-        for bird in self.jogo.birds:
-            if bird != self:
-                # mede distância
-                dist = self.posic - bird.posic
-                # Se está dentro do círculo, gera aceleração de repulsão
-                if 0 < dist.length() < BIRD_ZONE:
-                    self.acel += dist.normalize()
+#     def dist_birds (self): # distância entre pássaros
+#         for bird in self.jogo.birds:
+#             if bird != self:
+#                 # mede distância
+#                 dist = self.posic - bird.posic
+#                 # Se está dentro do círculo, gera aceleração de repulsão
+#                 if 0 < dist.length() < BIRD_ZONE:
+#                     self.acel += dist.normalize()
 
-    def update (self):
-        # -- rotação --
-        if self.jogo.player.posic != self.posic:
-            self.angulo = (self.jogo.player.posic - self.posic).angle_to(vect(1, 0)) # subtração de vetores: pássaro sempre aponta pro player
-        else:
-            self.angulo = 0
-        self.image = pygame.transform.rotate (self.jogo.bird_img, self.angulo) # gira imagem no ângulo acima
-        # -- vetores --
-        self.rect.center = self.posic
-        self.acel = vect (1, 0).rotate(-self.angulo) # declara aceleração de modulo unitario
-        self.dist_birds() # verifica distância de outros pássaros para ajustar a acel.
-        self.acel.scale_to_length(choice(BIRD_SPEEDS))
-        self.acel += self.veloc * (-1) # limita velocidade máxima
-        self.veloc += self.acel * dt
-        self.posic += self.veloc * dt + 0.5*self.acel*dt**2 # s = s0 + v*t + (1/2)*a*t**2
+#     def update (self):
+#         # -- rotação --
+#         if self.jogo.player.posic != self.posic:
+#             self.angulo = (self.jogo.player.posic - self.posic).angle_to(vect(1, 0)) # subtração de vetores: pássaro sempre aponta pro player
+#         else:
+#             self.angulo = 0
+#         self.image = pygame.transform.rotate (self.jogo.bird_img, self.angulo) # gira imagem no ângulo acima
+#         # -- vetores --
+#         self.rect.center = self.posic
+#         self.acel = vect (1, 0).rotate(-self.angulo) # declara aceleração de modulo unitario
+#         self.dist_birds() # verifica distância de outros pássaros para ajustar a acel.
+#         self.acel.scale_to_length(choice(BIRD_SPEEDS))
+#         self.acel += self.veloc * (-1) # limita velocidade máxima
+#         self.veloc += self.acel * dt
+#         self.posic += self.veloc * dt + 0.5*self.acel*dt**2 # s = s0 + v*t + (1/2)*a*t**2
         # -- colisão com barreiras (não tem)
         # -- Saúde --
         # if self.health <= 0:
@@ -496,3 +496,38 @@ class TiledMap:
         temp_surface = pygame.Surface((self.width, self.height))
         self.render(temp_surface)
         return temp_surface
+
+
+class CrazyBirdsHorizon (pygame.sprite.Sprite):
+    def __init__ (self, jogo, img, x, y):
+        self.groups = jogo.all_sprites, jogo.crazy_birds
+        pygame.sprite.Sprite.__init__(self, self.groups)
+        self.jogo = jogo
+        self.image = img
+        self.rect = self.image.get_rect()
+        self.posic = vect (x, y)
+        self.hit_rect = BIRD_HIT_RECT.copy()
+        self.hit_rect.center = self.rect.center
+        self.speed = vect (30, 0)
+        self.rect.center = self.posic
+        self.last_update = pygame.time.get_ticks()
+        self.bird_horizon_count = 3
+
+    def update (self):
+        
+        self.posic += self.speed * dt
+        self.rect.center = self.posic
+        self.hit_rect.center = self.rect.center
+        if self.posic.x > self.jogo.map.width:
+            self.posic.x = -30
+            self.posic.y = randint (OBJECT_HEIGHT, self.jogo.map.height - OBJECT_HEIGHT)
+
+        now = pygame.time.get_ticks()
+        delta_t = now - self.last_update
+        if delta_t > 150:
+            delta_t = 0
+            self.last_update = now
+            self.bird_horizon_count += 1
+            if self.bird_horizon_count > 5:
+                self.bird_horizon_count = 3
+        self.image = self.jogo.bird_img['tile00{}.png'.format(self.bird_horizon_count)]

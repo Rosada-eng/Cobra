@@ -98,7 +98,7 @@ VENENO_CHARGE = 150 # (igual ao comprimento da barra gerada no HUD)
 
 
 # Configurações do mob Bird
-BIRD_IMG = 'tile004.png'
+BIRD_IMG = ['tile003.png', 'tile004.png', 'tile005.png'] # direita
 BIRD_SPEEDS = [7, 12, 10, 5, 9]
 BIRD_HEALTH = 100
 BIRD_DAMAGE = 10 # dano que o pássaro causa
