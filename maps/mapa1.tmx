@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.2" tiledversion="1.3.5" orientation="orthogonal" renderorder="right-down" width="50" height="50" tilewidth="32" tileheight="32" infinite="0" nextlayerid="15" nextobjectid="60">
+<map version="1.2" tiledversion="1.3.5" orientation="orthogonal" renderorder="right-down" width="50" height="50" tilewidth="32" tileheight="32" infinite="0" nextlayerid="16" nextobjectid="128">
  <editorsettings>
   <export target="mapa_com_frutas.tmx" format="tmx"/>
  </editorsettings>
@@ -23,6 +23,7 @@
    <terrain name="High _ grass" tile="202"/>
    <terrain name="High _ grass _ yellow" tile="205"/>
    <terrain name="Horta" tile="208"/>
+   <terrain name="Cratera" tile="52"/>
   </terraintypes>
   <tile id="1" terrain="0,0,0,"/>
   <tile id="2" terrain="0,0,,0"/>
@@ -30,6 +31,8 @@
   <tile id="5" terrain="1,1,,1"/>
   <tile id="7" terrain="2,2,2,"/>
   <tile id="8" terrain="2,2,,2"/>
+  <tile id="10" terrain="17,17,17,"/>
+  <tile id="11" terrain="17,17,,17"/>
   <tile id="19" terrain="9,9,9,"/>
   <tile id="20" terrain="9,9,,9"/>
   <tile id="22" terrain="0,,0,0"/>
@@ -38,6 +41,8 @@
   <tile id="26" terrain=",1,1,1"/>
   <tile id="28" terrain="2,,2,2"/>
   <tile id="29" terrain=",2,2,2"/>
+  <tile id="31" terrain="17,,17,17"/>
+  <tile id="32" terrain=",17,17,17"/>
   <tile id="40" terrain="9,,9,9"/>
   <tile id="41" terrain=",9,9,9"/>
   <tile id="42" terrain=",,,0"/>
@@ -49,6 +54,9 @@
   <tile id="48" terrain=",,,2"/>
   <tile id="49" terrain=",,2,2"/>
   <tile id="50" terrain=",,2,"/>
+  <tile id="51" terrain=",,,17"/>
+  <tile id="52" terrain=",,17,17"/>
+  <tile id="53" terrain=",,17,"/>
   <tile id="60" terrain=",,,9"/>
   <tile id="61" terrain=",,9,9"/>
   <tile id="62" terrain=",,9,"/>
@@ -61,6 +69,9 @@
   <tile id="69" terrain=",2,,2"/>
   <tile id="70" terrain="2,2,2,2"/>
   <tile id="71" terrain="2,,2,"/>
+  <tile id="72" terrain=",17,,17"/>
+  <tile id="73" terrain="17,17,17,17"/>
+  <tile id="74" terrain="17,,17,"/>
   <tile id="81" terrain=",9,,9"/>
   <tile id="82" terrain="9,9,9,9"/>
   <tile id="83" terrain="9,,9,"/>
@@ -73,6 +84,9 @@
   <tile id="90" terrain=",2,,"/>
   <tile id="91" terrain="2,2,,"/>
   <tile id="92" terrain="2,,,"/>
+  <tile id="93" terrain=",17,,"/>
+  <tile id="94" terrain="17,17,,"/>
+  <tile id="95" terrain="17,,,"/>
   <tile id="102" terrain=",9,,"/>
   <tile id="103" terrain="9,9,,"/>
   <tile id="104" terrain="9,,,"/>
@@ -85,9 +99,12 @@
   <tile id="111" terrain="2,2,2,2" probability="0.05"/>
   <tile id="112" terrain="2,2,2,2"/>
   <tile id="113" terrain="2,2,2,2"/>
-  <tile id="123" terrain="9,9,9,9" probability="0.05"/>
-  <tile id="124" terrain="9,9,9,9" probability="0.05"/>
-  <tile id="125" terrain="9,9,9,9" probability="0.05"/>
+  <tile id="114" terrain="17,17,17,17"/>
+  <tile id="115" terrain="17,17,17,17"/>
+  <tile id="116" terrain="17,17,17,17"/>
+  <tile id="123" terrain="8,8,8,8" probability="0.05"/>
+  <tile id="124" terrain="8,8,8,8" probability="0.05"/>
+  <tile id="125" terrain="8,8,8,8" probability="0.05"/>
   <tile id="127" terrain="3,3,3,"/>
   <tile id="128" terrain="3,3,,3"/>
   <tile id="130" terrain="4,4,4,"/>
@@ -642,7 +659,7 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 </data>
  </layer>
- <objectgroup id="11" name="Camada de Objetos 1">
+ <objectgroup id="11" name="Camada de Objetos 1" visible="0">
   <object id="1" name="Wall" x="0.333333" y="6.91667" width="4.16667" height="1588.17"/>
   <object id="2" name="player" x="128.154" y="192.069" width="31.6001" height="31.3914"/>
   <object id="3" name="Wall" x="1595.72" y="6.61364" width="3.91667" height="1588.33"/>
@@ -662,11 +679,11 @@
   <object id="20" name="Wall" x="0.784074" y="1595.57" width="1598.92" height="4.33297"/>
   <object id="21" name="Wall" x="1.20667" y="0.3335" width="1596.17" height="5.333"/>
  </objectgroup>
- <objectgroup id="13" name="Passaros">
+ <objectgroup id="13" name="Passaros" visible="0">
   <object id="56" name="Passaro" x="1152" y="128" width="32" height="32"/>
   <object id="57" name="Passaro" x="192" y="1504" width="32" height="32"/>
  </objectgroup>
- <objectgroup id="12" name="frutas">
+ <objectgroup id="12" name="frutas" visible="0">
   <object id="25" name="fruit" x="30.8692" y="354.996" width="30.8692" height="27.6198"/>
   <object id="27" name="fruit" x="223.396" y="388.302" width="30.8692" height="27.6198"/>
   <object id="28" name="fruit" x="378.554" y="320.065" width="30.8692" height="27.6198"/>
@@ -698,7 +715,60 @@
   <object id="54" name="fruit" x="32.1737" y="31.5313" width="30.8692" height="27.6198"/>
   <object id="55" name="fruit" x="164.419" y="962.537" width="30.8692" height="27.6198"/>
  </objectgroup>
- <objectgroup id="14" name="Presas">
+ <objectgroup id="14" name="Presas" visible="0">
   <object id="58" name="presa1" x="224.962" y="196.953" width="30.9644" height="33.2301"/>
+ </objectgroup>
+ <objectgroup id="15" name="Mato Grosso">
+  <object id="61" name="mato grosso" x="0" y="4.53721" width="68.0581" height="376.588"/>
+  <object id="62" name="mato grosso" x="68.937" y="2.06811" width="99.2693" height="290.225"/>
+  <object id="63" name="mato grosso" x="168.896" y="1.37874" width="66.1795" height="259.892"/>
+  <object id="65" name="mato grosso" x="234.386" y="2.75748" width="63.422" height="224.045"/>
+  <object id="67" name="mato grosso" x="296.429" y="1.37874" width="157.176" height="199.228"/>
+  <object id="69" name="mato grosso" x="452.227" y="2.06811" width="68.2476" height="162.002"/>
+  <object id="71" name="mato grosso" x="519.785" y="2.75748" width="35.8472" height="94.4437"/>
+  <object id="73" name="mato grosso" x="213.705" y="423.962" width="178.547" height="35.1579"/>
+  <object id="74" name="mato grosso" x="181.994" y="373.638" width="273.68" height="49.6346"/>
+  <object id="75" name="mato grosso" x="217.152" y="343.306" width="320.557" height="28.9535"/>
+  <object id="76" name="mato grosso" x="314.353" y="310.906" width="225.551" height="31.0216"/>
+  <object id="77" name="mato grosso" x="537.019" y="217.152" width="53.0815" height="139.942"/>
+  <object id="78" name="mato grosso" x="379.153" y="277.127" width="159.905" height="33.7791"/>
+  <object id="79" name="mato grosso" x="453.605" y="372.949" width="67.5583" height="19.9917"/>
+  <object id="80" name="mato grosso" x="918.424" y="9.71143" width="679.8" height="52.7192"/>
+  <object id="81" name="mato grosso" x="947.558" y="63.818" width="649.279" height="41.6204"/>
+  <object id="84" name="mato grosso" x="1048.83" y="102.883" width="548.002" height="45.5627"/>
+  <object id="86" name="mato grosso" x="1109.88" y="148.446" width="486.959" height="151.221"/>
+  <object id="88" name="mato grosso" x="1241.68" y="298.28" width="355.161" height="117.925"/>
+  <object id="89" name="mato grosso" x="1391.51" y="413.226" width="206.715" height="97.3177"/>
+  <object id="91" name="mato grosso" x="1453.94" y="505.645" width="147.059" height="133.922"/>
+  <object id="92" name="mato grosso" x="1503.88" y="635.625" width="98.5017" height="42.788"/>
+  <object id="95" name="mato grosso" x="120.875" y="941.911" width="49.9445" height="174.806"/>
+  <object id="96" name="mato grosso" x="178.634" y="1117.15" width="129.023" height="34.6837"/>
+  <object id="98" name="mato grosso" x="170.644" y="946.171" width="223.363" height="172.031"/>
+  <object id="99" name="mato grosso" x="394.007" y="944.784" width="126.249" height="140.122"/>
+  <object id="100" name="mato grosso" x="162.32" y="912.875" width="355.161" height="34.6761"/>
+  <object id="101" name="mato grosso" x="216.426" y="882.353" width="298.28" height="31.492"/>
+  <object id="102" name="mato grosso" x="346.837" y="853.219" width="167.869" height="30.84"/>
+  <object id="103" name="mato grosso" x="478.635" y="826.859" width="33.2963" height="28.1411"/>
+  <object id="104" name="mato grosso" x="510.544" y="819.922" width="73.5294" height="174.806"/>
+  <object id="105" name="mato grosso" x="545.228" y="793.563" width="102.664" height="28.1487"/>
+  <object id="106" name="mato grosso" x="581.223" y="898.19" width="43.0836" height="67.4038"/>
+  <object id="107" name="mato grosso" x="581.958" y="820.733" width="64.5458" height="79.655"/>
+  <object id="108" name="mato grosso" x="1529.61" y="921.809" width="66.8428" height="203.637"/>
+  <object id="109" name="mato grosso" x="1461.22" y="1018.19" width="71.5063" height="107.259"/>
+  <object id="110" name="mato grosso" x="1243.59" y="1495.41" width="359.086" height="107.259"/>
+  <object id="111" name="mato grosso" x="1305.77" y="1367.95" width="296.907" height="138.349"/>
+  <object id="112" name="mato grosso" x="1562.26" y="1127" width="43.5256" height="248.718"/>
+  <object id="113" name="mato grosso" x="1334.36" y="1279.12" width="51.298" height="94.8236"/>
+  <object id="114" name="mato grosso" x="1366.32" y="1218.16" width="62.1794" height="65.2884"/>
+  <object id="115" name="mato grosso" x="1411.93" y="1153.98" width="75.8027" height="59.0704"/>
+  <object id="116" name="mato grosso" x="1439.87" y="1123.46" width="81.39" height="31.5501"/>
+  <object id="117" name="mato grosso" x="1427.64" y="1214.37" width="27.8921" height="38.4088"/>
+  <object id="120" name="mato grosso" x="1384.24" y="1279.04" width="36.8195" height="40.3261"/>
+  <object id="121" name="mato grosso" x="1528.01" y="1332.52" width="49.0927" height="45.586"/>
+  <object id="123" name="mato grosso" x="548.58" y="1243.55" width="55.2227" height="140.141"/>
+  <object id="124" name="mato grosso" x="598.593" y="1362.85" width="208.388" height="22.4017"/>
+  <object id="125" name="mato grosso" x="598.593" y="1237.82" width="210.471" height="18.2339"/>
+  <object id="126" name="mato grosso" x="595.989" y="1297.73" width="215.16" height="24.4855"/>
+  <object id="127" name="mato grosso" x="802.292" y="1237.82" width="55.7437" height="143.266"/>
  </objectgroup>
 </map>

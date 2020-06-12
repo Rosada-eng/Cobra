@@ -68,6 +68,9 @@ class Game:
         self.map_img = self.map.make_map()
         self.map_rect = self.map_img.get_rect()
 
+        self.eye_img = pygame.image.load(path.join(IMG_DIR, 'eye_bckg.jpg')).convert_alpha()
+        self.eye_img = pygame.transform.scale(self.eye_img, (30,30))
+
         # --- Cobra ---
             # Esquerda
         self.snake_left = {}
@@ -172,10 +175,9 @@ class Game:
         self.sound_effects['bite1'] = pygame.mixer.Sound(path.join(EFFECTS_DIR,'mastigando', 'bite1.ogg'))
         self.sound_effects['bite2'] = pygame.mixer.Sound(path.join(EFFECTS_DIR,'mastigando', 'bite2.ogg'))
         self.sound_effects['bite3'] = pygame.mixer.Sound(path.join(EFFECTS_DIR,'mastigando', 'bite3.ogg'))
-        self.sound_effects['bait'] = pygame.mixer.Sound(path.join(EFFECTS_DIR, 'poison.ogg'))
-        
-        
 
+        
+    
         
     def new(self):   
         #cria os grupos:
@@ -185,12 +187,15 @@ class Game:
         # self.birds = pygame.sprite.Group ()
         self.veneno = pygame.sprite.Group()
         self.crazy_birds = pygame.sprite.Group()
+        self.mato_grosso = pygame.sprite.Group()
         # Spawna as barreiras
         for tile_object in self.map.tmxdata.objects:
             if tile_object.name == 'player':
                 self.player = Snake(self, self.snake_right['R1.png'], tile_object.x, tile_object.y)
             if tile_object.name == 'Wall':
-                Obstacle(self, tile_object.x, tile_object.y, tile_object.width, tile_object.height) 
+                Obstacle(self, tile_object.x, tile_object.y, tile_object.width, tile_object.height, 'WALL')
+            if tile_object.name == 'mato grosso':
+                Obstacle(self, tile_object.x, tile_object.y, tile_object.width, tile_object.height, 'MATO')
             if tile_object.name == 'fruit':
                 Fruit (self, random.choice(self.fruit_images), tile_object.x, tile_object.y)
             # if tile_object.name == 'Passaro':
@@ -297,6 +302,7 @@ class Game:
         health_player_bar(self.screen, 10, 10, self.player.health / PLAYER_HEALTH)
         stamine_player_bar (self.screen, 10, 30, self.player.stamine / SNAKE_MAX_STAMINE)
         poison_charge_bar (self.screen, 10, 45, self.player.charge)
+        self.screen.blit(self.eye_img, (10, 60))
         pygame.display.flip()
 
     def quit(self):

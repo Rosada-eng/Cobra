@@ -20,6 +20,7 @@ class Snake(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.center = (x + SNAKE_WIDTH/2 ,y + SNAKE_HEIGHT/2)
         self.veloc = vect (0, 0) # Começa com velocidade zero 
+        self.speed = PLAYER_SPEED
         self.last_update = pygame.time.get_ticks()
         self.snake_count = 0
         self.LEFT = False
@@ -43,30 +44,31 @@ class Snake(pygame.sprite.Sprite):
         
     def get_keys(self):
         self.veloc = vect (0, 0)
+        self.interactive_objects()
         keys = pygame.key.get_pressed() #Salva uma dicionario de keys q estão sendo pressionadas
         if keys[pygame.K_LEFT]:
-            self.veloc.x = -PLAYER_SPEED
+            self.veloc.x = -self.speed
             self.dir = vect (-1, 0)
             self.LEFT = True
             self.RIGHT = False
             self.UP = False
             self.DOWN = False
         elif keys[pygame.K_RIGHT]:
-            self.veloc.x = PLAYER_SPEED
+            self.veloc.x = self.speed
             self.dir = vect (1, 0)
             self.LEFT = False
             self.RIGHT = True
             self.UP = False
             self.DOWN = False
         elif keys[pygame.K_UP]:
-            self.veloc.y = -PLAYER_SPEED
+            self.veloc.y = -self.speed
             self.dir = vect (0, -1)
             self.LEFT = False
             self.RIGHT = False
             self.UP = True
             self.DOWN = False
         elif keys[pygame.K_DOWN]:
-            self.veloc.y = PLAYER_SPEED
+            self.veloc.y = self.speed
             self.dir = vect (0, 1)
             self.LEFT = False
             self.RIGHT = False
@@ -120,9 +122,6 @@ class Snake(pygame.sprite.Sprite):
                 self.last_atack = pygame.time.get_ticks()
                 self.current_position = vect(self.posic.x, self.posic.y) # guarda a posição inicial antes de dar o bote
                 self.ATACK = True # executa a animação de ataque qnd rodar o update
-                
-
-
 
     def collide_with_walls (self, dir):
         if dir == 'x':
@@ -143,6 +142,17 @@ class Snake(pygame.sprite.Sprite):
                     self.posic.y = hits[0].rect.bottom
                 self.veloc.y = 0
                 self.rect.y = self.posic.y  
+
+    def interactive_objects (self):
+        hits = pygame.sprite.spritecollide (self, self.jogo.mato_grosso, False) # retorna uma lista com os elementos do grupo q colidiram
+        if hits:
+            self.speed = 0.7*PLAYER_SPEED
+        else:
+            self.speed = 1.0*PLAYER_SPEED
+
+            
+
+
 
 
     #def atack (self):
@@ -174,8 +184,10 @@ class Snake(pygame.sprite.Sprite):
                     #self.latest_atack = pygame.time.get_ticks()
                     #self.count_step += 1
                     self.jogo.guaxinim.kill()
-                    #self.jogo.sound_effects['bite1'].play() # fazer tocar os outros 3 audios
-                    self.jogo.sound_effects['bait'].play() # fazer tocar os outros 3 audios
+                    channel1 = self.jogo.sound_effects['bite1'].play() 
+                    channel1.queue(self.jogo.sound_effects['bite2'])  
+                    channel1.queue(self.jogo.sound_effects['bite3']) 
+
                     self.count_step = 0
                     self.ATACK = False
                         
@@ -503,9 +515,13 @@ class Orbe(pygame.sprite.Sprite):
 
 # ------------ OBSTÁCULO ------------
 class Obstacle (pygame.sprite.Sprite):
-    def __init__(self, jogo, x,y, width, height):
-        self.groups = jogo.walls 
-        self._layer = WALL_LAYER
+    def __init__(self, jogo, x,y, width, height, type):
+        self.type = type
+        if self.type == 'WALL':
+            self.groups = jogo.walls
+        if self.type == 'MATO':
+            self.groups = jogo.mato_grosso
+        self._layer = CAMADAS[type]
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.jogo = jogo
         self.rect = pygame.Rect(x, y, width, height)
