@@ -39,7 +39,6 @@ class Snake(pygame.sprite.Sprite):
         self.to_target = vect (0,0)
         self.dist_to_target = 0
         self.count_step = 0
-        self.kill_prey = False
         self.latest_atack = 0
         
     def get_keys(self):
@@ -81,7 +80,7 @@ class Snake(pygame.sprite.Sprite):
         self.last_dir = self.dir # guarda última direção
         # Configura disparo do veneno
         if keys[pygame.K_SPACE]:
-            now_time = pygame.time.get_ticks() # grava instante atual            
+            now_time = pygame.time.get_ticks() # grava instante atual           
             if now_time - self.last_shoot > VENENO_FREQUENCY:
                 self.last_shoot = now_time # se passou tempo mínimo, grava novo 'último tiro'
                 self.charge = 0
@@ -163,8 +162,7 @@ class Snake(pygame.sprite.Sprite):
             ## Consome STAMINA
             now = pygame.time.get_ticks()
             delta_t = now - self.last_atack
-            
-            
+                        
             if delta_t > 30:
                 self.posic.x += move_step.x
                 self.posic.y += move_step.y
@@ -176,6 +174,8 @@ class Snake(pygame.sprite.Sprite):
                     #self.latest_atack = pygame.time.get_ticks()
                     #self.count_step += 1
                     self.jogo.guaxinim.kill()
+                    #self.jogo.sound_effects['bite1'].play() # fazer tocar os outros 3 audios
+                    self.jogo.sound_effects['bait'].play() # fazer tocar os outros 3 audios
                     self.count_step = 0
                     self.ATACK = False
                         
@@ -185,9 +185,7 @@ class Snake(pygame.sprite.Sprite):
                   #kill_prey (jogo.guaxinim)
           
 
-
         else:
-            self.kill_prey = False
             self.posic.x += self.veloc.x * dt #delta X = vx*deltaT
             self.posic.y += self.veloc.y * dt #delta Y = vy*deltaT
             #obs.1: Usar dt garante que o personagem ande proporcionalmente à velocidade de processamento da maquina

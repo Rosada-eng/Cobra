@@ -161,6 +161,22 @@ class Game:
         # --- Veneno da cobra ---
         self.veneno_img = pygame.image.load(path.join(IMG_DIR, VENENO_IMG)).convert_alpha()
     
+        # ==== SOUND ====
+        # --- música de fundo ---
+        pygame.mixer.music.load(path.join(MUSIC_DIR, 'sonarctica_v7.ogg'))
+        pygame.mixer.music.set_volume(0.2)
+        # -- Dicionário com os efeitos
+        self.sound_effects = {}
+        self.sound_effects['hit'] = pygame.mixer.Sound(path.join(EFFECTS_DIR, '1hit.ogg'))
+        self.sound_effects['pick_fruit'] = pygame.mixer.Sound(path.join(EFFECTS_DIR, 'task_completed.wav'))
+        self.sound_effects['bite1'] = pygame.mixer.Sound(path.join(EFFECTS_DIR,'mastigando', 'bite1.ogg'))
+        self.sound_effects['bite2'] = pygame.mixer.Sound(path.join(EFFECTS_DIR,'mastigando', 'bite2.ogg'))
+        self.sound_effects['bite3'] = pygame.mixer.Sound(path.join(EFFECTS_DIR,'mastigando', 'bite3.ogg'))
+        self.sound_effects['bait'] = pygame.mixer.Sound(path.join(EFFECTS_DIR, 'poison.ogg'))
+        
+        
+
+        
     def new(self):   
         #cria os grupos:
         self.all_sprites = pygame.sprite.LayeredUpdates()
@@ -209,6 +225,7 @@ class Game:
 
     def run(self):
         self.playing = True
+        pygame.mixer.music.play (loops=-1)
         while self.playing:
             self.events()
             self.update()
@@ -225,6 +242,7 @@ class Game:
         # --- Player colide com a frutas:
         hits = pygame.sprite.spritecollide (self.player, self.fruits, False, pygame.sprite.collide_mask)
         for hit in hits:
+            self.sound_effects['pick_fruit'].play()
             # frutinha já era
             hit.kill()
             # aumenta stamina
@@ -245,6 +263,7 @@ class Game:
             for hit in hits:
                 self.ANALISE = False
                 self.player.health -= BIRD_DAMAGE
+                self.sound_effects['hit'].play()
                 hit.speed = vect (0, 0)
                 if self.player.health <= 0:
                     self.playing = False

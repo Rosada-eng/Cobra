@@ -7,9 +7,12 @@ vect = pygame.math.Vector2
 # Identifica diretórios de imagens, sons e fontes
 GAME_DIR = path.dirname(__file__)
 MAP_DIR = path.join(GAME_DIR, 'maps')
-IMG_DIR = path.join(GAME_DIR, 'assets/img')
-SONG_DIR = path.join(GAME_DIR, 'assets', 'song')
+IMG_DIR = path.join(GAME_DIR, 'assets', 'img')
 FONT_DIR = path.join(GAME_DIR, 'assets', 'fontes')
+MUSIC_DIR = path.join(GAME_DIR, 'assets', 'sounds', 'music')
+EFFECTS_DIR = path.join(GAME_DIR, 'assets', 'sounds', 'effects')
+
+
 
 # Configurações da Tela
 WIDTH = 700
@@ -105,14 +108,6 @@ BIRD_KNOCKBACK = 30 # repulsão quando atinge player
 BIRD_HIT_RECT = pygame.Rect (0, 0, 30, 30) #ret. de colisão
 BIRD_SPEEDS = [40, 50, 30, 25]
 BIRD_HEALTH = 100
-
-
-
-
-
-
-
-
 BIRD_ZONE = 100 # círculo que evita superposição de pássaros
 
 # CORUJA
@@ -123,6 +118,8 @@ OWL_WALK_DOWN = ['D0.png', 'D1.png', 'D2.png']
 OWL_HEIGHT = 40
 OWL_WIDTH = 50
 
+# ====== CONFIG SOM =======
+MASTIGANDO = {'bite1':'bite1.wav', 'bite2':'bite2.wav', 'bite3':'bite3.wav'}
 
 
 
