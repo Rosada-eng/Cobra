@@ -43,6 +43,7 @@ CAMADAS = {'PLAYER': 3, 'FRUIT': 2, 'BIRD': 4, 'OBJECT': 1, 'WALL': 1, 'MATO': 1
 WALL_LAYER = 1
 PLAYER_LAYER = 3
 FRUITS_LAYER = 2
+BIRDS_LAYER = 4
 
 # Configuração do MHS:
 A = 10 # amplitude do movimento

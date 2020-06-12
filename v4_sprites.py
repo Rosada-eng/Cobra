@@ -256,6 +256,7 @@ class Veneno (pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.jogo = jogo
         self.image = jogo.veneno_img
+        self.mask = pygame.mask.from_surface(self.image)
         self.rect = self.image.get_rect()
         self.hit_rect = VENENO_HIT_RECT
         self.hit_rect.center = self.rect.center
@@ -581,9 +582,10 @@ class TiledMap:
         return temp_surface
 
 
-# ------------ PÁSSAROS NA HORIZONTAL ------------
+# ------------ PÁSSAROS ------------
 class CrazyBirds(pygame.sprite.Sprite):
     def __init__ (self, jogo, img, x, y, vx, vy):
+        self._layer = BIRDS_LAYER
         self.groups = jogo.all_sprites, jogo.crazy_birds
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.jogo = jogo
@@ -594,9 +596,9 @@ class CrazyBirds(pygame.sprite.Sprite):
         self.hit_rect = BIRD_HIT_RECT.copy()
         self.hit_rect.center = self.rect.center
         self.speed = vect (vx, vy)
-        self.acel = vect (self.speed.x/5, self.speed.y/5) # acel. pra quando colidir com player
         self.vx = vx
         self.vy = vy
+        self.acel = vect (self.vx/10, self.vy/10) # acel. pra quando colidir com player
         self.rect.center = self.posic
         self.last_update = pygame.time.get_ticks()
         self.bird_horizon_count = 0 # contador para troca de imagens
@@ -639,12 +641,14 @@ class CrazyBirds(pygame.sprite.Sprite):
         elif self.vx < 0:
             self.image = self.jogo.bird_left_img['left00{}.png'.format(self.bird_horizon_count)]
         else:
+            # Carrega imagem dos que vão pra baixo
             if self.vy > 0:
                 self.image = self.jogo.bird_down_img['down00{}.png'.format(self.bird_horizon_count)]
+            # Carrega imagem dos que vão pra cima
             elif self.vy < 0:
                 self.image = self.jogo.bird_up_img['up00{}.png'.format(self.bird_horizon_count)]
 
-
+        # Acelera pássaro novamente após colisão com player
         if abs(self.speed.x) < abs(self.vx):
             self.speed.x += self.acel.x * dt
             self.posic.x += self.speed.x * dt
@@ -655,3 +659,4 @@ class CrazyBirds(pygame.sprite.Sprite):
             self.posic.y += self.speed.y * dt
             self.rect.center = self.posic
             self.hit_rect.center = self.rect.center
+

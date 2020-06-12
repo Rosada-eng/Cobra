@@ -659,7 +659,7 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 </data>
  </layer>
- <objectgroup id="11" name="Camada de Objetos 1" visible="0">
+ <objectgroup id="11" name="Camada de Objetos 1">
   <object id="1" name="Wall" x="0.333333" y="6.91667" width="4.16667" height="1588.17"/>
   <object id="2" name="player" x="128.154" y="192.069" width="31.6001" height="31.3914"/>
   <object id="3" name="Wall" x="1595.72" y="6.61364" width="3.91667" height="1588.33"/>
@@ -679,11 +679,11 @@
   <object id="20" name="Wall" x="0.784074" y="1595.57" width="1598.92" height="4.33297"/>
   <object id="21" name="Wall" x="1.20667" y="0.3335" width="1596.17" height="5.333"/>
  </objectgroup>
- <objectgroup id="13" name="Passaros" visible="0">
+ <objectgroup id="13" name="Passaros">
   <object id="56" name="Passaro" x="1152" y="128" width="32" height="32"/>
   <object id="57" name="Passaro" x="192" y="1504" width="32" height="32"/>
  </objectgroup>
- <objectgroup id="12" name="frutas" visible="0">
+ <objectgroup id="12" name="frutas">
   <object id="25" name="fruit" x="30.8692" y="354.996" width="30.8692" height="27.6198"/>
   <object id="27" name="fruit" x="223.396" y="388.302" width="30.8692" height="27.6198"/>
   <object id="28" name="fruit" x="378.554" y="320.065" width="30.8692" height="27.6198"/>
@@ -715,7 +715,7 @@
   <object id="54" name="fruit" x="32.1737" y="31.5313" width="30.8692" height="27.6198"/>
   <object id="55" name="fruit" x="164.419" y="962.537" width="30.8692" height="27.6198"/>
  </objectgroup>
- <objectgroup id="14" name="Presas" visible="0">
+ <objectgroup id="14" name="Presas">
   <object id="58" name="presa1" x="224.962" y="196.953" width="30.9644" height="33.2301"/>
  </objectgroup>
  <objectgroup id="15" name="Mato Grosso">
