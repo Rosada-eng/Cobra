@@ -197,7 +197,7 @@ class Game:
             #     Bird (self, tile_object.x, tile_object.y)    
             if tile_object.name == 'presa1':
                 self.guaxinim = Prey(self, self.guaxi_right['R1.png'], tile_object.x, tile_object.y)    
-        for i in range (8):
+        for i in range (16):
             # sorteio pra deixar aleatório a qtde de pássaros que vem de um lado e do outro
             sorteio = random.choice([0, 1, 2, 3])
             # pássaros que vão pra direita
@@ -270,6 +270,10 @@ class Game:
             # if hits:
             #     self.player.posic += vect (BIRD_KNOCKBACK, 0).rotate(90)
 
+        # hits = pygame.sprite.groupcollide(self.veneno, self.crazy_birds, True, True, pygame.sprite.collide_mask)
+        # for hit in hits:
+        #     self.player.stamine += 10
+        
 
         # --- PLayer colide com pássaros
         # hits = pygame.sprite.spritecollide (self.player, self.birds, False)
@@ -285,7 +289,7 @@ class Game:
         self.screen.blit(self.map_img, self.camera.apply_rect(self.map_rect))
         for sprite in self.all_sprites: #Analisa cada um dos sprites do grupo e mandar imprimir
             # -- Pássaro --
-            # if isinstance (sprite, Bird):
+            # if isinstance (sprite, CrazyBirds):
             #     sprite.draw_life_bar()
             # -- Fruta --
             if isinstance (sprite, Fruit): # se for relacionado a classe Fruit
