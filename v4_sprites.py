@@ -1,6 +1,6 @@
 import pygame
 import pytmx
-from random import choice, randint, uniform
+from random import *
 from v4_config import *
 from math import pi, sin
 vect = pygame.math.Vector2
@@ -9,9 +9,8 @@ vect = pygame.math.Vector2
 class Snake(pygame.sprite.Sprite):
     def __init__ (self, jogo, img, x, y): #será criado no proprio objeto 'jogo'
         # Construtor da classe mãe:
-        self._layer = PLAYER_LAYER
-        self.groups = jogo.all_sprites 
-        
+        self._layer = LAYERS['PLAYER']
+        self.groups = jogo.all_sprites  
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.jogo = jogo       
         self.image = img
@@ -21,18 +20,18 @@ class Snake(pygame.sprite.Sprite):
         self.rect.center = (x + SNAKE_WIDTH/2 ,y + SNAKE_HEIGHT/2)
         self.veloc = vect (0, 0) # Começa com velocidade zero 
         self.speed = PLAYER_SPEED
+        self.health = PLAYER_HEALTH
+        self.stamine = 0
+        self.dir = vect (1, 0) # começa virado pra direita
         self.last_update = pygame.time.get_ticks()
         self.snake_count = 0
+        self.charge = VENENO_CHARGE
         self.LEFT = False
         self.RIGHT = False
         self.UP = False
         self.DOWN = False
         self.last_shoot = 0 # no começo, não houve disparos
-        self.health = PLAYER_HEALTH
-        self.stamine = 0
-        self.dir = vect (1, 0) # começa virado pra direita
         self.last_dir = self.dir
-        self.charge = VENENO_CHARGE
         # configurações para o ataque
         self.ATACK = False
         self.last_atack = 0
@@ -40,11 +39,15 @@ class Snake(pygame.sprite.Sprite):
         self.to_target = vect (0,0)
         self.dist_to_target = 0
         self.count_step = 0
-        self.latest_atack = 0
+        self.INGRASS = False
+        self.last_hit = 0 # último hit do pássaro na cobra
+        self.ANALISE = True # analisa múltiplos hits do pássaro na cobra
+        
         
     def get_keys(self):
         self.veloc = vect (0, 0)
         self.interactive_objects()
+        CHANCE = 0.005
         keys = pygame.key.get_pressed() #Salva uma dicionario de keys q estão sendo pressionadas
         if keys[pygame.K_LEFT]:
             self.veloc.x = -self.speed
@@ -53,6 +56,10 @@ class Snake(pygame.sprite.Sprite):
             self.RIGHT = False
             self.UP = False
             self.DOWN = False
+            if self.INGRASS:
+                if random() < CHANCE:
+                    channel2 = self.jogo.sound_effects['1step_grass'].play() 
+                    """ configurar para não repetir tantas vezes """
         elif keys[pygame.K_RIGHT]:
             self.veloc.x = self.speed
             self.dir = vect (1, 0)
@@ -60,6 +67,9 @@ class Snake(pygame.sprite.Sprite):
             self.RIGHT = True
             self.UP = False
             self.DOWN = False
+            if self.INGRASS:
+                if random() < CHANCE:
+                    channel2 = self.jogo.sound_effects['1step_grass'].play()
         elif keys[pygame.K_UP]:
             self.veloc.y = -self.speed
             self.dir = vect (0, -1)
@@ -67,6 +77,9 @@ class Snake(pygame.sprite.Sprite):
             self.RIGHT = False
             self.UP = True
             self.DOWN = False
+            if self.INGRASS:
+                if random() < CHANCE:
+                    channel2 = self.jogo.sound_effects['1step_grass'].play()
         elif keys[pygame.K_DOWN]:
             self.veloc.y = self.speed
             self.dir = vect (0, 1)
@@ -74,6 +87,9 @@ class Snake(pygame.sprite.Sprite):
             self.RIGHT = False
             self.UP = False
             self.DOWN = True
+            if self.INGRASS:
+                if random() < CHANCE:
+                    channel2 = self.jogo.sound_effects['1step_grass'].play()
         else:
             self.UP = False
             self.DOWN = False
@@ -147,12 +163,10 @@ class Snake(pygame.sprite.Sprite):
         hits = pygame.sprite.spritecollide (self, self.jogo.mato_grosso, False) # retorna uma lista com os elementos do grupo q colidiram
         if hits:
             self.speed = 0.7*PLAYER_SPEED
+            self.INGRASS = True
         else:
             self.speed = 1.0*PLAYER_SPEED
-
-            
-
-
+            self.INGRASS = False
 
 
     #def atack (self):
@@ -162,7 +176,6 @@ class Snake(pygame.sprite.Sprite):
 
         """
     def update(self):
-
         self.get_keys()
         if self.ATACK:
             number_frames = 5 # numero de frames p/ animar o bote
@@ -171,15 +184,13 @@ class Snake(pygame.sprite.Sprite):
             
             ## Consome STAMINA
             now = pygame.time.get_ticks()
-            delta_t = now - self.last_atack
-                        
+            delta_t = now - self.last_atack       
             if delta_t > 30:
                 self.posic.x += move_step.x
                 self.posic.y += move_step.y
                 self.rect.center = (self.posic.x, self.posic.y)
                 self.count_step +=1
-                self.last_atack = now
-                                
+                self.last_atack = now      
                 if self.count_step >= number_frames:
                     #self.latest_atack = pygame.time.get_ticks()
                     #self.count_step += 1
@@ -187,33 +198,24 @@ class Snake(pygame.sprite.Sprite):
                     channel1 = self.jogo.sound_effects['bite1'].play() 
                     channel1.queue(self.jogo.sound_effects['bite2'])  
                     channel1.queue(self.jogo.sound_effects['bite3']) 
-
                     self.count_step = 0
-                    self.ATACK = False
-                        
-
-            #wait_to_kill = now - self.latest_atack
-            #if wait_to_kill > 1000: #espera 1 segundo para dar kill
-                  #kill_prey (jogo.guaxinim)
-          
-
+                    self.ATACK = False        
+    
         else:
             self.posic.x += self.veloc.x * dt #delta X = vx*deltaT
             self.posic.y += self.veloc.y * dt #delta Y = vy*deltaT
             #obs.1: Usar dt garante que o personagem ande proporcionalmente à velocidade de processamento da maquina
-            
             self.rect.x = self.posic.x
             self.collide_with_walls ('x') #checa condições de colisao em X
             self.rect.y = self.posic.y
             self.collide_with_walls('y') #checa condições de colisao em Y
 
             now = pygame.time.get_ticks()
-            delta_t = now - self.last_update
-            
+            delta_t = now - self.last_update   
             self.charge = (now - self.last_shoot)/VENENO_DURATION * VENENO_CHARGE
             if self.charge > VENENO_CHARGE:
                 self.charge = VENENO_CHARGE
-            
+
             if self.LEFT:
                 self.image = self.jogo.snake_left['L{}.png'.format(self.snake_count)]
                 if delta_t > 150:
@@ -222,6 +224,7 @@ class Snake(pygame.sprite.Sprite):
                     self.snake_count +=1
                     if self.snake_count > 2:
                         self.snake_count = 0
+
             elif self.RIGHT:
                 self.image = self.jogo.snake_right['R{}.png'.format(self.snake_count)]
                 if delta_t > 150:
@@ -229,7 +232,8 @@ class Snake(pygame.sprite.Sprite):
                     self.last_update = now
                     self.snake_count +=1
                     if self.snake_count > 2:
-                        self.snake_count = 0      
+                        self.snake_count = 0  
+
             elif self.DOWN:
                 self.image = self.jogo.snake_down['D{}.png'.format(self.snake_count)]
                 if delta_t > 150:
@@ -238,7 +242,7 @@ class Snake(pygame.sprite.Sprite):
                     self.snake_count +=1
                     if self.snake_count > 2:
                         self.snake_count = 0
-              
+
             elif self.UP:
                 self.image = self.jogo.snake_up['U{}.png'.format(self.snake_count)]
                 if delta_t > 150:
@@ -247,6 +251,56 @@ class Snake(pygame.sprite.Sprite):
                     self.snake_count +=1
                     if self.snake_count > 2:
                         self.snake_count = 0
+
+        # --- Player colide com a frutas:
+        hits = pygame.sprite.spritecollide (self, self.jogo.fruits, False, pygame.sprite.collide_mask)
+        for hit in hits:
+            self.jogo.sound_effects['pick_fruit'].play()
+            # frutinha já era
+            hit.kill()
+            # aumenta stamina
+            self.stamine += FRUTAS_STAMINA
+            if self.stamine > SNAKE_MAX_STAMINE:
+                self.stamine = SNAKE_MAX_STAMINE
+
+         # --- Player colide com pássaros
+        now = pygame.time.get_ticks()
+        delay = now - self.last_hit
+        if delay > 2000:
+            self.ANALISE = True
+        if self.ANALISE and not self.INGRASS:
+            hits = pygame.sprite.spritecollide (self, self.jogo.crazy_birds, False, pygame.sprite.collide_mask)           
+            self.last_hit = pygame.time.get_ticks()   
+            # Se colidiu, trava colisão por delay=2s para evitar múltiplas colisões num único instante    
+            for hit in hits:
+                self.ANALISE = False
+                self.health -= BIRD_DAMAGE
+                self.jogo.sound_effects['hit'].play()
+                hit.speed = vect (0, 0)
+                if self.health <= 0:
+                    self.playing = False
+
+
+                    """ Arrumar para adequar o código de baixo para o Sprite"""
+            # if hits:
+            #     self.player.posic += vect (BIRD_KNOCKBACK, 0).rotate(90)
+
+        # hits = pygame.sprite.groupcollide(self.veneno, self.crazy_birds, True, True, pygame.sprite.collide_mask)
+        # for hit in hits:
+        #     self.player.stamine += 10
+        
+
+        # --- PLayer colide com pássaros
+        # hits = pygame.sprite.spritecollide (self.player, self.birds, False)
+        # for hit in hits:
+        #     self.player.health -= BIRD_DAMAGE
+        #     hit.speed = vect (0, 0)
+        #     if self.player.health <= 0:
+        #         self.playing = False
+        # if hits:
+        #     self.player.posic += vect (BIRD_KNOCKBACK, 0).rotate(-hits[0].angulo)
+                
+
 
 
 # ------------ VENENO DA COBRA ------------
@@ -447,7 +501,7 @@ class Prey (pygame.sprite.Sprite):
 class Fruit(pygame.sprite.Sprite):
     def __init__(self, jogo, img, x, y):
         self.groups = jogo.all_sprites, jogo.fruits
-        self._layer = FRUITS_LAYER
+        self._layer = LAYERS['FRUIT']
         # Construtor da classe mãe
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.jogo = jogo
@@ -458,21 +512,29 @@ class Fruit(pygame.sprite.Sprite):
         self.pos = vect (x, y)
         self.rect.center = self.pos
         self.y_0 = self.pos.y
-        self.last_update = pygame.time.get_ticks()
+        self.last_update = pygame.time.get_ticks() # referência para fazer o efeito de movimentação da fruta
         self.t = 0
         self.phi_0 = 2*pi / (randint (1,5)) #phi_inicial: Porção de uma volta.
         self.argumento = 0
+        
 
+    
 
     def update(self):        
         now = pygame.time.get_ticks()
-        delta_t = now - self.last_update        
+        delta_t = now - self.last_update # análise do tempo p/ criar efeito da fruta
         self.argumento = (OMEGA * delta_t + self.phi_0) 
         if delta_t > T:
             delta_t = 0  
             self.last_update = now              
         self.pos.y = self.y_0 + A*sin(self.argumento)
         self.rect.center = self.pos
+
+        delta_respawn = now - self.jogo.last_spawn
+        if delta_respawn >= 90000: # respawn de 1,5 min:
+            self.jogo.respawn('fruit')
+            
+
 
 
 # ------------ ORBE ------------  
@@ -522,7 +584,7 @@ class Obstacle (pygame.sprite.Sprite):
             self.groups = jogo.walls
         if self.type == 'MATO':
             self.groups = jogo.mato_grosso
-        self._layer = CAMADAS[type]
+        self._layer = LAYERS[type]
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.jogo = jogo
         self.rect = pygame.Rect(x, y, width, height)
@@ -585,7 +647,7 @@ class TiledMap:
 # ------------ PÁSSAROS ------------
 class CrazyBirds(pygame.sprite.Sprite):
     def __init__ (self, jogo, img, x, y, vx, vy):
-        self._layer = BIRDS_LAYER
+        self._layer = LAYERS['BIRD']
         self.groups = jogo.all_sprites, jogo.crazy_birds
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.jogo = jogo

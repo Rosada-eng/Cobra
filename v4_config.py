@@ -39,11 +39,7 @@ GAME = 1
 QUIT = 2
 
 # Camadas
-CAMADAS = {'PLAYER': 3, 'FRUIT': 2, 'BIRD': 4, 'OBJECT': 1, 'WALL': 1, 'MATO': 1}
-WALL_LAYER = 1
-PLAYER_LAYER = 3
-FRUITS_LAYER = 2
-BIRDS_LAYER = 4
+LAYERS = {'PLAYER': 3, 'FRUIT': 2, 'BIRD': 4, 'OBJECT': 1, 'WALL': 1, 'MATO': 1}
 
 # Configuração do MHS:
 A = 10 # amplitude do movimento
@@ -65,6 +61,9 @@ SNAKE_WIDTH = 30
 SNAKE_HEIGHT = 30
 SNAKE_MAX_STAMINE = 100
 ATACK_RANGE = 100
+
+# Lista de Presas:
+#LISTA_PRESAS = [guaxinim]
 
 # Configurações do mob Guaxinim
 GUAXI_WALK_LEFT = ['L0.png', 'L1.png', 'L2.png']
@@ -130,5 +129,6 @@ MASTIGANDO = {'bite1':'bite1.wav', 'bite2':'bite2.wav', 'bite3':'bite3.wav'}
 https://opengameart.org/content/2d-fruits  #tile de frutas
 https://opengameart.org/content/lpc-terrain-repack # tile de terrenos
 https://opengameart.org/content/king-cobra # tile da cobrinha
+https://freesound.org/people/JanKoehl/sounds/85603/ # som de caminhada no mato
 
 """

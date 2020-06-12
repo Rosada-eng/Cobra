@@ -1,7 +1,7 @@
 import pygame
 import pytmx
 import sys
-import random
+from random import *
 from os import path
 from v4_config import *
 from v4_sprites import *
@@ -56,11 +56,12 @@ class Game:
         pygame.mixer.init()
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT)) #cria uma screen com o tamanho pedido
         pygame.display.set_caption ('Teste Tiled Map') #muda o título da screen
-
         pygame.key.set_repeat(500,100) # Inicia a função de repetir (tempo de espera, tempo para repetir cada ação)
         self.load_data()
-        self.last_hit = 0 # último hit do pássaro na cobra
-        self.ANALISE = True # analisa múltiplos hits do pássaro na cobra
+        self.last_spawn = 0
+        #self.LISTA_PRESAS = LISTA_PRESAS
+        #self.fase = 0
+        
         
     def load_data(self):
         # cria mapa       
@@ -68,8 +69,10 @@ class Game:
         self.map_img = self.map.make_map()
         self.map_rect = self.map_img.get_rect()
 
-        self.eye_img = pygame.image.load(path.join(IMG_DIR, 'eye_bckg.jpg')).convert_alpha()
-        self.eye_img = pygame.transform.scale(self.eye_img, (30,30))
+        self.see_img = pygame.image.load(path.join(IMG_DIR, 'see.jpg')).convert_alpha()
+        self.see_img = pygame.transform.scale(self.see_img, (30,30))
+        self.not_see_img = pygame.image.load(path.join(IMG_DIR, 'not see.jpg')).convert_alpha()
+        self.not_see_img = pygame.transform.scale(self.not_see_img, (30,30))
 
         # --- Cobra ---
             # Esquerda
@@ -167,7 +170,7 @@ class Game:
         # ==== SOUND ====
         # --- música de fundo ---
         pygame.mixer.music.load(path.join(MUSIC_DIR, 'sonarctica_v7.ogg'))
-        pygame.mixer.music.set_volume(0.2)
+        pygame.mixer.music.set_volume(0.1)
         # -- Dicionário com os efeitos
         self.sound_effects = {}
         self.sound_effects['hit'] = pygame.mixer.Sound(path.join(EFFECTS_DIR, '1hit.ogg'))
@@ -175,6 +178,9 @@ class Game:
         self.sound_effects['bite1'] = pygame.mixer.Sound(path.join(EFFECTS_DIR,'mastigando', 'bite1.ogg'))
         self.sound_effects['bite2'] = pygame.mixer.Sound(path.join(EFFECTS_DIR,'mastigando', 'bite2.ogg'))
         self.sound_effects['bite3'] = pygame.mixer.Sound(path.join(EFFECTS_DIR,'mastigando', 'bite3.ogg'))
+        self.sound_effects['in-grass'] = pygame.mixer.Sound(path.join(EFFECTS_DIR, 'grass_in_or_out.ogg'))
+        self.sound_effects['grass_walk'] = pygame.mixer.Sound(path.join(EFFECTS_DIR,'grass_walk.ogg'))
+        self.sound_effects['1step_grass'] = pygame.mixer.Sound(path.join(EFFECTS_DIR,'1step - grass_walk.ogg'))
 
         
     
@@ -197,36 +203,51 @@ class Game:
             if tile_object.name == 'mato grosso':
                 Obstacle(self, tile_object.x, tile_object.y, tile_object.width, tile_object.height, 'MATO')
             if tile_object.name == 'fruit':
-                Fruit (self, random.choice(self.fruit_images), tile_object.x, tile_object.y)
+                Fruit (self, choice(self.fruit_images), tile_object.x, tile_object.y)
             # if tile_object.name == 'Passaro':
             #     Bird (self, tile_object.x, tile_object.y)    
             if tile_object.name == 'presa1':
                 self.guaxinim = Prey(self, self.guaxi_right['R1.png'], tile_object.x, tile_object.y)    
         for i in range (16):
             # sorteio pra deixar aleatório a qtde de pássaros que vem de um lado e do outro
-            sorteio = random.choice([0, 1, 2, 3])
+            sorteio = choice([0, 1, 2, 3])
             # pássaros que vão pra direita
             if sorteio == 0:  
-                posx = random.randint (-300, -100)
-                speedx = random.choice(BIRD_SPEEDS)
-                CrazyBirds(self, self.bird_right_img['right000.png'], posx, random.randint(0, self.map.height), speedx, 0)     
+                posx = randint (-300, -100)
+                speedx = choice(BIRD_SPEEDS)
+                CrazyBirds(self, self.bird_right_img['right000.png'], posx, randint(0, self.map.height), speedx, 0)     
             # pássaros que vão pra direita
             elif sorteio == 1:  
-                posx = random.randint (self.map.width + 20, self.map.width + 100)
-                speedx = -random.choice(BIRD_SPEEDS)
-                CrazyBirds(self, self.bird_left_img['left000.png'], posx, random.randint(0, self.map.height), speedx, 0)     
+                posx = randint (self.map.width + 20, self.map.width + 100)
+                speedx = -choice(BIRD_SPEEDS)
+                CrazyBirds(self, self.bird_left_img['left000.png'], posx, randint(0, self.map.height), speedx, 0)     
             # pássaros que vão pra cima
             elif sorteio == 2:  
-                posy = random.randint (self.map.height + 50, self.map.height + 150)
-                speedy = -random.choice(BIRD_SPEEDS)
-                CrazyBirds(self, self.bird_up_img['up000.png'], random.randint(0, self.map.width), posy, 0, speedy)     
+                posy = randint (self.map.height + 50, self.map.height + 150)
+                speedy = -choice(BIRD_SPEEDS)
+                CrazyBirds(self, self.bird_up_img['up000.png'], randint(0, self.map.width), posy, 0, speedy)     
             # pássaros que vão pra baixo
             else:  
-                posy = random.randint (-300, -100)
-                speedy = random.choice(BIRD_SPEEDS)
-                CrazyBirds(self, self.bird_down_img['down000.png'], random.randint(0, self.map.width), posy, 0, speedy)     
+                posy = randint (-300, -100)
+                speedy = choice(BIRD_SPEEDS)
+                CrazyBirds(self, self.bird_down_img['down000.png'], randint(0, self.map.width), posy, 0, speedy)     
         # cria câmera
         self.camera = Camera(self.map.width, self.map.height)
+
+    def respawn(self, type):
+        if type == 'fruit':
+            
+            for sprite in self.fruits.sprites(): # primeiramente, remove todas as frutas que não foram colhetadas
+                sprite.kill()
+                self.last_spawn = pygame.time.get_ticks()
+            for tile_object in self.map.tmxdata.objects:
+                if tile_object.name == 'fruit':
+                    Fruit (self, choice(self.fruit_images), tile_object.x, tile_object.y)
+
+       # if type == 'prey':
+       #     self.LISTA_PRESAS[self.fase].kill()
+       #     self.LISTA_PRESAS[self.fase+1] = Prey(self, self.)
+
 
     def run(self):
         self.playing = True
@@ -244,51 +265,13 @@ class Game:
     def update(self):
         self.all_sprites.update()
         self.camera.update(self.player)
-        # --- Player colide com a frutas:
-        hits = pygame.sprite.spritecollide (self.player, self.fruits, False, pygame.sprite.collide_mask)
-        for hit in hits:
-            self.sound_effects['pick_fruit'].play()
-            # frutinha já era
-            hit.kill()
-            # aumenta stamina
-            self.player.stamine += FRUTAS_STAMINA
-            if self.player.stamine > SNAKE_MAX_STAMINE:
-                self.player.stamine = SNAKE_MAX_STAMINE
+
+
+        """ MUDAR OS COLIDES P/ DENTRO DOS SPRITES """
+        
         
 
-        # --- Player colide com pássaros
-        now = pygame.time.get_ticks()
-        delay = now - self.last_hit
-        if delay > 2000:
-            self.ANALISE = True
-        if self.ANALISE:
-            hits = pygame.sprite.spritecollide (self.player, self.crazy_birds, False, pygame.sprite.collide_mask)           
-            self.last_hit = pygame.time.get_ticks()   
-            # Se colidiu, trava colisão por delay=2s para evitar múltiplas colisões num único instante    
-            for hit in hits:
-                self.ANALISE = False
-                self.player.health -= BIRD_DAMAGE
-                self.sound_effects['hit'].play()
-                hit.speed = vect (0, 0)
-                if self.player.health <= 0:
-                    self.playing = False
-            # if hits:
-            #     self.player.posic += vect (BIRD_KNOCKBACK, 0).rotate(90)
-
-        # hits = pygame.sprite.groupcollide(self.veneno, self.crazy_birds, True, True, pygame.sprite.collide_mask)
-        # for hit in hits:
-        #     self.player.stamine += 10
-        
-
-        # --- PLayer colide com pássaros
-        # hits = pygame.sprite.spritecollide (self.player, self.birds, False)
-        # for hit in hits:
-        #     self.player.health -= BIRD_DAMAGE
-        #     hit.speed = vect (0, 0)
-        #     if self.player.health <= 0:
-        #         self.playing = False
-        # if hits:
-        #     self.player.posic += vect (BIRD_KNOCKBACK, 0).rotate(-hits[0].angulo)
+       
                
     def draw(self):
         self.screen.blit(self.map_img, self.camera.apply_rect(self.map_rect))
@@ -306,7 +289,11 @@ class Game:
         health_player_bar(self.screen, 10, 10, self.player.health / PLAYER_HEALTH)
         stamine_player_bar (self.screen, 10, 30, self.player.stamine / SNAKE_MAX_STAMINE)
         poison_charge_bar (self.screen, 10, 45, self.player.charge)
-        self.screen.blit(self.eye_img, (10, 60))
+        if self.player.INGRASS:
+            self.screen.blit(self.not_see_img, (10,60))
+        else:
+            self.screen.blit(self.see_img, (10,60))
+       # self.screen.blit(self.eye_img, (10, 60))
         pygame.display.flip()
 
     def quit(self):
