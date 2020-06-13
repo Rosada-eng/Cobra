@@ -49,24 +49,44 @@ def poison_charge_bar (surf, x, y, charge):
     pygame.draw.rect(surf, color, preench_rect) 
     pygame.draw.rect(surf, BLACK, contorno_rect, 3)
 
+
+
 # ========== CENTRAL DE COMANDO ==========
+# Parâmetros de controle do jogo
+OPEN_GAME = True
+# INIT_SCREEN = True
+Fase1 = True
+Fase2 = False
+Fase3 = False
+
+
 class Game:
-    def __init__(self):
+    def __init__(self, Fase1, Fase2, Fase3):
         pygame.init()
         pygame.mixer.init()
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT)) #cria uma screen com o tamanho pedido
         pygame.display.set_caption ('Teste Tiled Map') #muda o título da screen
-
+        self.playing = True
         pygame.key.set_repeat(500,100) # Inicia a função de repetir (tempo de espera, tempo para repetir cada ação)
         self.load_data()
         self.last_hit = 0 # último hit do pássaro na cobra
         self.ANALISE = True # analisa múltiplos hits do pássaro na cobra
+
+        self.Fase1 = Fase1
+        self.Fase2 = Fase2
+        self.Fase3 = Fase3
         
     def load_data(self):
-        # cria mapa       
-        self.map = TiledMap((path.join(MAP_DIR, 'mapa1.tmx')))
-        self.map_img = self.map.make_map()
-        self.map_rect = self.map_img.get_rect()
+        # cria mapa
+        if Fase1:       
+            self.map = TiledMap((path.join(MAP_DIR, 'mapa1.tmx')))
+            self.map_img = self.map.make_map()
+            self.map_rect = self.map_img.get_rect()
+
+        elif Fase2:
+            self.map = TiledMap((path.join(MAP_DIR, 'mapa2.tmx')))
+            self.map_img = self.map.make_map()
+            self.map_rect = self.map_img.get_rect()
 
         self.eye_img = pygame.image.load(path.join(IMG_DIR, 'eye_bckg.jpg')).convert_alpha()
         self.eye_img = pygame.transform.scale(self.eye_img, (30,30))
@@ -175,9 +195,6 @@ class Game:
         self.sound_effects['bite1'] = pygame.mixer.Sound(path.join(EFFECTS_DIR,'mastigando', 'bite1.ogg'))
         self.sound_effects['bite2'] = pygame.mixer.Sound(path.join(EFFECTS_DIR,'mastigando', 'bite2.ogg'))
         self.sound_effects['bite3'] = pygame.mixer.Sound(path.join(EFFECTS_DIR,'mastigando', 'bite3.ogg'))
-
-        
-    
         
     def new(self):   
         #cria os grupos:
@@ -229,7 +246,7 @@ class Game:
         self.camera = Camera(self.map.width, self.map.height)
 
     def run(self):
-        self.playing = True
+        
         pygame.mixer.music.play (loops=-1)
         while self.playing:
             self.events()
@@ -270,10 +287,32 @@ class Game:
                 self.player.health -= BIRD_DAMAGE
                 self.sound_effects['hit'].play()
                 hit.speed = vect (0, 0)
+                # Se o jogador morre... (ainda tem que criar os if's pra fase que ele estiver)
                 if self.player.health <= 0:
-                    self.playing = False
-            # if hits:
-            #     self.player.posic += vect (BIRD_KNOCKBACK, 0).rotate(90)
+                    self.Fase1 = False # finaliza Fase1
+                    self.playing = False # encerra run da atual fase
+                
+        if self.player.stamine == SNAKE_MAX_STAMINE: # configurar para quando dá o bote
+            if self.Fase1:
+                self.Fase1 = False # finaliza Fase1
+                self.playing = False # finaliza run da Fase1
+                self.Fase2 = True # passa pra Fase2
+            # elif self.Fase2:
+            #     self.Fase2 = False
+            #     self.playing = False
+            #     self.Fase3 = True
+            # elif self.Fase3:
+            #     self.Fase3 = False
+            #     self.playing = False
+            #     self.FASE_A_DETERMINAR = True
+ 
+ 
+ 
+ 
+        # if hits:
+        #     self.player.posic += vect (BIRD_KNOCKBACK, 0).rotate(90)
+
+
 
         # hits = pygame.sprite.groupcollide(self.veneno, self.crazy_birds, True, True, pygame.sprite.collide_mask)
         # for hit in hits:
@@ -315,8 +354,24 @@ class Game:
 
 
 
-jogo = Game()
-while True:
-    jogo.new()
-    jogo.run()
+jogo = Game(Fase1, Fase2, Fase3)
+
+# ========== LOOPING DE COMANDO ==========
+while OPEN_GAME:
+    while Fase1:
+        jogo.new()
+        jogo.run()
+        # Se o jogador passou da fase 1...
+        if jogo.Fase2 == True: # a 1° condição é quando dá o bote
+            Fase1 = False
+            Fase2 = True
+            jogo.playing = True # libera run da próxima fase
+            jogo.load_data()
+        # Se o jogador morreu...
+        elif jogo.player.health <= 0:
+            Fase1 = False
+            OPEN_GAME = False # '''Esse tem que ser configurado pra só quando o jogador encerrar'''
+    while Fase2:
+        jogo.new()
+        jogo.run()
 
