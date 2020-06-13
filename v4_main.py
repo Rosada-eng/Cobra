@@ -66,17 +66,16 @@ class Game:
         pygame.mixer.init()
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT)) #cria uma screen com o tamanho pedido
         pygame.display.set_caption ('Teste Tiled Map') #muda o título da screen
-        self.playing = True
         pygame.key.set_repeat(500,100) # Inicia a função de repetir (tempo de espera, tempo para repetir cada ação)
         self.load_data()
         self.last_hit = 0 # último hit do pássaro na cobra
         self.ANALISE = True # analisa múltiplos hits do pássaro na cobra
 
+        self.playing = True
         self.Fase1 = Fase1
         self.Fase2 = Fase2
         self.Fase3 = Fase3
-        pygame.key.set_repeat(500,100) # Inicia a função de repetir (tempo de espera, tempo para repetir cada ação)
-        self.load_data()
+
         self.last_spawn = 0
         #self.LISTA_PRESAS = LISTA_PRESAS
         #self.fase = 0
@@ -291,24 +290,11 @@ class Game:
         self.all_sprites.update()
         self.camera.update(self.player)
 
-        # --- Player colide com pássaros
-        now = pygame.time.get_ticks()
-        delay = now - self.last_hit
-        if delay > 2000:
-            self.ANALISE = True
-        if self.ANALISE:
-            hits = pygame.sprite.spritecollide (self.player, self.crazy_birds, False, pygame.sprite.collide_mask)           
-            self.last_hit = pygame.time.get_ticks()   
-            # Se colidiu, trava colisão por delay=2s para evitar múltiplas colisões num único instante    
-            for hit in hits:
-                self.ANALISE = False
-                self.player.health -= BIRD_DAMAGE
-                self.sound_effects['hit'].play()
-                hit.speed = vect (0, 0)
-                # Se o jogador morre... (ainda tem que criar os if's pra fase que ele estiver)
-                if self.player.health <= 0:
-                    self.Fase1 = False # finaliza Fase1
-                    self.playing = False # encerra run da atual fase
+        
+        # Se o jogador morre... (ainda tem que criar os if's pra fase que ele estiver)
+        if self.player.health <= 0:
+            self.Fase1 = False # finaliza Fase1
+            self.playing = False # encerra run da atual fase
                 
         if self.player.stamine == SNAKE_MAX_STAMINE: # configurar para quando dá o bote
             if self.Fase1:
@@ -330,9 +316,6 @@ class Game:
         # if hits:
         #     self.player.posic += vect (BIRD_KNOCKBACK, 0).rotate(90)
 
-
-
-        """ MUDAR OS COLIDES P/ DENTRO DOS SPRITES """
         
         
 
