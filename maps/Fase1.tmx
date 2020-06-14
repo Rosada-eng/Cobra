@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.2" tiledversion="1.3.4" orientation="orthogonal" renderorder="right-down" width="100" height="80" tilewidth="32" tileheight="32" infinite="0" nextlayerid="10" nextobjectid="289">
+<map version="1.2" tiledversion="1.3.5" orientation="orthogonal" renderorder="right-down" width="100" height="80" tilewidth="32" tileheight="32" infinite="0" nextlayerid="11" nextobjectid="292">
  <tileset firstgid="1" name="Árvores" tilewidth="32" tileheight="32" tilecount="256" columns="16">
   <image source="../assets/img/celianna_TileB1.png" width="512" height="512"/>
  </tileset>
@@ -736,7 +736,7 @@
 0,0,0,0,0,0,0,0,0,0,248,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,786,787,786,787,786,787,786,787,786,787,786,787,786,787,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 </data>
  </layer>
- <objectgroup id="8" name="Walls">
+ <objectgroup id="8" name="TUDO">
   <object id="1" name="Wall" x="1000" y="8" width="696" height="184"/>
   <object id="2" name="Wall" x="264" y="488" width="16" height="16"/>
   <object id="3" name="Wall" x="680" y="104" width="16" height="16"/>
@@ -826,7 +826,6 @@
   <object id="89" name="fruit" x="2992" y="296" width="16" height="16"/>
   <object id="90" name="fruit" x="3080" y="752" width="16" height="16"/>
   <object id="91" name="Wall" x="3112" y="936" width="32" height="48"/>
-  <object id="92" name="presa1" x="2912" y="2304" width="32" height="32"/>
   <object id="96" name="mato grosso" x="312" y="1976" width="1264" height="232"/>
   <object id="97" name="player" x="232" y="232" width="24" height="24"/>
   <object id="98" name="Wall" x="0" y="1344" width="424" height="48"/>
@@ -1014,5 +1013,10 @@
   <object id="286" name="Wall" x="1728" y="2144" width="32" height="32"/>
   <object id="287" name="Wall" x="1056" y="1568" width="32" height="32"/>
   <object id="288" name="Wall" x="2944" y="1088" width="32" height="32"/>
+ </objectgroup>
+ <objectgroup id="10" name="Presas">
+  <object id="289" name="presa1" x="2819.45" y="2302.82" width="32" height="32"/>
+  <object id="290" name="presa2" x="836.459" y="2301.33" width="32" height="32"/>
+  <object id="291" name="presa3" x="1793.13" y="521.471" width="32" height="32"/>
  </objectgroup>
 </map>

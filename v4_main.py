@@ -77,8 +77,10 @@ class Game:
         self.Fase3 = Fase3
 
         self.last_spawn = 0
-        #self.LISTA_PRESAS = LISTA_PRESAS
-        #self.fase = 0
+        self.paused = False
+
+        self.last_sec = 0
+
         
         
     def load_data(self):
@@ -89,7 +91,7 @@ class Game:
             self.map_rect = self.map_img.get_rect()
 
         elif Fase2:
-            self.map = TiledMap((path.join(MAP_DIR, 'mapa2.tmx')))
+            self.map = TiledMap((path.join(MAP_DIR, 'mapa1.tmx')))
             self.map_img = self.map.make_map()
             self.map_rect = self.map_img.get_rect()
 
@@ -190,7 +192,13 @@ class Game:
 
         # --- Veneno da cobra ---
         self.veneno_img = pygame.image.load(path.join(IMG_DIR, VENENO_IMG)).convert_alpha()
-    
+
+        # ==== FONTS ====
+        self.alagard = path.join(FONT_DIR, 'alagard.TTF')
+        self.romulus = path.join(FONT_DIR, 'romulus.TTF')
+        
+        self.cortina_screen = pygame.Surface(self.screen.get_size()).convert_alpha()
+        self.cortina_screen.fill((210,105,30, 170))
         # ==== SOUND ====
         # --- música de fundo ---
         pygame.mixer.music.load(path.join(MUSIC_DIR, 'sonarctica_v7.ogg'))
@@ -206,7 +214,12 @@ class Game:
         self.sound_effects['grass_walk'] = pygame.mixer.Sound(path.join(EFFECTS_DIR,'grass_walk.ogg'))
         self.sound_effects['1step_grass'] = pygame.mixer.Sound(path.join(EFFECTS_DIR,'1step - grass_walk.ogg'))
 
-        
+    def draw_text(self, text, font_name, size, color, x, y):
+        font = pygame.font.Font(font_name, size)
+        text_surface = font.render(text, True, color)
+        text_rect = text_surface.get_rect()
+        text_rect.center = (x,y)
+        self.screen.blit(text_surface, text_rect)
     
         
     def new(self):   
@@ -227,12 +240,6 @@ class Game:
                 Object(self, tile_object.x, tile_object.y, tile_object.width, tile_object.height, 'WALL')
             if tile_object.name == 'mato grosso':
                 Object(self, tile_object.x, tile_object.y, tile_object.width, tile_object.height, 'MATO')
-            #if tile_object.name == 'detect_presa1':
-            #    Object(self, tile_object.x, tile_object.y, tile_object.width, tile_object.height, 'DETECT')
-            #if tile_object.name == 'detect_presa2':
-            #    Object(self, tile_object.x, tile_object.y, tile_object.width, tile_object.height, 'DETECT')
-            #if tile_object.name == 'detect_presa3':
-            #    Object(self, tile_object.x, tile_object.y, tile_object.width, tile_object.height, 'DETECT')
             if tile_object.name == 'fruit':
                 Fruit (self, choice(self.fruit_images), tile_object.x, tile_object.y)
             # if tile_object.name == 'Passaro':
@@ -279,27 +286,30 @@ class Game:
                 if tile_object.name == 'fruit':
                     Fruit (self, choice(self.fruit_images), tile_object.x, tile_object.y)
 
-       # if type == 'prey':
-       #     self.LISTA_PRESAS[self.fase].kill()
-       #     self.LISTA_PRESAS[self.fase+1] = Prey(self, self.)
-
 
     def run(self):
-        
         pygame.mixer.music.play (loops=-1)
         while self.playing:
             self.events()
-            self.update()
+            if not self.paused:
+                self.update()
             self.draw()
 
     def events(self):
         for event in pygame.event.get():
+            #print (event)
             if event.type == pygame.QUIT:
                 self.quit()
+            if event.type == pygame.KEYDOWN:
+                if event.type == pygame.K_ESCAPE:
+                    self.paused = not self.paused
+            
 
     def update(self):
         self.all_sprites.update()
         self.camera.update(self.player)
+
+        #sec = pygame.time.get_ticks()
 
         
         # Se o jogador morre... (ainda tem que criar os if's pra fase que ele estiver)
@@ -307,11 +317,12 @@ class Game:
             self.Fase1 = False # finaliza Fase1
             self.playing = False # encerra run da atual fase
                 
-        if self.player.stamine == SNAKE_MAX_STAMINE: # configurar para quando dá o bote
+        if self.player.stamine >= SNAKE_MAX_STAMINE/10: # configurar para quando dá o bote
             if self.Fase1:
                 self.Fase1 = False # finaliza Fase1
                 self.playing = False # finaliza run da Fase1
                 self.Fase2 = True # passa pra Fase2
+                #self.playing = True
             # elif self.Fase2:
             #     self.Fase2 = False
             #     self.playing = False
@@ -352,7 +363,10 @@ class Game:
             self.screen.blit(self.not_see_img, (10,60))
         else:
             self.screen.blit(self.see_img, (10,60))
-       # self.screen.blit(self.eye_img, (10, 60))
+
+        if not self.paused:
+            self.screen.blit(self.cortina_screen, (0,0))
+            self.draw_text("PAUSE", self.romulus, 80, (75,0,130), WIDTH/2, HEIGHT/2)
         pygame.display.flip()
 
     def quit(self):
