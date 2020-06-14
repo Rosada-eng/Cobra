@@ -41,6 +41,9 @@ QUIT = 2
 # Camadas
 LAYERS = {'PLAYER': 3, 'FRUIT': 2, 'BIRD': 4, 'OBJECT': 1, 'WALL': 1, 'MATO': 1, 'DETECT': 1}
 
+# ============ CONFIGURAÇÕES DAS FASES ============
+FASE1 = (2*60 + 00)*1000 # tempo em milisseg
+
 # Configuração do MHS:
 A = 10 # amplitude do movimento
 T = 2000  # período em milisseg

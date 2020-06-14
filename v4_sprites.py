@@ -156,6 +156,8 @@ class Snake(pygame.sprite.Sprite):
                 self.ATACK = True # executa a animação de ataque qnd rodar o update
                 self.target = self.jogo.presa3
 
+
+
     def collide_with_walls (self, dir):
         if dir == 'x':
             hits = pygame.sprite.spritecollide (self, self.jogo.walls, False) # retorna uma lista com os elementos do grupo q colidiram

@@ -72,12 +72,16 @@ class Game:
         self.ANALISE = True # analisa múltiplos hits do pássaro na cobra
 
         self.playing = True
+        self.mostrador = " "
+        self.tempo_fase = 5000
+        self.last_sec = 0
         self.Fase1 = Fase1
         self.Fase2 = Fase2
         self.Fase3 = Fase3
 
         self.last_spawn = 0
         self.paused = False
+        self.GAMEOVER = False
 
         self.last_sec = 0
 
@@ -199,6 +203,8 @@ class Game:
         
         self.cortina_screen = pygame.Surface(self.screen.get_size()).convert_alpha()
         self.cortina_screen.fill((210,105,30, 170))
+        self.gameover_screen = pygame.Surface(self.screen.get_size()).convert_alpha()
+        self.gameover_screen.fill((0,0,0, 220))
         # ==== SOUND ====
         # --- música de fundo ---
         pygame.mixer.music.load(path.join(MUSIC_DIR, 'sonarctica_v7.ogg'))
@@ -297,30 +303,38 @@ class Game:
 
     def events(self):
         for event in pygame.event.get():
-            #print (event)
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    self.paused = not self.paused
             if event.type == pygame.QUIT:
                 self.quit()
-            if event.type == pygame.KEYDOWN:
-                if event.type == pygame.K_ESCAPE:
-                    self.paused = not self.paused
-        #keys = pygame.key.get_pressed()
-        #if keys[pygame.K_ESCAPE]:
-        #    self.paused = not self.paused
+
 
     def timer (self):
-        tempo_fase = 2*60*1000 # Tempo em milisseg
-        minutos = tempo_fase // (60*1000) # quantidade inteira de minutos
-        seg = (time - minutos*60*1000) / 1000
+        if self.tempo_fase <= 0: # Analisa se acabou o tempo. Se sim, o jogo acaba.
+            self.GAMEOVER = True
+            #self.playing = False
+        else:
+            segundos_total = self.tempo_fase // 1000 # analisa o tempo em segundos
+            seg = segundos_total % 10 # pega o último dígito (0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
+            tempo_em_min = segundos_total / 60
+            minutos = tempo_em_min // 1 # Pega a parte inteira dos minutos
+            frac_min = tempo_em_min % 1 # Pega a parte fracionária do minuto
+            frac_min_em_seg = (frac_min * 60) # Transforma a parte fracionária do minuto em segundos (esse valor é menor que 60)
+            dez_seg = (frac_min_em_seg // 10) % 10 # retira o último digito (seg) e pega o último algarismo após essa remoção (algarismo da dez_seg)
 
-        self.mostrador = "{0}: {1}{2}" .format(minutos, )            
+            self.mostrador = "{0:.0f} : {1:.0f}{2}" .format(minutos, dez_seg, seg)
+            return self.mostrador          
 
     def update(self):
         self.all_sprites.update()
         self.camera.update(self.player)
+        now = pygame.time.get_ticks()
+        delta_t = now - self.last_sec
+        if delta_t >= 1000: # intervalo de 1 seg
+            self.last_sec = now
+            self.tempo_fase -= 1000       
 
-        #sec = pygame.time.get_ticks()
-
-        
         # Se o jogador morre... (ainda tem que criar os if's pra fase que ele estiver)
         if self.player.health <= 0:
             self.Fase1 = False # finaliza Fase1
@@ -376,6 +390,12 @@ class Game:
         if self.paused:
             self.screen.blit(self.cortina_screen, (0,0))
             self.draw_text("PAUSE", self.romulus, 80, (75,0,130), WIDTH/2, HEIGHT/2)
+        
+        if self.GAMEOVER:
+            self.screen.blit(self.gameover_screen, (0,0))
+            self.draw_text("GAME OVER!", self.romulus, 80, (149,165,166), WIDTH/2, HEIGHT/2)
+        
+        self.draw_text(self.timer(), self.romulus, 40, WHITE, WIDTH/2 , 20)
         pygame.display.flip()
 
     def quit(self):
