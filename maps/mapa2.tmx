@@ -105,7 +105,7 @@
  </layer>
  <objectgroup id="5" name="Objeto">
   <object id="3" name="Wall" x="896" y="448" width="320" height="64"/>
-  <object id="4" name="Jogador" x="1040" y="592" width="32" height="32"/>
+  <object id="4" name="player" x="1040" y="592" width="32" height="32"/>
   <object id="11" name="Wall" x="1344" y="448" width="1024" height="64"/>
   <object id="13" name="Wall" x="1344" y="832" width="320" height="64" rotation="-90"/>
   <object id="16" name="mato_grosso" x="1632" y="352" width="64" height="64"/>

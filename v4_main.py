@@ -84,7 +84,7 @@ class Game:
     def load_data(self):
         # cria mapa
         if Fase1:       
-            self.map = TiledMap((path.join(MAP_DIR, 'mapa1.tmx')))
+            self.map = TiledMap((path.join(MAP_DIR, 'Fase1.tmx')))
             self.map_img = self.map.make_map()
             self.map_rect = self.map_img.get_rect()
 
