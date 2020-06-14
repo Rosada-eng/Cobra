@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.2" tiledversion="1.3.4" orientation="orthogonal" renderorder="right-down" width="100" height="80" tilewidth="32" tileheight="32" infinite="0" nextlayerid="10" nextobjectid="289">
  <tileset firstgid="1" name="Árvores" tilewidth="32" tileheight="32" tilecount="256" columns="16">
-  <image source="../../Desktop/img/img/Tiles/celianna_TileB1.png" width="512" height="512"/>
+  <image source="../assets/img/celianna_TileB1.png" width="512" height="512"/>
  </tileset>
  <tileset firstgid="257" name="Terreno principal 2" tilewidth="32" tileheight="32" tilecount="483" columns="21">
-  <image source="../../Desktop/img/img/Tiles/c6dafe8d907c61cdaf12a1d766e709b5.png" width="672" height="736"/>
+  <image source="../assets/img/terrain.png" width="672" height="736"/>
   <terraintypes>
    <terrain name="Caminho de terra claro" tile="64"/>
    <terrain name="Caminnho de terra vermelha" tile="70"/>
@@ -143,10 +143,10 @@
   <tile id="344" terrain="3,,,"/>
  </tileset>
  <tileset firstgid="740" name="Mais terrenos" tilewidth="32" tileheight="32" tilecount="192" columns="16">
-  <image source="../../Desktop/img/img/Tiles/celianna_TileA2.png" width="512" height="384"/>
+  <image source="../assets/img/celianna_TileA2.png" width="512" height="384"/>
  </tileset>
  <tileset firstgid="932" name="Construções" tilewidth="32" tileheight="32" tilecount="900" columns="30">
-  <image source="../../Desktop/img/img/Tiles/kisspng-sprite-tile-based-video-game-opengameart-org-tiles-5ad7e1d7a1c119.0323451215240974956626.png" width="960" height="960"/>
+  <image source="../assets/img/kisspng-sprite-tile-based-video-game-opengameart-org-tiles-5ad7e1d7a1c119.0323451215240974956626.png" width="960" height="960"/>
  </tileset>
  <layer id="1" name="Gramado solo" width="100" height="80">
   <data encoding="csv">
