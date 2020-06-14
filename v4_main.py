@@ -303,7 +303,16 @@ class Game:
             if event.type == pygame.KEYDOWN:
                 if event.type == pygame.K_ESCAPE:
                     self.paused = not self.paused
-            
+        #keys = pygame.key.get_pressed()
+        #if keys[pygame.K_ESCAPE]:
+        #    self.paused = not self.paused
+
+    def timer (self):
+        tempo_fase = 2*60*1000 # Tempo em milisseg
+        minutos = tempo_fase // (60*1000) # quantidade inteira de minutos
+        seg = (time - minutos*60*1000) / 1000
+
+        self.mostrador = "{0}: {1}{2}" .format(minutos, )            
 
     def update(self):
         self.all_sprites.update()
@@ -364,7 +373,7 @@ class Game:
         else:
             self.screen.blit(self.see_img, (10,60))
 
-        if not self.paused:
+        if self.paused:
             self.screen.blit(self.cortina_screen, (0,0))
             self.draw_text("PAUSE", self.romulus, 80, (75,0,130), WIDTH/2, HEIGHT/2)
         pygame.display.flip()

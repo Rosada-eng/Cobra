@@ -134,27 +134,23 @@ class Snake(pygame.sprite.Sprite):
             to_target_2 = vect (self.jogo.presa2.posic.x - self.posic.x, self.jogo.presa2.posic.y - self.posic.y) # vetor Distância inicial p/ Presa 2
             to_target_3 = vect (self.jogo.presa3.posic.x - self.posic.x, self.jogo.presa3.posic.y - self.posic.y) # vetor Distância inicial p/ Presa 3
 
-
             dist_to_target_1 = to_target_1.magnitude() # distância inicial (em pixels) entre Player e Presa 1
             dist_to_target_2 = to_target_2.magnitude() # distância inicial (em pixels) entre Player e Presa 2
             dist_to_target_3 = to_target_3.magnitude() # distância inicial (em pixels) entre Player e Presa 3
-
-            #lista_distancias = [dist_to_target_1, dist_to_target_2, dist_to_target_3]
             
-            
-            if dist_to_target_1 <= ATACK_RANGE: 
+            if dist_to_target_1 <= ATACK_RANGE and self.jogo.presa1.alive and self.stamine == SNAKE_MAX_STAMINE: 
                 self.last_atack = pygame.time.get_ticks()
                 #self.current_position = vect(self.posic.x, self.posic.y) # guarda a posição inicial antes de dar o bote
                 self.ATACK = True # executa a animação de ataque qnd rodar o update
                 self.target = self.jogo.presa1
 
-            elif dist_to_target_2 <= ATACK_RANGE: 
+            elif dist_to_target_2 <= ATACK_RANGE and self.jogo.presa2.alive and self.stamine == SNAKE_MAX_STAMINE : 
                 self.last_atack = pygame.time.get_ticks()
                 #self.current_position = vect(self.posic.x, self.posic.y) # guarda a posição inicial antes de dar o bote
                 self.ATACK = True # executa a animação de ataque qnd rodar o update
                 self.target = self.jogo.presa2
 
-            elif dist_to_target_3 <= ATACK_RANGE: 
+            elif dist_to_target_3 <= ATACK_RANGE and self.jogo.presa3.alive and self.stamine == SNAKE_MAX_STAMINE: 
                 self.last_atack = pygame.time.get_ticks()
                 #self.current_position = vect(self.posic.x, self.posic.y) # guarda a posição inicial antes de dar o bote
                 self.ATACK = True # executa a animação de ataque qnd rodar o update
@@ -190,13 +186,6 @@ class Snake(pygame.sprite.Sprite):
             self.speed = 1.0*PLAYER_SPEED
             self.INGRASS = False
 
-
-    #def atack (self):
-        """ Como detectar a presa mais próximas? 
-        Temos que configurar uma lista com as presas [guaxinim, galinha, porco, raposa, etc...]
-        aí, eu coloco em self.[current_prey].posic
-
-        """
     def update(self):
         self.get_keys()
         if self.ATACK:
@@ -205,6 +194,7 @@ class Snake(pygame.sprite.Sprite):
             move_step = self.to_target / number_frames 
             
             ## Consome STAMINA
+            self.stamine = 0.8* self.stamine
             now = pygame.time.get_ticks()
             delta_t = now - self.last_atack       
             if delta_t > 30:
@@ -214,14 +204,13 @@ class Snake(pygame.sprite.Sprite):
                 self.count_step +=1
                 self.last_atack = now      
                 if self.count_step >= number_frames:
-                    #self.latest_atack = pygame.time.get_ticks()
-                    #self.count_step += 1
                     self.target.kill()
                     channel1 = self.jogo.sound_effects['bite1'].play() 
                     channel1.queue(self.jogo.sound_effects['bite2'])  
                     channel1.queue(self.jogo.sound_effects['bite3']) 
                     self.count_step = 0
-                    self.ATACK = False        
+                    self.ATACK = False
+                    self.target.alive = False    
     
         else:
             self.posic.x += self.veloc.x * dt #delta X = vx*deltaT
@@ -449,6 +438,7 @@ class Prey (pygame.sprite.Sprite):
         self.dir = vect(1,0) # Versor da velocidade
         self.speed = GUAXI_SPEED
         self.veloc = self.dir * self.speed
+        self.alive = True
 
         self.last_position = vect(x,y) # Ou trabalha com distancia ou com tempo
         self.distance = vect(0,0) # distância que percorre antes de mudar de direção
