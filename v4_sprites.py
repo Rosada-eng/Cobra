@@ -35,7 +35,8 @@ class Snake(pygame.sprite.Sprite):
         # configurações para o ataque
         self.ATACK = False
         self.last_atack = 0
-        self.current_position = vect (0,0)
+        #self.current_position = vect (0,0)
+        self.target = 0 # variável que guardará quem é o target mais próximo
         self.to_target = vect (0,0)
         self.dist_to_target = 0
         self.count_step = 0
@@ -129,15 +130,35 @@ class Snake(pygame.sprite.Sprite):
 
         if keys[pygame.K_x]:
             # checa distância entre Player e a Presa:
-            to_target_0 = vect (self.jogo.guaxinim.posic.x - self.posic.x, self.jogo.guaxinim.posic.y - self.posic.y) # vetor Distância inicial
-            dist_to_target_0 = to_target_0.magnitude() # distância inicial (em pixels) entre Player e Presa
+            to_target_1 = vect (self.jogo.presa1.posic.x - self.posic.x, self.jogo.presa1.posic.y - self.posic.y) # vetor Distância inicial p/ Presa 1
+            to_target_2 = vect (self.jogo.presa2.posic.x - self.posic.x, self.jogo.presa2.posic.y - self.posic.y) # vetor Distância inicial p/ Presa 2
+            to_target_3 = vect (self.jogo.presa3.posic.x - self.posic.x, self.jogo.presa3.posic.y - self.posic.y) # vetor Distância inicial p/ Presa 3
 
-            if dist_to_target_0 <= ATACK_RANGE: 
-                """ Especificar o target 
-                dist_to_target[LISTA]             """ 
+
+            dist_to_target_1 = to_target_1.magnitude() # distância inicial (em pixels) entre Player e Presa 1
+            dist_to_target_2 = to_target_2.magnitude() # distância inicial (em pixels) entre Player e Presa 2
+            dist_to_target_3 = to_target_3.magnitude() # distância inicial (em pixels) entre Player e Presa 3
+
+            #lista_distancias = [dist_to_target_1, dist_to_target_2, dist_to_target_3]
+            
+            
+            if dist_to_target_1 <= ATACK_RANGE: 
                 self.last_atack = pygame.time.get_ticks()
-                self.current_position = vect(self.posic.x, self.posic.y) # guarda a posição inicial antes de dar o bote
+                #self.current_position = vect(self.posic.x, self.posic.y) # guarda a posição inicial antes de dar o bote
                 self.ATACK = True # executa a animação de ataque qnd rodar o update
+                self.target = self.jogo.presa1
+
+            elif dist_to_target_2 <= ATACK_RANGE: 
+                self.last_atack = pygame.time.get_ticks()
+                #self.current_position = vect(self.posic.x, self.posic.y) # guarda a posição inicial antes de dar o bote
+                self.ATACK = True # executa a animação de ataque qnd rodar o update
+                self.target = self.jogo.presa2
+
+            elif dist_to_target_3 <= ATACK_RANGE: 
+                self.last_atack = pygame.time.get_ticks()
+                #self.current_position = vect(self.posic.x, self.posic.y) # guarda a posição inicial antes de dar o bote
+                self.ATACK = True # executa a animação de ataque qnd rodar o update
+                self.target = self.jogo.presa3
 
     def collide_with_walls (self, dir):
         if dir == 'x':
@@ -160,6 +181,7 @@ class Snake(pygame.sprite.Sprite):
                 self.rect.y = self.posic.y  
 
     def interactive_objects (self):
+        # -- Analisa configurações de mato para esconder player e mudar sua velocidade
         hits = pygame.sprite.spritecollide (self, self.jogo.mato_grosso, False) # retorna uma lista com os elementos do grupo q colidiram
         if hits:
             self.speed = 0.7*PLAYER_SPEED
@@ -179,7 +201,7 @@ class Snake(pygame.sprite.Sprite):
         self.get_keys()
         if self.ATACK:
             number_frames = 5 # numero de frames p/ animar o bote
-            self.to_target = vect (self.jogo.guaxinim.posic.x - self.posic.x, self.jogo.guaxinim.posic.y - self.posic.y)
+            self.to_target = vect (self.target.posic.x - self.posic.x, self.target.posic.y - self.posic.y)
             move_step = self.to_target / number_frames 
             
             ## Consome STAMINA
@@ -194,7 +216,7 @@ class Snake(pygame.sprite.Sprite):
                 if self.count_step >= number_frames:
                     #self.latest_atack = pygame.time.get_ticks()
                     #self.count_step += 1
-                    self.jogo.guaxinim.kill()
+                    self.target.kill()
                     channel1 = self.jogo.sound_effects['bite1'].play() 
                     channel1.queue(self.jogo.sound_effects['bite2'])  
                     channel1.queue(self.jogo.sound_effects['bite3']) 
@@ -577,13 +599,15 @@ class Orbe(pygame.sprite.Sprite):
 
 
 # ------------ OBSTÁCULO ------------
-class Obstacle (pygame.sprite.Sprite):
+class Object (pygame.sprite.Sprite):
     def __init__(self, jogo, x,y, width, height, type):
         self.type = type
         if self.type == 'WALL':
             self.groups = jogo.walls
         if self.type == 'MATO':
             self.groups = jogo.mato_grosso
+        if self.type == 'DETECT':
+            self.groups = jogo.detect_prey
         self._layer = LAYERS[type]
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.jogo = jogo

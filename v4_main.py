@@ -218,20 +218,31 @@ class Game:
         self.veneno = pygame.sprite.Group()
         self.crazy_birds = pygame.sprite.Group()
         self.mato_grosso = pygame.sprite.Group()
+        self.detect_prey = pygame.sprite.Group()
         # Spawna as barreiras
         for tile_object in self.map.tmxdata.objects:
             if tile_object.name == 'player':
                 self.player = Snake(self, self.snake_right['R1.png'], tile_object.x, tile_object.y)
             if tile_object.name == 'Wall':
-                Obstacle(self, tile_object.x, tile_object.y, tile_object.width, tile_object.height, 'WALL')
+                Object(self, tile_object.x, tile_object.y, tile_object.width, tile_object.height, 'WALL')
             if tile_object.name == 'mato grosso':
-                Obstacle(self, tile_object.x, tile_object.y, tile_object.width, tile_object.height, 'MATO')
+                Object(self, tile_object.x, tile_object.y, tile_object.width, tile_object.height, 'MATO')
+            #if tile_object.name == 'detect_presa1':
+            #    Object(self, tile_object.x, tile_object.y, tile_object.width, tile_object.height, 'DETECT')
+            #if tile_object.name == 'detect_presa2':
+            #    Object(self, tile_object.x, tile_object.y, tile_object.width, tile_object.height, 'DETECT')
+            #if tile_object.name == 'detect_presa3':
+            #    Object(self, tile_object.x, tile_object.y, tile_object.width, tile_object.height, 'DETECT')
             if tile_object.name == 'fruit':
                 Fruit (self, choice(self.fruit_images), tile_object.x, tile_object.y)
             # if tile_object.name == 'Passaro':
             #     Bird (self, tile_object.x, tile_object.y)    
             if tile_object.name == 'presa1':
-                self.guaxinim = Prey(self, self.guaxi_right['R1.png'], tile_object.x, tile_object.y)    
+                self.presa1 = Prey(self, self.guaxi_right['R1.png'], tile_object.x, tile_object.y)    
+            if tile_object.name == 'presa2':
+                self.presa2 = Prey(self, self.guaxi_right['R1.png'], tile_object.x, tile_object.y)    
+            if tile_object.name == 'presa3':
+                self.presa3 = Prey(self, self.guaxi_right['R1.png'], tile_object.x, tile_object.y)    
         for i in range (16):
             # sorteio pra deixar aleatório a qtde de pássaros que vem de um lado e do outro
             sorteio = choice([0, 1, 2, 3])

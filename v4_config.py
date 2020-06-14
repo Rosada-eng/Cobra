@@ -39,7 +39,7 @@ GAME = 1
 QUIT = 2
 
 # Camadas
-LAYERS = {'PLAYER': 3, 'FRUIT': 2, 'BIRD': 4, 'OBJECT': 1, 'WALL': 1, 'MATO': 1}
+LAYERS = {'PLAYER': 3, 'FRUIT': 2, 'BIRD': 4, 'OBJECT': 1, 'WALL': 1, 'MATO': 1, 'DETECT': 1}
 
 # Configuração do MHS:
 A = 10 # amplitude do movimento
