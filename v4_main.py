@@ -88,7 +88,7 @@ class Game:
         self.Fase2 = Fase2
         self.Fase3 = Fase3
 
-        self.tempo_fase = 5000
+        self.tempo_fase = 2500*60
         self.mostrador = " " # vai exibir o tempo na tela
         self.player_level = 1
         self.player_xp = 0
@@ -223,6 +223,8 @@ class Game:
 
         # --- Veneno da cobra ---
         self.veneno_img = pygame.image.load(path.join(IMG_DIR, VENENO_IMG)).convert_alpha()
+
+        self.init_img = pygame.image.load(path.join(IMG_DIR, INIT_IMG)).convert()
 
         # ==== FONTS ====
         self.romulus = path.join(FONT_DIR, 'romulus.TTF')
@@ -505,9 +507,55 @@ class Game:
                         self.playing = True
                         Fase1 = True
                         jogo.__init__(Fase1, Fase2, Fase3)
+
+    def init_screen(self):
+        running = True
+        while running:
+            self.clock.tick(30)
+            self.information = False # janela de informações
+            self.screen.fill(BLACK)
+            # Carrega imagem com nome do jogo
+            self.image = self.init_img
+            self.image_rect = self.image.get_rect()
+            self.image_rect.center = (WIDTH/2, self.image_rect.height/2)
+            self.screen.blit(self.image, self.image_rect)
+            # Insere texto na tela
+            self.draw_text("Pressione ENTER para começar", self.romulus_40, WHITE, WIDTH/2, HEIGHT/2)
+            pygame.display.flip()
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
+                    self.quit()
+                if event.type == pygame.KEYUP:
+                    if event.key == pygame.K_RETURN:
+                        running = False
+                        self.Fase1 = True
+                    # Tecla 'i' exibe instruções do jogo
+                    if event.key == pygame.K_i:
+                        self.information = not self.information
+                        while self.information:
+                            self.screen.fill(BLUE)
+                            self.draw_text("INstruções aqui", self.romulus_40, WHITE, WIDTH/2, HEIGHT/2)
+                            pygame.display.flip()
+                            # Fecha ou volta para o início
+                            for event in pygame.event.get():
+                                if event.type == pygame.QUIT:
+                                    self.information = False
+                                    running = False
+                                    self.quit()
+                                if event.type == pygame.KEYUP:
+                                    if event.key == pygame.K_i:
+                                        self.information = False
+            
+      
+                
+            
+            
+
+            
     
 
-    def init_screen (self):
+    # def init_screen (self):
         #waiting = True
         #while waiting:
         #    self.clock.tick(30)
@@ -545,6 +593,7 @@ jogo = Game(Fase1, Fase2, Fase3)
 
 # ========== LOOPING DE COMANDO ==========
 while True:
+    jogo.init_screen()
     while Fase1:
         jogo.new()
         jogo.run()
