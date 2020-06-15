@@ -43,6 +43,7 @@ class Snake(pygame.sprite.Sprite):
         self.INGRASS = False
         self.last_hit = 0 # último hit do pássaro na cobra
         self.ANALISE = True # analisa múltiplos hits do pássaro na cobra
+        self.score = 0
         
         
     def get_keys(self):
@@ -143,18 +144,21 @@ class Snake(pygame.sprite.Sprite):
                 #self.current_position = vect(self.posic.x, self.posic.y) # guarda a posição inicial antes de dar o bote
                 self.ATACK = True # executa a animação de ataque qnd rodar o update
                 self.target = self.jogo.presa1
+                self.score += GUAXI_SCORE
 
             elif dist_to_target_2 <= ATACK_RANGE and self.jogo.presa2.alive and self.stamine == SNAKE_MAX_STAMINE : 
                 self.last_atack = pygame.time.get_ticks()
                 #self.current_position = vect(self.posic.x, self.posic.y) # guarda a posição inicial antes de dar o bote
                 self.ATACK = True # executa a animação de ataque qnd rodar o update
                 self.target = self.jogo.presa2
+                self.score += GUAXI_SCORE
 
             elif dist_to_target_3 <= ATACK_RANGE and self.jogo.presa3.alive and self.stamine == SNAKE_MAX_STAMINE: 
                 self.last_atack = pygame.time.get_ticks()
                 #self.current_position = vect(self.posic.x, self.posic.y) # guarda a posição inicial antes de dar o bote
                 self.ATACK = True # executa a animação de ataque qnd rodar o update
                 self.target = self.jogo.presa3
+                self.score += GUAXI_SCORE
 
 
 
@@ -190,13 +194,13 @@ class Snake(pygame.sprite.Sprite):
 
     def update(self):
         self.get_keys()
-        if self.ATACK:
+        if self.ATACK and self.stamine >= 0.8*SNAKE_MAX_STAMINE:
             number_frames = 5 # numero de frames p/ animar o bote
             self.to_target = vect (self.target.posic.x - self.posic.x, self.target.posic.y - self.posic.y)
             move_step = self.to_target / number_frames 
             
             ## Consome STAMINA
-            self.stamine = 0.8* self.stamine
+            
             now = pygame.time.get_ticks()
             delta_t = now - self.last_atack       
             if delta_t > 30:
@@ -212,7 +216,8 @@ class Snake(pygame.sprite.Sprite):
                     channel1.queue(self.jogo.sound_effects['bite3']) 
                     self.count_step = 0
                     self.ATACK = False
-                    self.target.alive = False    
+                    self.target.alive = False
+                    self.stamine -= 0.8* self.stamine # não fica negativa    
     
         else:
             self.posic.x += self.veloc.x * dt #delta X = vx*deltaT
@@ -271,8 +276,9 @@ class Snake(pygame.sprite.Sprite):
             self.jogo.sound_effects['pick_fruit'].play()
             # frutinha já era
             hit.kill()
-            # aumenta stamina
+            # aumenta stamina e score
             self.stamine += FRUTAS_STAMINA
+            self.score += FRUIT_SCORE
             if self.stamine > SNAKE_MAX_STAMINE:
                 self.stamine = SNAKE_MAX_STAMINE
 
