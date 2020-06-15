@@ -75,7 +75,10 @@ class Game:
         pygame.init()
         pygame.mixer.init()
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT)) #cria uma screen com o tamanho pedido
-        pygame.display.set_caption ('Teste Tiled Map') #muda o título da screen
+        self.clock = pygame.time.Clock()
+        self.clock.tick(30)
+        
+        pygame.display.set_caption ("The Snake is gonna Smoke! ~ by G & J ") #muda o título da screen
         pygame.key.set_repeat(500,100) # Inicia a função de repetir (tempo de espera, tempo para repetir cada ação)
         self.load_data()
         #self.last_hit = 0 # último hit do pássaro na cobra
@@ -83,7 +86,7 @@ class Game:
 
         self.playing = True
         self.mostrador = " "
-        self.tempo_fase = FASE1
+        self.tempo_fase = 5000
         self.last_sec = 0
         self.Fase1 = Fase1
         self.Fase2 = Fase2
@@ -94,6 +97,7 @@ class Game:
         self.last_spawn = 0
         self.paused = False
         self.GAMEOVER = False
+        self.LOSER = False
         self.total_score = 0
 
         self.last_sec = 0
@@ -247,6 +251,7 @@ class Game:
         self.sound_effects['grass_walk'] = pygame.mixer.Sound(path.join(EFFECTS_DIR,'grass_walk.ogg'))
         self.sound_effects['1step_grass'] = pygame.mixer.Sound(path.join(EFFECTS_DIR,'1step - grass_walk.ogg'))
         self.sound_effects['levelup'] = pygame.mixer.Sound(path.join(EFFECTS_DIR,'blessing2.ogg'))
+        self.sound_effects['gameover'] = pygame.mixer.Sound(path.join(EFFECTS_DIR,'gameover.ogg'))
 
     def draw_text(self, text, font, color, x, y):
         text_surface = font.render(text, True, color)
@@ -329,7 +334,7 @@ class Game:
         pygame.mixer.music.play (loops=-1)
         while self.playing:
             self.events()
-            if not self.paused:
+            if not self.paused and not self.GAMEOVER:
                 self.update()
             self.draw()
 
@@ -345,7 +350,9 @@ class Game:
     def timer (self):
         if self.tempo_fase <= 0: # Analisa se acabou o tempo. Se sim, o jogo acaba.
             self.GAMEOVER = True
-            #self.playing = False
+            self.LOSER = True
+            self.playing = False
+
         else:
             segundos_total = self.tempo_fase // 1000 # analisa o tempo em segundos
             seg = segundos_total % 10 # pega o último dígito (0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
@@ -373,8 +380,10 @@ class Game:
 
         # Se o jogador morre... (ainda tem que criar os if's pra fase que ele estiver)
         if self.player.health <= 0:
-            self.Fase1 = False # finaliza Fase1
+            #self.Fase1 = False # finaliza Fase1
             self.playing = False # encerra run da atual fase
+            self.GAMEOVER = True
+            self.LOSER = True
 
             
                 
@@ -437,7 +446,7 @@ class Game:
         poison_charge_bar (self.screen, 40, 45, self.player.charge)
         # - LVL:
         self.draw_text ("Lvl:", self.romulus_20, BLACK, 20, 70)
-        self.draw_text ("{}".format(self.player_level), self.romulus_20, RED, 50,70 )
+        self.draw_text ("{}".format(self.player_level), self.romulus_40, RED, 50,70 )
         # - Símbolo de Visibilidade
         if self.player.INGRASS:
             self.screen.blit(self.not_see_img, (160,60))
@@ -466,26 +475,114 @@ class Game:
         pygame.quit()
         sys.exit()
 
+    def game_over (self):
+        waiting = True
+        while waiting:
+            self.clock.tick(30)
+            pygame.mixer.music.stop()
+            # Tela de Game Over
+            self.screen.blit(self.gameover_screen, (0,0))
+            self.draw_text("GAME OVER!", self.romulus_80, (149,165,166), WIDTH/2, HEIGHT*0.3)
+            if self.LOSER:
+                self.sound_effects['gameover'].play()
+                self.LOSER = False
+                
+
+            pygame.display.flip()
+            for event in pygame.event.get():
+                print (event)
+                if event.type == pygame.QUIT:
+                    waiting = False
+                    self.quit()
+
+                if event.type == pygame.KEYUP:
+                   waiting = False
+                   self.GAMEOVER = False
+                   self.playing = True
+                   self.zerar_atributos()
+
+    def zerar_atributos(self):
+          self._layer = LAYERS['PLAYER']
+        self.groups = jogo.all_sprites  
+        pygame.sprite.Sprite.__init__(self, self.groups)
+        # --- Atributos Player ---
+        self.speed = PLAYER_SPEED
+        self.health = PLAYER_HEALTH
+        self.max_health = PLAYER_HEALTH
+        #self.max_stamine = PLAYER_MAX_STAMINE
+        self.player_vision = PLAYER_VISION
+        self.snake_width = SNAKE_WIDTH
+        self.snake_height = SNAKE_HEIGHT
+        # LEVEL UP:
+        self.next_level_xp = 1000
+        self.current_xp = 0
+        self.last_levelup = 0
+        self.LEVELUP = False
+        self.snake_count_lvl = 0
+        self.last_image = 0
+        # Atributos da Fruta 
+        self.fruit_xp = 20
+        self.fruit_stamine = 10
+        # Condições do
+        # configurações gerais do sprite
+        self.jogo = jogo       
+        self.image = img
+        self.mask = pygame.mask.from_surface(self.image)
+        self.rect = self.image.get_rect()
+        self.rect.center = (x + self.snake_width/2 ,y + self.snake_height/2)
+        self.posic = vect (x, y) #declara as posições (x,y) em que o player será spawnado
+        self.veloc = vect (0, 0) # Começa com velocidade zero 
+        self.dir = vect (1, 0) # começa virado pra direita
+        self.stamine = 0 # Stamina inicial
+        self.last_update = pygame.time.get_ticks()
+        self.snake_count = 0
+        self.charge = VENENO_CHARGE
+        self.LEFT = False
+        self.RIGHT = False
+        self.UP = False
+        self.DOWN = False
+        self.last_shoot = 0 # no começo, não houve disparos
+        self.last_dir = self.dir
+        # configurações para o ataque
+        self.ATACK = False
+        self.last_atack = 0
+        #self.current_position = vect (0,0)
+        self.target = 0 # variável que guardará quem é o target mais próximo
+        self.to_target = vect (0,0)
+        self.dist_to_target = 0
+        self.count_step = 0
+        self.INGRASS = False
+        self.last_hit = 0 # último hit do pássaro na cobra
+        self.ANALISE = True # analisa múltiplos hits do pássaro na cobra
+        self.score = 0
+        
+
+
+
+
+            
+
 
 
 jogo = Game(Fase1, Fase2, Fase3)
 
 # ========== LOOPING DE COMANDO ==========
-while OPEN_GAME:
+while True:
     while Fase1:
         jogo.new()
         jogo.run()
+        jogo.game_over()
         # Se o jogador passou da fase 1...
-        if jogo.Fase2 == True: # a 1° condição é quando dá o bote
-            Fase1 = False
-            Fase2 = True
-            jogo.playing = True # libera run da próxima fase
-            jogo.load_data()
-        # Se o jogador morreu...
-        elif jogo.player.health <= 0:
-            Fase1 = False
-            OPEN_GAME = False # '''Esse tem que ser configurado pra só quando o jogador encerrar'''
-    while Fase2:
-        jogo.new()
-        jogo.run()
+        #if jogo.Fase2 == True: # a 1° condição é quando dá o bote
+        #    Fase1 = False
+        #    Fase2 = True
+        #    jogo.playing = True # libera run da próxima fase
+        #    jogo.load_data()
+        ## Se o jogador morreu...
+        #elif jogo.player.health <= 0:
+        #    Fase1 = False
+        #    OPEN_GAME = False # '''Esse tem que ser configurado pra só quando o jogador encerrar'''
+    #while Fase2:
+    #    jogo.new()
+    #    jogo.run()
 
