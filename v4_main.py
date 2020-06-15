@@ -76,7 +76,7 @@ class Game:
         pygame.mixer.init()
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT)) #cria uma screen com o tamanho pedido
         self.clock = pygame.time.Clock()
-        self.clock.tick(30)
+        self.clock.tick(60)
         
         pygame.display.set_caption ("The Snake is gonna Smoke! ~ by G & J ") #muda o título da screen
         pygame.key.set_repeat(500,100) # Inicia a função de repetir (tempo de espera, tempo para repetir cada ação)

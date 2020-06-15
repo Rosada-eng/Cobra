@@ -238,7 +238,7 @@ class Snake(pygame.sprite.Sprite):
                     ## Adiciona tempo
                     self.jogo.tempo_fase += 30*1000
                     # Adiciona XP:
-                    self.current_xp += 300
+                    self.current_xp += 500
     
         else:
             self.posic.x += self.veloc.x * dt #delta X = vx*deltaT
@@ -265,16 +265,7 @@ class Snake(pygame.sprite.Sprite):
                     if self.snake_count_lvl > 5:
                         self.snake_count_lvl = 0
                         self.LEVELUP = False
-                        #if self.LEFT:
-                        #    self.image = self.jogo.snake_left['L{}.png'.format(self.snake_count)]
-                        #    self.image = pygame.transform.scale(self.image, (self.snake_width, self.snake_height))
-                        #elif self.RIGHT:
-                        #    self.image = self.jogo.snake_left['R{}.png'.format(self.snake_count)]
-                        #    self.image = pygame.transform.scale(self.image, (self.snake_width, self.snake_height))
-                        #elif self.UP:
-                        #    self.image = self.jogo.snake_left['U{}.png'.format(self.snake_count)]
-                        #    self.image = pygame.transform.scale(self.image, (self.snake_width, self.snake_height))
-                        #elif self.DOWN:
+                        # Retorna à imagem da cobra
                         self.image = self.jogo.snake_down['D{}.png'.format(self.snake_count)]
                         self.image = pygame.transform.scale(self.image, (self.snake_width, self.snake_height))
                         
@@ -325,7 +316,7 @@ class Snake(pygame.sprite.Sprite):
         hits = pygame.sprite.spritecollide (self, self.jogo.fruits, False, pygame.sprite.collide_mask)
         for hit in hits:
             self.jogo.sound_effects['pick_fruit'].play()
-            self.current_xp += 500
+            self.current_xp += FRUIT_XP
                        
             hit.kill()
             # aumenta stamina e score
