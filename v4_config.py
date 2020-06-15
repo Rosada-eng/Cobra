@@ -138,6 +138,8 @@ OWL_WIDTH = 50
 MASTIGANDO = {'bite1':'bite1.wav', 'bite2':'bite2.wav', 'bite3':'bite3.wav'}
 
 
+INIT_IMG = 'init_teste.png'
+
 
 # REFERÊNCIAS
 """

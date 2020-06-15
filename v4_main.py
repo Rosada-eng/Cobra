@@ -227,6 +227,8 @@ class Game:
         # --- Veneno da cobra ---
         self.veneno_img = pygame.image.load(path.join(IMG_DIR, VENENO_IMG)).convert_alpha()
 
+        self.init_img = pygame.image.load(path.join(IMG_DIR, INIT_IMG)).convert()
+
         # ==== FONTS ====
         self.romulus = path.join(FONT_DIR, 'romulus.TTF')
         self.romulus_20 = pygame.font.Font(self.romulus, 20)
@@ -540,40 +542,48 @@ class Game:
                             self.playing = True
                             Fase1 = True
                             jogo.__init__()
-       
+
+
+    def init_screen(self):
+        running = True
+        while running:
+            self.clock.tick(30)
+            self.information = False # janela de informações
+            self.screen.fill(BLACK)
+            # Carrega imagem com nome do jogo
+            self.image = self.init_img
+            self.image_rect = self.image.get_rect()
+            self.image_rect.center = (WIDTH/2, self.image_rect.height/2)
+            self.screen.blit(self.image, self.image_rect)
+            # Insere texto na tela
+            self.draw_text("Pressione ENTER para começar", self.romulus_40, WHITE, WIDTH/2, HEIGHT/2)
+            pygame.display.flip()
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
+                    self.quit()
+                if event.type == pygame.KEYUP:
+                    if event.key == pygame.K_RETURN:
+                        running = False
+                        self.Fase1 = True
+                    # Tecla 'i' exibe instruções do jogo
+                    if event.key == pygame.K_i:
+                        self.information = not self.information
+                        while self.information:
+                            self.screen.fill(BLUE)
+                            self.draw_text("INstruções aqui", self.romulus_40, WHITE, WIDTH/2, HEIGHT/2)
+                            pygame.display.flip()
+                            # Fecha ou volta para o início
+                            for event in pygame.event.get():
+                                if event.type == pygame.QUIT:
+                                    self.information = False
+                                    running = False
+                                    self.quit()
+                                if event.type == pygame.KEYUP:
+                                    if event.key == pygame.K_i:
+                                        self.information = False
+            
     
-
-    #def init_screen (self):
-        #waiting = True
-        #while waiting:
-        #    self.clock.tick(30)
-        #    pygame.mixer.music.stop()
-        #    # Tela de Game Over
-        #    self.screen.blit(self.gameover_screen, (0,0))
-        #    self.draw_text("GAME OVER!", self.romulus_80, (149,165,166), WIDTH/2, HEIGHT*0.3)
-        #    self.draw_text("Aperte ESPACO para TENTAR NOVAMENTE", self.romulus_40, (149,165,166), WIDTH/2, HEIGHT*0.6)
-        #    
-        #    if self.LOSER:
-        #        self.sound_effects['gameover'].play()
-        #        self.LOSER = False
-#
-        #    pygame.display.flip()
-        #    for event in pygame.event.get():
-        #        print (event)
-        #        if event.type == pygame.QUIT:
-        #            waiting = False
-        #            self.quit()
-#
-        #        if event.type == pygame.KEYUP:
-        #            if event.key == pygame.K_SPACE:
-        #                waiting = False
-        #                self.GAMEOVER = False
-        #                self.playing = True
-        #                Fase1 = True
-        #                jogo.__init__(Fase1, Fase2, Fase3)
-
-                   
-        
 
 
 jogo = Game()
@@ -584,7 +594,7 @@ while True:
         jogo.new()
         jogo.run()
         jogo.game_over()
-        print ("passou")
+        
         
         # Se o jogador passou da fase 1...
         #if jogo.Fase2 == True: # a 1° condição é quando dá o bote
@@ -597,7 +607,7 @@ while True:
         #    Fase1 = False
         #    OPEN_GAME = False # '''Esse tem que ser configurado pra só quando o jogador encerrar'''
     while jogo.Fase2:
-        print ("entrou")
+        
         jogo.new()
         jogo.run()
         jogo.game_over()
