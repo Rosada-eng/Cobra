@@ -777,6 +777,12 @@ class CrazyBirds(pygame.sprite.Sprite):
         self.posic += self.speed * dt
         self.rect.center = self.posic
         self.hit_rect.center = self.rect.center
+        # Verifica colisão com veneno
+        hits = pygame.sprite.spritecollide (self, self.jogo.veneno, False, pygame.sprite.collide_mask)
+        for hit in hits:
+            self.kill()
+            hit.kill()
+            self.jogo.player.score += BIRD_SCORE_HIT
         # Verifica se os que vão pra direita já atravessaram o mapa
         if self.posic.x > self.jogo.map.width and self.vx > 0:
             self.posic.x = -30

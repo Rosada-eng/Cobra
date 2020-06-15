@@ -283,7 +283,12 @@ class Game:
                 self.presa2 = Prey(self, self.guaxi_right['R1.png'], tile_object.x, tile_object.y)    
             if tile_object.name == 'presa3':
                 self.presa3 = Prey(self, self.guaxi_right['R1.png'], tile_object.x, tile_object.y)    
-        for i in range (16):
+        if Fase1:
+            qtde_birds = 30
+        if Fase2:
+            qtde_birds = 50
+        
+        for i in range (qtde_birds):
             # sorteio pra deixar aleatório a qtde de pássaros que vem de um lado e do outro
             sorteio = choice([0, 1, 2, 3])
             # pássaros que vão pra direita

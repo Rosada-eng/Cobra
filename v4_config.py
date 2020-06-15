@@ -93,11 +93,11 @@ GUAXI_SCORE = 200
 # Configurações das frutas
 LISTA_FRUTAS = ['abacaxi.png', 'cereja.png', 'laranja.png', 'limao.png', 'maca.png', 'morango.png', 'uva.png']
 # Configurações do veneno da cobra
-VENENO_SPEED = 50
+VENENO_SPEED = 75
 #VENENO_ANIM = []
 VENENO_IMG = 'veneno0.png'
-VENENO_DURATION = 2000
-VENENO_FREQUENCY = 2000 # frequência de disparos
+VENENO_DURATION = 4000
+VENENO_FREQUENCY = 4000 # frequência de disparos
 VENENO_HIT_RECT = pygame.Rect (0, 0, 16, 16)
 VENENO_DESLOC_LEFT = vect (15, 10) 
 VENENO_DESLOC_RIGHT = vect (50, 10) 
@@ -114,6 +114,9 @@ BIRD_LEFT_IMG = ['left000.png', 'left001.png', 'left002.png', 'left003.png'] # e
 BIRD_UP_IMG = ['up000.png', 'up001.png', 'up002.png', 'up003.png'] # cima
 BIRD_DOWN_IMG = ['down000.png', 'down001.png', 'down002.png', 'down003.png'] # baixo
 BIRD_DAMAGE = 10 # dano que o pássaro causa
+BIRD_SCORE_HIT = 20
+
+
 BIRD_KNOCKBACK = 30 # repulsão quando atinge player
 BIRD_HIT_RECT = pygame.Rect (0, 0, 30, 30) #ret. de colisão
 BIRD_SPEEDS = [40, 50, 30, 25]
