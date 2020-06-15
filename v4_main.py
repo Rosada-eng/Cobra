@@ -8,7 +8,7 @@ from v4_sprites import *
 
 # ========== HUD do jogo ==========
 # ----- Barra de vida do jogador
-def health_player_bar(surf, x, y, fracao): # (sup. de desesnho, x, y, porcentagem)
+def health_player_bar(surf, x, y, fracao): # Função para desenhar o HUD de Life (HP)
     if fracao < 0:
         fracao = 0
     BAR_WIDTH = 150
@@ -28,7 +28,7 @@ def health_player_bar(surf, x, y, fracao): # (sup. de desesnho, x, y, porcentage
     pygame.draw.rect(surf, BLACK, contorno_rect, 3)
 
 # ----- Barra de Stamina
-def stamine_player_bar (surf, x, y, stamina):
+def stamine_player_bar (surf, x, y, stamina): # Função para desenhar o HUD de Stamina (SP)
     BAR_WIDTH = 150
     BAR_HEIGHT = 15
     preench = stamina * BAR_WIDTH
@@ -39,7 +39,7 @@ def stamine_player_bar (surf, x, y, stamina):
     pygame.draw.rect(surf, BLACK, contorno_rect, 3)
 
 # ----- Barra de carga do disparo
-def poison_charge_bar (surf, x, y, charge):
+def poison_charge_bar (surf, x, y, charge): # Função para desenhar o HUD que indica o carregamento do veneno
     BAR_WIDTH = 150
     BAR_HEIGHT = 10
     preench = charge
@@ -50,7 +50,7 @@ def poison_charge_bar (surf, x, y, charge):
     pygame.draw.rect(surf, BLACK, contorno_rect, 3)
 
 # ----- Barra de EXP:
-def xp_bar (surf, x, y, charge):
+def xp_bar (surf, x, y, charge): # Função para desenhar o HUD que indica a barra de exp para upar de level
     BAR_WIDTH = 150
     BAR_HEIGHT = 5
     preench = charge
@@ -62,13 +62,6 @@ def xp_bar (surf, x, y, charge):
 
 
 # ========== CENTRAL DE COMANDO ==========
-# Parâmetros de controle do jogo
-OPEN_GAME = True
-# INIT_SCREEN = True
-Fase1 = True
-Fase2 = False
-Fase3 = False
-
 
 class Game:
     def __init__(self):
@@ -79,24 +72,24 @@ class Game:
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT)) #cria uma screen com o tamanho pedido
         self.clock = pygame.time.Clock()
         self.clock.tick(60) 
-        pygame.display.set_caption ("The Snake is gonna Smoke! ~ by G & J ") #muda o título da screen
+        pygame.display.set_caption ("The Snake is gonna Smoke! ~ by Guilherme Rosada & Jamesson Santos") #muda o título da screen
         pygame.key.set_repeat(500,100) # Inicia a função de repetir (tempo de espera, tempo para repetir cada ação)
+
         # Variável para determinar a fase do player
         self.Fase1 = True
         self.Fase2 = False
         self.init_load = False
-        #self.lista_fases = [self.Fase1, self.Fase2]
-        self.count_fase = 0 # contador para indicar em qual fase o player está
+        self.count_fase = 0 # contador para indicar em qual fase o player está (será usado em algumas funções)
         
-
-        self.tempo_fase = 2*60*1000
+        # Configurações do jogo
+        self.tempo_fase = TEMPO_FASES[self.count_fase]
         self.mostrador = " " # vai exibir o tempo na tela
         self.player_level = 1
         self.player_xp = 0
 
         # Variáveis para controlar ações no jogo:
-        self.playing = True 
-        self.paused = False
+        self.playing = True # utilizada para controlar o looping 'run'
+        self.paused = False 
         self.GAMEOVER = False 
         self.LOSER = False # utilizada para tocar o som de game over uma única vez
         self.ANALISE = True # analisa múltiplos hits dos pássaros na cobra
@@ -123,6 +116,10 @@ class Game:
             self.map_img = self.map.make_map()
             self.map_rect = self.map_img.get_rect()
 
+        # Tela inicial
+        self.init_img = pygame.image.load(path.join(IMG_DIR, INIT_IMG)).convert()
+         
+        # imagens para o HUD:
         self.see_img = pygame.image.load(path.join(IMG_DIR, 'now_you_see.png')).convert_alpha()
         self.see_img = pygame.transform.scale(self.see_img, (30,30))
         self.not_see_img = pygame.image.load(path.join(IMG_DIR, 'now_you_dont.png')).convert_alpha()
@@ -227,8 +224,6 @@ class Game:
         # --- Veneno da cobra ---
         self.veneno_img = pygame.image.load(path.join(IMG_DIR, VENENO_IMG)).convert_alpha()
 
-        self.init_img = pygame.image.load(path.join(IMG_DIR, INIT_IMG)).convert()
-
         # ==== FONTS ====
         self.romulus = path.join(FONT_DIR, 'romulus.TTF')
         self.romulus_20 = pygame.font.Font(self.romulus, 20)
@@ -260,17 +255,17 @@ class Game:
         self.sound_effects['levelup'] = pygame.mixer.Sound(path.join(EFFECTS_DIR,'blessing2.ogg'))
         self.sound_effects['gameover'] = pygame.mixer.Sound(path.join(EFFECTS_DIR,'gameover.ogg'))
 
-    def draw_text(self, text, font, color, x, y):
+    def draw_text(self, text, font, color, x, y): # Função para imprimir textos na tela
         text_surface = font.render(text, True, color)
         text_rect = text_surface.get_rect()
         text_rect.center = (x,y)
         self.screen.blit(text_surface, text_rect)
     
         
-    def new(self): 
+    def new(self): # Função que cria os objetos no jogo
         while self.init_load: # carrega o Load novamente, cada vez q mudar de fase
             self.load_data()
-            self.tempo_fase = TEMPO_FASES[self.count_fase]
+            self.tempo_fase = TEMPO_FASES[self.count_fase] # Adequa o tempo de fase para o respectivo mapa
             self.init_load = False
             self.last_spawn = pygame.time.get_ticks() # reseta o tempo base em que a fruta dá respawn
         
@@ -278,33 +273,31 @@ class Game:
         self.all_sprites = pygame.sprite.LayeredUpdates()
         self.walls = pygame.sprite.Group()
         self.fruits = pygame.sprite.Group()
-        # self.birds = pygame.sprite.Group ()
         self.veneno = pygame.sprite.Group()
         self.crazy_birds = pygame.sprite.Group()
         self.mato_grosso = pygame.sprite.Group()
         self.detect_prey = pygame.sprite.Group()
-        # Spawna as barreiras
+        # Spawna Sprites a partir de Objetos criados no TiledMap
         for tile_object in self.map.tmxdata.objects:
             if tile_object.name == 'player':
                 self.player = Snake(self, self.snake_right['R1.png'], tile_object.x, tile_object.y)
-            if tile_object.name == 'Wall':
+            if tile_object.name == 'Wall': # Cria barreiras no mapa (impede movimentação)
                 Object(self, tile_object.x, tile_object.y, tile_object.width, tile_object.height, 'WALL')
-            if tile_object.name == 'mato grosso':
+            if tile_object.name == 'mato grosso': # Cria Objetos Interativos: Retângulos que, quando colidem, alteram os atributos do player
                 Object(self, tile_object.x, tile_object.y, tile_object.width, tile_object.height, 'MATO')
-            if tile_object.name == 'fruit':
-                Fruit (self, choice(self.fruit_images), tile_object.x, tile_object.y)
-            
-            # if tile_object.name == 'Passaro':
-            #     Bird (self, tile_object.x, tile_object.y)    
+            if tile_object.name == 'fruit': # Frutas: Dão stamina, xp e score
+                Fruit (self, choice(self.fruit_images), tile_object.x, tile_object.y)   
             if tile_object.name == 'presa1':
                 self.presa1 = Prey(self, self.guaxi_right['R1.png'], tile_object.x, tile_object.y)    
             if tile_object.name == 'presa2':
                 self.presa2 = Prey(self, self.guaxi_right['R1.png'], tile_object.x, tile_object.y)    
             if tile_object.name == 'presa3':
-                self.presa3 = Prey(self, self.guaxi_right['R1.png'], tile_object.x, tile_object.y)    
-        if Fase1:
+                self.presa3 = Prey(self, self.guaxi_right['R1.png'], tile_object.x, tile_object.y) 
+        # - Aves migratórias
+        # Estabelece a quantidade de passaros para cada fase   
+        if self.Fase1:
             qtde_birds = 30
-        if Fase2:
+        if self.Fase2:
             qtde_birds = 50
         
         for i in range (qtde_birds):
@@ -315,7 +308,7 @@ class Game:
                 posx = randint (-300, -100)
                 speedx = choice(BIRD_SPEEDS)
                 CrazyBirds(self, self.bird_right_img['right000.png'], posx, randint(0, self.map.height), speedx, 0)     
-            # pássaros que vão pra direita
+            # pássaros que vão pra esquerda
             elif sorteio == 1:  
                 posx = randint (self.map.width + 20, self.map.width + 100)
                 speedx = -choice(BIRD_SPEEDS)
@@ -333,10 +326,10 @@ class Game:
     
             # cria câmera
             self.camera = Camera(self.map.width, self.map.height)
-
+            # Ativa o looping 'run'
             self.playing = True
 
-    def respawn(self, type):
+    def respawn(self, type): # Classe que faz o respawn de frutas após determinado tempo
         if type == 'fruit':
             
             for sprite in self.fruits.sprites(): # primeiramente, remove todas as frutas que não foram colhetadas
@@ -344,29 +337,28 @@ class Game:
                 self.last_spawn = pygame.time.get_ticks()
             for tile_object in self.map.tmxdata.objects:
                 if tile_object.name == 'fruit':
-                    Fruit (self, choice(self.fruit_images), tile_object.x, tile_object.y)
+                    Fruit (self, choice(self.fruit_images), tile_object.x, tile_object.y) # respawn
 
 
-    def run(self):
+    def run(self): # Looping secundário do jogo
         pygame.mixer.music.play (loops=-1)
         while self.playing:
             self.events()
-            if not self.paused and not self.GAMEOVER:
+            if not self.paused and not self.GAMEOVER: # Pausa o Update caso aperte ESC ou entre em Game Over
                 self.update()
             self.draw()
 
     def events(self):
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
+                if event.key == pygame.K_ESCAPE: # Configura a tela de Pause
                     self.paused = not self.paused
-                if event.key == pygame.K_m:
-                    self.next_phase()
-            if event.type == pygame.QUIT:
+                
+            if event.type == pygame.QUIT: # Sai do jogo
                 self.quit()
 
 
-    def timer (self):
+    def timer (self): # Configura o Timer do jogo
         if self.tempo_fase <= 0: # Analisa se acabou o tempo. Se sim, o jogo acaba.
             self.GAMEOVER = True
             self.LOSER = True
@@ -382,7 +374,7 @@ class Game:
             dez_seg = (frac_min_em_seg // 10) % 10 # retira o último digito (seg) e pega o último algarismo após essa remoção (algarismo da dez_seg)
 
             self.mostrador = "{0:.0f} : {1:.0f}{2}" .format(minutos, dez_seg, seg)
-            return self.mostrador          
+            return self.mostrador # o mostrador será "blitado" depois         
 
     def update(self):
         #score_now = self.player.score
@@ -391,43 +383,22 @@ class Game:
         #self.total_score += self.player.score - score_now
 
         self.camera.update(self.player)
+        # Delay e looping para tirar 1 segundo do Timer
         now = pygame.time.get_ticks()
         delta_t = now - self.last_sec
         if delta_t >= 1000: # intervalo de 1 seg
             self.last_sec = now
             self.tempo_fase -= 1000      
 
-        # Se o jogador morre... (ainda tem que criar os if's pra fase que ele estiver)
+        # Se o jogador morre... 
         if self.player.health <= 0:
-            #self.Fase1 = False # finaliza Fase1
             self.playing = False # encerra run da atual fase
             self.GAMEOVER = True
             self.LOSER = True
 
-            
-                
-        #if self.player.stamine >= PLAYER_MAX_STAMINE: # configurar para quando dá o bote
-        #    if self.Fase1:
-        #        self.Fase1 = False # finaliza Fase1
-        #        self.playing = False # finaliza run da Fase1
-        #        self.Fase2 = True # passa pra Fase2
-        #        #self.playing = True
-            # elif self.Fase2:
-            #     self.Fase2 = False
-            #     self.playing = False
-            #     self.Fase3 = True
-            # elif self.Fase3:
-            #     self.Fase3 = False
-            #     self.playing = False
-            #     self.FASE_A_DETERMINAR = True
- 
- 
- 
- 
-        # if hits:
-        #     self.player.posic += vect (BIRD_KNOCKBACK, 0).rotate(90)
  
     #def score_show(self):
+
     #    score = "{:06d}".format(self.total_score)
     #    return score
        
@@ -439,8 +410,6 @@ class Game:
             self.init_load = True
             self.count_fase = 1 # Muda o contador para 1 (próximo mapa)
             
-      
-
         elif self.count_fase == 1: # se estava na última fase
             self.Fase2 = False
             self.playing = False
@@ -448,17 +417,12 @@ class Game:
             self.count_fase = 0 # volta para a fase inicial
             self.init_load = True
          
-
-
-            
-               
+    
     def draw(self):
+        # Desenha o mapa
         self.screen.blit(self.map_img, self.camera.apply_rect(self.map_rect))
-        # -- Blit cada sprite:
+        # -- Blit cada sprite individualmente:
         for sprite in self.all_sprites: #Analisa cada um dos sprites do grupo e mandar imprimir
-            # -- Pássaro --
-            # if isinstance (sprite, CrazyBirds):
-            #     sprite.draw_life_bar()
             # -- Fruta --
             if isinstance (sprite, Fruit): # se for relacionado a classe Fruit
                 quad_dist_to_player = (self.player.posic.x - sprite.pos.x)**2 + (self.player.posic.y - sprite.pos.y)**2
@@ -504,8 +468,11 @@ class Game:
             self.draw_text("GAME OVER!", self.romulus_80, (149,165,166), WIDTH/2, HEIGHT/2)
         # -- Timer --
         self.draw_text(self.timer(), self.romulus_40, WHITE, WIDTH/2 , 20)
+
         # -- SCORE
+
         #self.draw_text(self.score_show(), self.romulus, 30, WHITE, 7*WIDTH/8, 20)
+
         pygame.display.flip()
 
 
@@ -514,8 +481,8 @@ class Game:
         sys.exit()
 
     def game_over (self):
-        if self.GAMEOVER:
-            waiting = True
+        if self.GAMEOVER: # é ativado qnd acaba o tempo ou a life
+            waiting = True # Ativa o looping
             while waiting:
                 self.clock.tick(30) # reduz o clock 
                 pygame.mixer.music.stop() # para a música de fundo
@@ -544,13 +511,13 @@ class Game:
                             jogo.__init__()
 
 
-    def init_screen(self):
-        running = True
+    def init_screen(self): # Exibe a tela inicial do jogo
+        running = True # Configura o looping
         while running:
             self.clock.tick(30)
-            self.information = False # janela de informações
+            self.information = False # Configura se exibe ou não a janela de informações
             self.screen.fill(BLACK)
-            # Carrega imagem com nome do jogo
+            # Chama imagem com nome do jogo
             self.image = self.init_img
             self.image_rect = self.image.get_rect()
             self.image_rect.center = (WIDTH/2, self.image_rect.height/2)
@@ -563,13 +530,13 @@ class Game:
                     running = False
                     self.quit()
                 if event.type == pygame.KEYUP:
-                    if event.key == pygame.K_RETURN:
+                    if event.key == pygame.K_RETURN: # Se apertar Enter, entra no Jogo
                         running = False
                         self.Fase1 = True
                     # Tecla 'i' exibe instruções do jogo
                     if event.key == pygame.K_i:
                         self.information = not self.information
-                        while self.information:
+                        while self.information: # Looping para dar blit
                             self.screen.fill(BLUE)
                             self.draw_text("INstruções aqui", self.romulus_40, WHITE, WIDTH/2, HEIGHT/2)
                             pygame.display.flip()
@@ -595,17 +562,7 @@ while True:
         jogo.run()
         jogo.game_over()
         
-        
-        # Se o jogador passou da fase 1...
-        #if jogo.Fase2 == True: # a 1° condição é quando dá o bote
-        #    Fase1 = False
-        #    Fase2 = True
-        #    jogo.playing = True # libera run da próxima fase
-        #    jogo.load_data()
-        ## Se o jogador morreu...
-        #elif jogo.player.health <= 0:
-        #    Fase1 = False
-        #    OPEN_GAME = False # '''Esse tem que ser configurado pra só quando o jogador encerrar'''
+
     while jogo.Fase2:
         
         jogo.new()
