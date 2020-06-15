@@ -72,34 +72,38 @@ Fase3 = False
 
 class Game:
     def __init__(self, Fase1, Fase2, Fase3):
+        # Inicializador de Biblioteca Pygame e pygame mixer (áudio)
         pygame.init()
         pygame.mixer.init()
+        # Configurações iniciais de tela, clock e repetição
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT)) #cria uma screen com o tamanho pedido
         self.clock = pygame.time.Clock()
-        self.clock.tick(60)
-        
+        self.clock.tick(60) 
         pygame.display.set_caption ("The Snake is gonna Smoke! ~ by G & J ") #muda o título da screen
         pygame.key.set_repeat(500,100) # Inicia a função de repetir (tempo de espera, tempo para repetir cada ação)
+        # Chama função Load para carregar arquivos do jogo:
         self.load_data()
-        #self.last_hit = 0 # último hit do pássaro na cobra
-        self.ANALISE = True # analisa múltiplos hits do pássaro na cobra
-
-        self.playing = True
-        self.mostrador = " "
-        self.tempo_fase = 5000
-        self.last_sec = 0
+        # Variável para determinar a fase do player
         self.Fase1 = Fase1
         self.Fase2 = Fase2
         self.Fase3 = Fase3
+
+        self.tempo_fase = 5000
+        self.mostrador = " " # vai exibir o tempo na tela
         self.player_level = 1
         self.player_xp = 0
 
-        self.last_spawn = 0
+        # Variáveis para controlar ações no jogo:
+        self.playing = True 
         self.paused = False
-        self.GAMEOVER = False
-        self.LOSER = False
-        self.total_score = 0
+        self.GAMEOVER = False 
+        self.LOSER = False # utilizada para tocar o som de game over uma única vez
+        self.ANALISE = True # analisa múltiplos hits dos pássaros na cobra
 
+        # Variáveis para guardar o tempo inicial (para configurar delay):
+        self.last_sec = 0
+        self.last_spawn = 0
+        self.total_score = 0
         self.last_sec = 0
 
         
@@ -221,9 +225,6 @@ class Game:
         self.veneno_img = pygame.image.load(path.join(IMG_DIR, VENENO_IMG)).convert_alpha()
 
         # ==== FONTS ====
-        self.alagard = path.join(FONT_DIR, 'alagard.TTF')
-        self.alagard_100 = pygame.font.Font(self.alagard, 100)
-
         self.romulus = path.join(FONT_DIR, 'romulus.TTF')
         self.romulus_20 = pygame.font.Font(self.romulus, 20)
         self.romulus_40 = pygame.font.Font(self.romulus, 40)
@@ -231,6 +232,7 @@ class Game:
 
         self.trioDX = path.join(FONT_DIR, 'TrioDX.fon')
         self.trioDX_10 = pygame.font.Font(self.trioDX, 10)
+        self.trioDX_200 = pygame.font.Font(self.trioDX, 200)
         # ==== Telas ====
         self.cortina_screen = pygame.Surface(self.screen.get_size()).convert_alpha()
         self.cortina_screen.fill((210,105,30, 170))
@@ -469,7 +471,6 @@ class Game:
         #self.draw_text(self.score_show(), self.romulus, 30, WHITE, 7*WIDTH/8, 20)
         pygame.display.flip()
 
-        #pygame.display.flip()
 
     def quit(self):
         pygame.quit()
@@ -478,17 +479,19 @@ class Game:
     def game_over (self):
         waiting = True
         while waiting:
-            self.clock.tick(30)
-            pygame.mixer.music.stop()
+            self.clock.tick(30) # reduz o clock 
+            pygame.mixer.music.stop() # para a música de fundo
             # Tela de Game Over
             self.screen.blit(self.gameover_screen, (0,0))
             self.draw_text("GAME OVER!", self.romulus_80, (149,165,166), WIDTH/2, HEIGHT*0.3)
-            if self.LOSER:
+            self.draw_text("Aperte ESPACO para TENTAR NOVAMENTE", self.romulus_40, (149,165,166), WIDTH/2, HEIGHT*0.6)
+            
+            if self.LOSER: # configuração para tocar o som somente uma vez
                 self.sound_effects['gameover'].play()
                 self.LOSER = False
-                
 
             pygame.display.flip()
+            # Analisa eventos: Se fechar a tela, sai do jogo. Se apertar espaço, inicia um novo jogo
             for event in pygame.event.get():
                 print (event)
                 if event.type == pygame.QUIT:
@@ -496,18 +499,45 @@ class Game:
                     self.quit()
 
                 if event.type == pygame.KEYUP:
-                    waiting = False
-                    self.GAMEOVER = False
-                    self.playing = True
-                    Fase1 = True
-                    jogo.__init__(Fase1, Fase2, Fase3)
+                    if event.key == pygame.K_SPACE:
+                        waiting = False
+                        self.GAMEOVER = False
+                        self.playing = True
+                        Fase1 = True
+                        jogo.__init__(Fase1, Fase2, Fase3)
+    
+
+    def init_screen (self):
+        #waiting = True
+        #while waiting:
+        #    self.clock.tick(30)
+        #    pygame.mixer.music.stop()
+        #    # Tela de Game Over
+        #    self.screen.blit(self.gameover_screen, (0,0))
+        #    self.draw_text("GAME OVER!", self.romulus_80, (149,165,166), WIDTH/2, HEIGHT*0.3)
+        #    self.draw_text("Aperte ESPACO para TENTAR NOVAMENTE", self.romulus_40, (149,165,166), WIDTH/2, HEIGHT*0.6)
+        #    
+        #    if self.LOSER:
+        #        self.sound_effects['gameover'].play()
+        #        self.LOSER = False
+#
+        #    pygame.display.flip()
+        #    for event in pygame.event.get():
+        #        print (event)
+        #        if event.type == pygame.QUIT:
+        #            waiting = False
+        #            self.quit()
+#
+        #        if event.type == pygame.KEYUP:
+        #            if event.key == pygame.K_SPACE:
+        #                waiting = False
+        #                self.GAMEOVER = False
+        #                self.playing = True
+        #                Fase1 = True
+        #                jogo.__init__(Fase1, Fase2, Fase3)
+
                    
         
-
-
-
-
-            
 
 
 
