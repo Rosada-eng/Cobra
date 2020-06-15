@@ -496,65 +496,12 @@ class Game:
                     self.quit()
 
                 if event.type == pygame.KEYUP:
-                   waiting = False
-                   self.GAMEOVER = False
-                   self.playing = True
-                   self.zerar_atributos()
-
-    def zerar_atributos(self):
-          self._layer = LAYERS['PLAYER']
-        self.groups = jogo.all_sprites  
-        pygame.sprite.Sprite.__init__(self, self.groups)
-        # --- Atributos Player ---
-        self.speed = PLAYER_SPEED
-        self.health = PLAYER_HEALTH
-        self.max_health = PLAYER_HEALTH
-        #self.max_stamine = PLAYER_MAX_STAMINE
-        self.player_vision = PLAYER_VISION
-        self.snake_width = SNAKE_WIDTH
-        self.snake_height = SNAKE_HEIGHT
-        # LEVEL UP:
-        self.next_level_xp = 1000
-        self.current_xp = 0
-        self.last_levelup = 0
-        self.LEVELUP = False
-        self.snake_count_lvl = 0
-        self.last_image = 0
-        # Atributos da Fruta 
-        self.fruit_xp = 20
-        self.fruit_stamine = 10
-        # Condições do
-        # configurações gerais do sprite
-        self.jogo = jogo       
-        self.image = img
-        self.mask = pygame.mask.from_surface(self.image)
-        self.rect = self.image.get_rect()
-        self.rect.center = (x + self.snake_width/2 ,y + self.snake_height/2)
-        self.posic = vect (x, y) #declara as posições (x,y) em que o player será spawnado
-        self.veloc = vect (0, 0) # Começa com velocidade zero 
-        self.dir = vect (1, 0) # começa virado pra direita
-        self.stamine = 0 # Stamina inicial
-        self.last_update = pygame.time.get_ticks()
-        self.snake_count = 0
-        self.charge = VENENO_CHARGE
-        self.LEFT = False
-        self.RIGHT = False
-        self.UP = False
-        self.DOWN = False
-        self.last_shoot = 0 # no começo, não houve disparos
-        self.last_dir = self.dir
-        # configurações para o ataque
-        self.ATACK = False
-        self.last_atack = 0
-        #self.current_position = vect (0,0)
-        self.target = 0 # variável que guardará quem é o target mais próximo
-        self.to_target = vect (0,0)
-        self.dist_to_target = 0
-        self.count_step = 0
-        self.INGRASS = False
-        self.last_hit = 0 # último hit do pássaro na cobra
-        self.ANALISE = True # analisa múltiplos hits do pássaro na cobra
-        self.score = 0
+                    waiting = False
+                    self.GAMEOVER = False
+                    self.playing = True
+                    Fase1 = True
+                    jogo.__init__(Fase1, Fase2, Fase3)
+                   
         
 
 
@@ -572,6 +519,7 @@ while True:
         jogo.new()
         jogo.run()
         jogo.game_over()
+        
         # Se o jogador passou da fase 1...
         #if jogo.Fase2 == True: # a 1° condição é quando dá o bote
         #    Fase1 = False
