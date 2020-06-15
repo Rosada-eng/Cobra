@@ -343,10 +343,10 @@ class Game:
             return self.mostrador          
 
     def update(self):
-        score_now = self.player.score
+        #score_now = self.player.score
         self.all_sprites.update()
         #if self.player.score != score_now:
-        self.total_score += self.player.score - score_now
+        #self.total_score += self.player.score - score_now
 
         self.camera.update(self.player)
         now = pygame.time.get_ticks()
@@ -383,9 +383,9 @@ class Game:
         # if hits:
         #     self.player.posic += vect (BIRD_KNOCKBACK, 0).rotate(90)
  
-    def score_show(self):
-        score = "{:06d}".format(self.total_score)
-        return score
+    #def score_show(self):
+    #    score = "{:06d}".format(self.total_score)
+    #    return score
        
                
     def draw(self):
@@ -414,8 +414,8 @@ class Game:
         # - SP:
         self.draw_text ("SP:", self.romulus, 20, BLACK, 20, 35)
         stamine_player_bar (self.screen, 40, 28, self.player.stamine / PLAYER_MAX_STAMINE)
-        self.draw_text ("{0:.0f} / {1:.0f}".format(self.player.stamine, self.player.max_stamine), self.trioDX, 10, BLACK, 20 + 150/2, 36)
-        if self.player.stamine >= 0.2*self.player.max_stamine:
+        self.draw_text ("{0:.0f} / {1:.0f}".format(self.player.stamine, PLAYER_MAX_STAMINE), self.trioDX, 10, BLACK, 20 + 150/2, 36)
+        if self.player.stamine >= 0.8*PLAYER_MAX_STAMINE:
             self.screen.blit(self.blue_orb_img, (41 + 150, 28))
         # - Poison cooldown:
         poison_charge_bar (self.screen, 40, 45, self.player.charge)
@@ -440,7 +440,8 @@ class Game:
             self.draw_text("GAME OVER!", self.romulus, 80, (149,165,166), WIDTH/2, HEIGHT/2)
         # -- Timer --
         self.draw_text(self.timer(), self.romulus, 40, WHITE, WIDTH/2 , 20)
-        self.draw_text(self.score_show(), self.romulus, 30, WHITE, 7*WIDTH/8, 20)
+        # -- SCORE
+        #self.draw_text(self.score_show(), self.romulus, 30, WHITE, 7*WIDTH/8, 20)
         pygame.display.flip()
 
         #pygame.display.flip()

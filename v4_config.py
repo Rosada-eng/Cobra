@@ -64,6 +64,9 @@ SNAKE_WIDTH = 30
 SNAKE_HEIGHT = 30
 PLAYER_MAX_STAMINE = 100
 ATACK_RANGE = 100
+# pontuação
+FRUTAS_STAMINA = 10 # quantidade de stamina que a fruta fornece
+FRUIT_SCORE = 10
 
 # Lista de Presas:
 #LISTA_PRESAS = [guaxinim]
@@ -81,12 +84,10 @@ GUAXI_SCORE = 200
 
 # Configurações das frutas
 LISTA_FRUTAS = ['abacaxi.png', 'cereja.png', 'laranja.png', 'limao.png', 'maca.png', 'morango.png', 'uva.png']
-FRUTAS_STAMINA = 5 # quantidade de stamina que a fruta fornece
 SNAKE_WALK_LEFT = ['L0.png', 'L1.png', 'L2.png']
 SNAKE_WALK_RIGHT = ['R0.png', 'R1.png', 'R2.png']
 SNAKE_WALK_UP = ['U0.png', 'U1.png', 'U2.png']
 SNAKE_WALK_DOWN = ['D0.png', 'D1.png', 'D2.png']
-FRUIT_SCORE = 10
 
 # Configurações do veneno da cobra
 VENENO_SPEED = 50
