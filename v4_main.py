@@ -56,7 +56,7 @@ def xp_bar (surf, x, y, charge):
     preench = charge
     contorno_rect = pygame.Rect (x, y, BAR_WIDTH, BAR_HEIGHT)
     preench_rect = pygame.Rect (x, y, preench, BAR_HEIGHT)
-    color = (128,0,0)
+    color = (255,69,0)
     pygame.draw.rect(surf, color, preench_rect) 
     pygame.draw.rect(surf, (46,64,83), contorno_rect, 3)
 
@@ -334,7 +334,7 @@ class Game:
             segundos_total = self.tempo_fase // 1000 # analisa o tempo em segundos
             seg = segundos_total % 10 # pega o último dígito (0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
             tempo_em_min = segundos_total / 60
-            minutos = tempo_em_min // 1 # Pega a parte inteira dos minutos
+            minutos = (tempo_em_min // 1) # Pega a parte inteira dos minutos
             frac_min = tempo_em_min % 1 # Pega a parte fracionária do minuto
             frac_min_em_seg = (frac_min * 60) # Transforma a parte fracionária do minuto em segundos (esse valor é menor que 60)
             dez_seg = (frac_min_em_seg // 10) % 10 # retira o último digito (seg) e pega o último algarismo após essa remoção (algarismo da dez_seg)
@@ -419,7 +419,7 @@ class Game:
         else:
             self.screen.blit(self.see_img, (160,60))
         # - XP:
-        xp_bar(self.screen, 10, 85, self.player.current_xp / self.player.next_level_xp)
+        xp_bar(self.screen, 10, 85, self.player.current_xp / self.player.next_level_xp*100)
 
         # -- PAUSE --
         if self.paused:

@@ -21,8 +21,8 @@ class Snake(pygame.sprite.Sprite):
         self.snake_width = SNAKE_WIDTH
         self.snake_height = SNAKE_HEIGHT
         # LEVEL UP:
-        self.next_level_xp = 100
-        self.current_xp = 20
+        self.next_level_xp = 1000
+        self.current_xp = 0
         # Atributos da Fruta 
         self.fruit_xp = 20
         self.fruit_stamine = 10
@@ -202,17 +202,12 @@ class Snake(pygame.sprite.Sprite):
 
     def update(self):
         self.get_keys()
+        
         if self.ATACK:
             number_frames = 5 # numero de frames p/ animar o bote
             self.to_target = vect (self.target.posic.x - self.posic.x, self.target.posic.y - self.posic.y)
             move_step = self.to_target / number_frames 
             
-            ## Consome STAMINA
-            self.stamine = 0.8* self.stamine
-            ## Adiciona tempo
-            self.jogo.tempo_fase += 30000
-            # Adiciona XP:
-            self.current_xp += 300
             
             now = pygame.time.get_ticks()
             delta_t = now - self.last_atack       
@@ -229,7 +224,14 @@ class Snake(pygame.sprite.Sprite):
                     channel1.queue(self.jogo.sound_effects['bite3']) 
                     self.count_step = 0
                     self.ATACK = False
-                    self.target.alive = False    
+                    self.target.alive = False
+
+                    ## Consome STAMINA
+                    self.stamine -= 0.8* self.stamine
+                    ## Adiciona tempo
+                    self.jogo.tempo_fase += 30*1000
+                    # Adiciona XP:
+                    self.current_xp += 300
     
         else:
             self.posic.x += self.veloc.x * dt #delta X = vx*deltaT
@@ -286,8 +288,10 @@ class Snake(pygame.sprite.Sprite):
         hits = pygame.sprite.spritecollide (self, self.jogo.fruits, False, pygame.sprite.collide_mask)
         for hit in hits:
             self.jogo.sound_effects['pick_fruit'].play()
-            self.current_xp += self.fruit_xp
+            self.current_xp += 200
             self.stamine += self.fruit_stamine
+            print(self.current_xp/self.next_level_xp)
+            
             hit.kill()
             if self.stamine > PLAYER_MAX_STAMINE:
                 self.stamine = PLAYER_MAX_STAMINE
