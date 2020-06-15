@@ -214,8 +214,15 @@ class Game:
 
         # ==== FONTS ====
         self.alagard = path.join(FONT_DIR, 'alagard.TTF')
+        self.alagard_100 = pygame.font.Font(self.alagard, 100)
+
         self.romulus = path.join(FONT_DIR, 'romulus.TTF')
+        self.romulus_20 = pygame.font.Font(self.romulus, 20)
+        self.romulus_40 = pygame.font.Font(self.romulus, 40)
+        self.romulus_80 = pygame.font.Font(self.romulus, 80)
+
         self.trioDX = path.join(FONT_DIR, 'TrioDX.fon')
+        self.trioDX_10 = pygame.font.Font(self.trioDX, 10)
         # ==== Telas ====
         self.cortina_screen = pygame.Surface(self.screen.get_size()).convert_alpha()
         self.cortina_screen.fill((210,105,30, 170))
@@ -236,8 +243,7 @@ class Game:
         self.sound_effects['grass_walk'] = pygame.mixer.Sound(path.join(EFFECTS_DIR,'grass_walk.ogg'))
         self.sound_effects['1step_grass'] = pygame.mixer.Sound(path.join(EFFECTS_DIR,'1step - grass_walk.ogg'))
 
-    def draw_text(self, text, font_name, size, color, x, y):
-        font = pygame.font.Font(font_name, size)
+    def draw_text(self, text, font, color, x, y):
         text_surface = font.render(text, True, color)
         text_rect = text_surface.get_rect()
         text_rect.center = (x,y)
@@ -408,20 +414,20 @@ class Game:
         background.fill ((250, 215, 160))
         self.screen.blit(background, (5,5))
         # - HP:
-        self.draw_text ("HP:", self.romulus, 20, BLACK, 20, 20)
+        self.draw_text ("HP:", self.romulus_20, BLACK, 20, 20)
         health_player_bar(self.screen, 40, 10, self.player.health / self.player.max_health)
-        self.draw_text ("{0:.0f} / {1:.0f}".format(self.player.health, self.player.max_health), self.trioDX, 10, BLACK, 20 + 150/2, 18)
+        self.draw_text ("{0:.0f} / {1:.0f}".format(self.player.health, self.player.max_health), self.trioDX_10, BLACK, 20 + 150/2, 18)
         # - SP:
-        self.draw_text ("SP:", self.romulus, 20, BLACK, 20, 35)
+        self.draw_text ("SP:", self.romulus_20, BLACK, 20, 35)
         stamine_player_bar (self.screen, 40, 28, self.player.stamine / PLAYER_MAX_STAMINE)
-        self.draw_text ("{0:.0f} / {1:.0f}".format(self.player.stamine, PLAYER_MAX_STAMINE), self.trioDX, 10, BLACK, 20 + 150/2, 36)
+        self.draw_text ("{0:.0f} / {1:.0f}".format(self.player.stamine, PLAYER_MAX_STAMINE), self.trioDX_10, BLACK, 20 + 150/2, 36)
         if self.player.stamine >= 0.8*PLAYER_MAX_STAMINE:
             self.screen.blit(self.blue_orb_img, (41 + 150, 28))
         # - Poison cooldown:
         poison_charge_bar (self.screen, 40, 45, self.player.charge)
         # - LVL:
-        self.draw_text ("Lvl:", self.romulus, 20, BLACK, 20, 70)
-        self.draw_text ("{}".format(self.player_level), self.romulus, 40, RED, 50,70 )
+        self.draw_text ("Lvl:", self.romulus_20, BLACK, 20, 70)
+        self.draw_text ("{}".format(self.player_level), self.romulus_20, RED, 50,70 )
         # - Símbolo de Visibilidade
         if self.player.INGRASS:
             self.screen.blit(self.not_see_img, (160,60))
@@ -433,13 +439,13 @@ class Game:
         # -- PAUSE --
         if self.paused:
             self.screen.blit(self.cortina_screen, (0,0))
-            self.draw_text("PAUSE", self.romulus, 80, (75,0,130), WIDTH/2, HEIGHT/2)
+            self.draw_text("PAUSE", self.romulus_80, (75,0,130), WIDTH/2, HEIGHT/2)
         # -- GAME OVER -- 
         if self.GAMEOVER:
             self.screen.blit(self.gameover_screen, (0,0))
-            self.draw_text("GAME OVER!", self.romulus, 80, (149,165,166), WIDTH/2, HEIGHT/2)
+            self.draw_text("GAME OVER!", self.romulus_80, (149,165,166), WIDTH/2, HEIGHT/2)
         # -- Timer --
-        self.draw_text(self.timer(), self.romulus, 40, WHITE, WIDTH/2 , 20)
+        self.draw_text(self.timer(), self.romulus_40, WHITE, WIDTH/2 , 20)
         # -- SCORE
         #self.draw_text(self.score_show(), self.romulus, 30, WHITE, 7*WIDTH/8, 20)
         pygame.display.flip()
