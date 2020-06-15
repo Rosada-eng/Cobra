@@ -23,6 +23,10 @@ class Snake(pygame.sprite.Sprite):
         # LEVEL UP:
         self.next_level_xp = 1000
         self.current_xp = 0
+        self.last_levelup = 0
+        self.LEVELUP = False
+        self.snake_count_lvl = 0
+        self.last_image = 0
         # Atributos da Fruta 
         self.fruit_xp = 20
         self.fruit_stamine = 10
@@ -251,8 +255,33 @@ class Snake(pygame.sprite.Sprite):
             if self.charge > VENENO_CHARGE:
                 self.charge = VENENO_CHARGE
 
-            if self.LEFT:
+            if self.LEVELUP:
+                self.image = self.jogo.snake_levelup['cloud{}.png'.format(self.snake_count_lvl)]
+                self.image = pygame.transform.scale(self.image, (self.snake_width, self.snake_height))
+                if delta_t > 100:
+                    delta_t = 0
+                    self.last_update = now
+                    self.snake_count_lvl +=1
+                    if self.snake_count_lvl > 5:
+                        self.snake_count_lvl = 0
+                        self.LEVELUP = False
+                        #if self.LEFT:
+                        #    self.image = self.jogo.snake_left['L{}.png'.format(self.snake_count)]
+                        #    self.image = pygame.transform.scale(self.image, (self.snake_width, self.snake_height))
+                        #elif self.RIGHT:
+                        #    self.image = self.jogo.snake_left['R{}.png'.format(self.snake_count)]
+                        #    self.image = pygame.transform.scale(self.image, (self.snake_width, self.snake_height))
+                        #elif self.UP:
+                        #    self.image = self.jogo.snake_left['U{}.png'.format(self.snake_count)]
+                        #    self.image = pygame.transform.scale(self.image, (self.snake_width, self.snake_height))
+                        #elif self.DOWN:
+                        self.image = self.jogo.snake_down['D{}.png'.format(self.snake_count)]
+                        self.image = pygame.transform.scale(self.image, (self.snake_width, self.snake_height))
+                        
+
+            elif self.LEFT:
                 self.image = self.jogo.snake_left['L{}.png'.format(self.snake_count)]
+                self.image = pygame.transform.scale(self.image, (self.snake_width, self.snake_height))
                 if delta_t > 150:
                     delta_t = 0
                     self.last_update = now
@@ -262,6 +291,7 @@ class Snake(pygame.sprite.Sprite):
 
             elif self.RIGHT:
                 self.image = self.jogo.snake_right['R{}.png'.format(self.snake_count)]
+                self.image = pygame.transform.scale(self.image, (self.snake_width, self.snake_height))
                 if delta_t > 150:
                     delta_t = 0
                     self.last_update = now
@@ -271,6 +301,7 @@ class Snake(pygame.sprite.Sprite):
 
             elif self.DOWN:
                 self.image = self.jogo.snake_down['D{}.png'.format(self.snake_count)]
+                self.image = pygame.transform.scale(self.image, (self.snake_width, self.snake_height))
                 if delta_t > 150:
                     delta_t = 0
                     self.last_update = now
@@ -280,18 +311,21 @@ class Snake(pygame.sprite.Sprite):
 
             elif self.UP:
                 self.image = self.jogo.snake_up['U{}.png'.format(self.snake_count)]
+                self.image = pygame.transform.scale(self.image, (self.snake_width, self.snake_height))
                 if delta_t > 150:
                     delta_t = 0
                     self.last_update = now
                     self.snake_count +=1
                     if self.snake_count > 2:
                         self.snake_count = 0
+            
+           
 
         # --- Player colide com a frutas:
         hits = pygame.sprite.spritecollide (self, self.jogo.fruits, False, pygame.sprite.collide_mask)
         for hit in hits:
             self.jogo.sound_effects['pick_fruit'].play()
-            self.current_xp += 200
+            self.current_xp += 500
                        
             hit.kill()
             # aumenta stamina e score
@@ -318,7 +352,10 @@ class Snake(pygame.sprite.Sprite):
                     self.playing = False
 
         if self.current_xp >= self.next_level_xp:
-            self.level_up()
+            if self.jogo.player_level < 10:
+                self.level_up()
+            else:
+                self.current_xp == self.next_level_xp # Trava barra de XP no máximo
 
 
         """ Arrumar para adequar o código de baixo para o Sprite"""
@@ -342,17 +379,34 @@ class Snake(pygame.sprite.Sprite):
                 
     def level_up(self):
         self.jogo.player_level +=1
-        self.next_level_xp *= 1.8
-        self.speed *= 1.2
-        self.max_health *= 1.1
-        self.health *= 1.1
-        #self.max_stamine *= 1.4
-        self.player_vision *= 1.2
-        self.snake_width *= 1.2
-        self.snake_height *= 1.2
+        self.current_xp = 0
+        self.jogo.sound_effects['levelup'].play()
+        if self.jogo.player_level <= 3:
+            self.next_level_xp = 1000
+        elif self.jogo.player_level <= 5:
+            self.next_level_xp = 2000
+        self.speed += 2
+        if self.jogo.player_level == 2:
+            self.max_health += 50
+            self.health += 50
+        elif self.jogo.player_level == 4:
+            self.max_health += 50
+            self.health += 50
+        elif self.jogo.player_level == 6:
+            self.max_health += 50
+            self.health += 50
+        elif self.jogo.player_level == 8:
+            self.max_health += 50
+            self.health += 50
 
-        self.fruit_stamine *= 2
-        self.fruit_xp *= 2
+        self.player_vision += 10
+        self.snake_width += 4
+        self.snake_height += 4
+        if self.snake_width >= 64 or self.snake_height >= 64:
+            self.snake_height, self.snake_width = 64, 64
+
+        self.LEVELUP = True # ativa animação
+ 
 
 
 

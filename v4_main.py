@@ -140,6 +140,10 @@ class Game:
         for img in SNAKE_WALK_DOWN:
             self.snake_down[img] =  pygame.image.load(path.join(IMG_DIR, 'King Snake', img)).convert_alpha()
             self.snake_down[img] =  pygame.transform.scale(self.snake_down[img], (SNAKE_WIDTH, SNAKE_HEIGHT))
+        self.snake_levelup = {}
+        for img in SNAKE_LEVELUP:
+            self.snake_levelup[img] =  pygame.image.load(path.join(IMG_DIR, 'levelup', img)).convert_alpha()
+            self.snake_levelup[img] =  pygame.transform.scale(self.snake_levelup[img], (SNAKE_WIDTH, SNAKE_HEIGHT))
 
         # --- Guaxinim ---
             # Esquerda
@@ -242,6 +246,7 @@ class Game:
         self.sound_effects['in-grass'] = pygame.mixer.Sound(path.join(EFFECTS_DIR, 'grass_in_or_out.ogg'))
         self.sound_effects['grass_walk'] = pygame.mixer.Sound(path.join(EFFECTS_DIR,'grass_walk.ogg'))
         self.sound_effects['1step_grass'] = pygame.mixer.Sound(path.join(EFFECTS_DIR,'1step - grass_walk.ogg'))
+        self.sound_effects['levelup'] = pygame.mixer.Sound(path.join(EFFECTS_DIR,'blessing2.ogg'))
 
     def draw_text(self, text, font, color, x, y):
         text_surface = font.render(text, True, color)

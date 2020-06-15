@@ -56,18 +56,25 @@ OBJECT_WIDTH = 20
 OBJECT_HEIGHT = 20
 
 # Configurações do jogador
-PLAYER_SPEED = 50
+PLAYER_SPEED = 20
 PLAYER_HEALTH = 100
 PLAYER_VISION = 100
 PLAYER_HIT_RECT = pygame.Rect (0, 0, 62, 62)
-SNAKE_WIDTH = 30
-SNAKE_HEIGHT = 30
+SNAKE_WIDTH = 32
+SNAKE_HEIGHT = 32
 PLAYER_MAX_STAMINE = 100
 ATACK_RANGE = 100
-# pontuação
+
+# Pontuação
 FRUTAS_STAMINA = 10 # quantidade de stamina que a fruta fornece
 FRUIT_SCORE = 10
 
+# Sprites da Cobra
+SNAKE_WALK_LEFT = ['L0.png', 'L1.png', 'L2.png']
+SNAKE_WALK_RIGHT = ['R0.png', 'R1.png', 'R2.png']
+SNAKE_WALK_UP = ['U0.png', 'U1.png', 'U2.png']
+SNAKE_WALK_DOWN = ['D0.png', 'D1.png', 'D2.png']
+SNAKE_LEVELUP = ['cloud0.png','cloud1.png', 'cloud2.png', 'cloud3.png', 'cloud4.png', 'cloud5.png'] #, 'cloud6.png', 'cloud7.png']
 # Lista de Presas:
 #LISTA_PRESAS = [guaxinim]
 
@@ -82,13 +89,9 @@ GUAXI_HIT_RECT = pygame.Rect (0,0, 0.9*GUAXI_WIDTH, 0.9*GUAXI_HEIGHT)
 GUAXI_SPEED = 0.6*PLAYER_SPEED
 GUAXI_SCORE = 200
 
+
 # Configurações das frutas
 LISTA_FRUTAS = ['abacaxi.png', 'cereja.png', 'laranja.png', 'limao.png', 'maca.png', 'morango.png', 'uva.png']
-SNAKE_WALK_LEFT = ['L0.png', 'L1.png', 'L2.png']
-SNAKE_WALK_RIGHT = ['R0.png', 'R1.png', 'R2.png']
-SNAKE_WALK_UP = ['U0.png', 'U1.png', 'U2.png']
-SNAKE_WALK_DOWN = ['D0.png', 'D1.png', 'D2.png']
-
 # Configurações do veneno da cobra
 VENENO_SPEED = 50
 #VENENO_ANIM = []
