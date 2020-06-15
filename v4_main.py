@@ -61,7 +61,6 @@ def xp_bar (surf, x, y, charge):
     pygame.draw.rect(surf, (46,64,83), contorno_rect, 3)
 
 
-
 # ========== CENTRAL DE COMANDO ==========
 # Parâmetros de controle do jogo
 OPEN_GAME = True
@@ -95,6 +94,7 @@ class Game:
         self.last_spawn = 0
         self.paused = False
         self.GAMEOVER = False
+        self.total_score = 0
 
         self.last_sec = 0
 
@@ -343,18 +343,24 @@ class Game:
             return self.mostrador          
 
     def update(self):
+        score_now = self.player.score
         self.all_sprites.update()
+        #if self.player.score != score_now:
+        self.total_score += self.player.score - score_now
+
         self.camera.update(self.player)
         now = pygame.time.get_ticks()
         delta_t = now - self.last_sec
         if delta_t >= 1000: # intervalo de 1 seg
             self.last_sec = now
-            self.tempo_fase -= 1000       
+            self.tempo_fase -= 1000      
 
         # Se o jogador morre... (ainda tem que criar os if's pra fase que ele estiver)
         if self.player.health <= 0:
             self.Fase1 = False # finaliza Fase1
             self.playing = False # encerra run da atual fase
+
+            
                 
         #if self.player.stamine >= PLAYER_MAX_STAMINE: # configurar para quando dá o bote
         #    if self.Fase1:
@@ -376,8 +382,11 @@ class Game:
  
         # if hits:
         #     self.player.posic += vect (BIRD_KNOCKBACK, 0).rotate(90)
-
-
+ 
+    def score_show(self):
+        score = "{:06d}".format(self.total_score)
+        return score
+       
                
     def draw(self):
         self.screen.blit(self.map_img, self.camera.apply_rect(self.map_rect))
@@ -431,7 +440,10 @@ class Game:
             self.draw_text("GAME OVER!", self.romulus, 80, (149,165,166), WIDTH/2, HEIGHT/2)
         # -- Timer --
         self.draw_text(self.timer(), self.romulus, 40, WHITE, WIDTH/2 , 20)
+        self.draw_text(self.score_show(), self.romulus, 30, WHITE, 7*WIDTH/8, 20)
         pygame.display.flip()
+
+        #pygame.display.flip()
 
     def quit(self):
         pygame.quit()

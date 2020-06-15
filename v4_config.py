@@ -77,6 +77,7 @@ GUAXI_WIDTH = 40
 GUAXI_HEIGHT = 40
 GUAXI_HIT_RECT = pygame.Rect (0,0, 0.9*GUAXI_WIDTH, 0.9*GUAXI_HEIGHT)
 GUAXI_SPEED = 0.6*PLAYER_SPEED
+GUAXI_SCORE = 200
 
 # Configurações das frutas
 LISTA_FRUTAS = ['abacaxi.png', 'cereja.png', 'laranja.png', 'limao.png', 'maca.png', 'morango.png', 'uva.png']
@@ -85,6 +86,7 @@ SNAKE_WALK_LEFT = ['L0.png', 'L1.png', 'L2.png']
 SNAKE_WALK_RIGHT = ['R0.png', 'R1.png', 'R2.png']
 SNAKE_WALK_UP = ['U0.png', 'U1.png', 'U2.png']
 SNAKE_WALK_DOWN = ['D0.png', 'D1.png', 'D2.png']
+FRUIT_SCORE = 10
 
 # Configurações do veneno da cobra
 VENENO_SPEED = 50

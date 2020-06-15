@@ -57,8 +57,9 @@ class Snake(pygame.sprite.Sprite):
         self.INGRASS = False
         self.last_hit = 0 # último hit do pássaro na cobra
         self.ANALISE = True # analisa múltiplos hits do pássaro na cobra
-    
-      
+        self.score = 0
+        
+        
     def get_keys(self):
         self.veloc = vect (0, 0)
         self.interactive_objects()
@@ -157,18 +158,21 @@ class Snake(pygame.sprite.Sprite):
                 #self.current_position = vect(self.posic.x, self.posic.y) # guarda a posição inicial antes de dar o bote
                 self.ATACK = True # executa a animação de ataque qnd rodar o update
                 self.target = self.jogo.presa1
+                self.score += GUAXI_SCORE
 
             elif dist_to_target_2 <= ATACK_RANGE and self.jogo.presa2.alive and self.stamine == PLAYER_MAX_STAMINE : 
                 self.last_atack = pygame.time.get_ticks()
                 #self.current_position = vect(self.posic.x, self.posic.y) # guarda a posição inicial antes de dar o bote
                 self.ATACK = True # executa a animação de ataque qnd rodar o update
                 self.target = self.jogo.presa2
+                self.score += GUAXI_SCORE
 
             elif dist_to_target_3 <= ATACK_RANGE and self.jogo.presa3.alive and self.stamine == PLAYER_MAX_STAMINE: 
                 self.last_atack = pygame.time.get_ticks()
                 #self.current_position = vect(self.posic.x, self.posic.y) # guarda a posição inicial antes de dar o bote
                 self.ATACK = True # executa a animação de ataque qnd rodar o update
                 self.target = self.jogo.presa3
+                self.score += GUAXI_SCORE
 
     def collide_with_walls (self, dir):
         if dir == 'x':
@@ -202,8 +206,7 @@ class Snake(pygame.sprite.Sprite):
 
     def update(self):
         self.get_keys()
-        
-        if self.ATACK:
+        if self.ATACK and self.stamine >= 0.8*SNAKE_MAX_STAMINE:
             number_frames = 5 # numero de frames p/ animar o bote
             self.to_target = vect (self.target.posic.x - self.posic.x, self.target.posic.y - self.posic.y)
             move_step = self.to_target / number_frames 
@@ -293,8 +296,11 @@ class Snake(pygame.sprite.Sprite):
             print(self.current_xp/self.next_level_xp)
             
             hit.kill()
-            if self.stamine > PLAYER_MAX_STAMINE:
-                self.stamine = PLAYER_MAX_STAMINE
+            # aumenta stamina e score
+            self.stamine += FRUTAS_STAMINA
+            self.score += FRUIT_SCORE
+            if self.stamine > SNAKE_MAX_STAMINE:
+                self.stamine = SNAKE_MAX_STAMINE
 
          # --- Player colide com pássaros
         now = pygame.time.get_ticks()
