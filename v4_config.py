@@ -32,6 +32,7 @@ WHITE = (255, 255, 255)
 BROWN = (106, 55, 5)
 ORANGE = (255, 140, 0)
 BLUE = (0, 0, 255)
+GRAY = (192, 192, 192)
 
 # Estados para controle do fluxo
 INIT = 0
@@ -139,6 +140,7 @@ MASTIGANDO = {'bite1':'bite1.wav', 'bite2':'bite2.wav', 'bite3':'bite3.wav'}
 
 
 INIT_IMG = 'init_teste.png'
+INSTRUC_IMG = 'instrucoes.png'
 
 
 # REFERÊNCIAS
