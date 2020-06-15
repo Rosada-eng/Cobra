@@ -30,7 +30,7 @@ def health_player_bar(surf, x, y, fracao): # (sup. de desesnho, x, y, porcentage
 # ----- Barra de Stamina
 def stamine_player_bar (surf, x, y, stamina):
     BAR_WIDTH = 150
-    BAR_HEIGHT = 10
+    BAR_HEIGHT = 15
     preench = stamina * BAR_WIDTH
     contorno_rect = pygame.Rect (x, y, BAR_WIDTH, BAR_HEIGHT)
     preench_rect = pygame.Rect (x, y, preench, BAR_HEIGHT)
@@ -48,6 +48,17 @@ def poison_charge_bar (surf, x, y, charge):
     color = RED
     pygame.draw.rect(surf, color, preench_rect) 
     pygame.draw.rect(surf, BLACK, contorno_rect, 3)
+
+# ----- Barra de EXP:
+def xp_bar (surf, x, y, charge):
+    BAR_WIDTH = 150
+    BAR_HEIGHT = 5
+    preench = charge
+    contorno_rect = pygame.Rect (x, y, BAR_WIDTH, BAR_HEIGHT)
+    preench_rect = pygame.Rect (x, y, preench, BAR_HEIGHT)
+    color = ORANGE
+    pygame.draw.rect(surf, color, preench_rect) 
+    pygame.draw.rect(surf, (46,64,83), contorno_rect, 3)
 
 
 
@@ -79,6 +90,7 @@ class Game:
         self.Fase2 = Fase2
         self.Fase3 = Fase3
         self.player_level = 1
+        self.player_xp = 0
 
         self.last_spawn = 0
         self.paused = False
@@ -91,12 +103,12 @@ class Game:
     def load_data(self):
         # cria mapa
         if Fase1:       
-            self.map = TiledMap((path.join(MAP_DIR, 'Fase1.tmx')))
+            self.map = TiledMap((path.join(MAP_DIR, 'mapa1.tmx')))
             self.map_img = self.map.make_map()
             self.map_rect = self.map_img.get_rect()
 
         elif Fase2:
-            self.map = TiledMap((path.join(MAP_DIR, 'mapa1.tmx')))
+            self.map = TiledMap((path.join(MAP_DIR, 'Fase1.tmx')))
             self.map_img = self.map.make_map()
             self.map_rect = self.map_img.get_rect()
 
@@ -104,6 +116,8 @@ class Game:
         self.see_img = pygame.transform.scale(self.see_img, (30,30))
         self.not_see_img = pygame.image.load(path.join(IMG_DIR, 'now_you_dont.png')).convert_alpha()
         self.not_see_img = pygame.transform.scale(self.not_see_img, (30,30))
+        self.blue_orb_img = pygame.image.load(path.join(IMG_DIR, '48.png')).convert_alpha()
+        self.blue_orb_img = pygame.transform.scale(self.blue_orb_img, (18,18))
 
         # --- Cobra ---
             # Esquerda
@@ -201,6 +215,7 @@ class Game:
         # ==== FONTS ====
         self.alagard = path.join(FONT_DIR, 'alagard.TTF')
         self.romulus = path.join(FONT_DIR, 'romulus.TTF')
+        self.trioDX = path.join(FONT_DIR, 'TrioDX.fon')
         # ==== Telas ====
         self.cortina_screen = pygame.Surface(self.screen.get_size()).convert_alpha()
         self.cortina_screen.fill((210,105,30, 170))
@@ -341,12 +356,12 @@ class Game:
             self.Fase1 = False # finaliza Fase1
             self.playing = False # encerra run da atual fase
                 
-        if self.player.stamine >= SNAKE_MAX_STAMINE/10: # configurar para quando dá o bote
-            if self.Fase1:
-                self.Fase1 = False # finaliza Fase1
-                self.playing = False # finaliza run da Fase1
-                self.Fase2 = True # passa pra Fase2
-                #self.playing = True
+        #if self.player.stamine >= PLAYER_MAX_STAMINE: # configurar para quando dá o bote
+        #    if self.Fase1:
+        #        self.Fase1 = False # finaliza Fase1
+        #        self.playing = False # finaliza run da Fase1
+        #        self.Fase2 = True # passa pra Fase2
+        #        #self.playing = True
             # elif self.Fase2:
             #     self.Fase2 = False
             #     self.playing = False
@@ -380,15 +395,19 @@ class Game:
                 self.screen.blit(sprite.image, self.camera.apply(sprite))
         
         # --- HUD ---
-        background = pygame.Surface ((190, 90)).convert_alpha()
+        background = pygame.Surface ((205, 90)).convert_alpha()
         background.fill ((250, 215, 160))
         self.screen.blit(background, (5,5))
         # - HP:
         self.draw_text ("HP:", self.romulus, 20, BLACK, 20, 20)
-        health_player_bar(self.screen, 40, 10, self.player.health / PLAYER_HEALTH)
+        health_player_bar(self.screen, 40, 10, self.player.health / self.player.max_health)
+        self.draw_text ("{0} / {1}".format(self.player.health, self.player.max_health), self.trioDX, 10, BLACK, 20 + 150/2, 18)
         # - SP:
         self.draw_text ("SP:", self.romulus, 20, BLACK, 20, 35)
-        stamine_player_bar (self.screen, 40, 30, self.player.stamine / SNAKE_MAX_STAMINE)
+        stamine_player_bar (self.screen, 40, 28, self.player.stamine / PLAYER_MAX_STAMINE)
+        self.draw_text ("{0} / {1}".format(self.player.stamine, self.player.max_stamine), self.trioDX, 10, BLACK, 20 + 150/2, 36)
+        if self.player.stamine >= 0.2*self.player.max_stamine:
+            self.screen.blit(self.blue_orb_img, (41 + 150, 28))
         # - Poison cooldown:
         poison_charge_bar (self.screen, 40, 45, self.player.charge)
         # - LVL:
@@ -399,6 +418,8 @@ class Game:
             self.screen.blit(self.not_see_img, (160,60))
         else:
             self.screen.blit(self.see_img, (160,60))
+        # - XP:
+        xp_bar(self.screen, 10, 85, self.player.current_xp / self.player.next_level_xp)
 
         # -- PAUSE --
         if self.paused:

@@ -58,11 +58,11 @@ OBJECT_HEIGHT = 20
 # Configurações do jogador
 PLAYER_SPEED = 50
 PLAYER_HEALTH = 100
-PLAYER_VISION = 150
+PLAYER_VISION = 100
 PLAYER_HIT_RECT = pygame.Rect (0, 0, 62, 62)
 SNAKE_WIDTH = 30
 SNAKE_HEIGHT = 30
-SNAKE_MAX_STAMINE = 100
+PLAYER_MAX_STAMINE = 100
 ATACK_RANGE = 100
 
 # Lista de Presas:
@@ -133,5 +133,6 @@ https://opengameart.org/content/2d-fruits  #tile de frutas
 https://opengameart.org/content/lpc-terrain-repack # tile de terrenos
 https://opengameart.org/content/king-cobra # tile da cobrinha
 https://freesound.org/people/JanKoehl/sounds/85603/ # som de caminhada no mato
-
+https://opengameart.org/content/pixel-fonts-by-pix3m # fonte 
+https://opengameart.org/content/new-original-grafx2-font-collection # fonte Trio DX
 """
