@@ -310,7 +310,10 @@ class Snake(pygame.sprite.Sprite):
                     if self.snake_count > 2:
                         self.snake_count = 0
             
-           
+        if not self.jogo.presa1.alive and not self.jogo.presa2.alive and not self.jogo.presa3.alive: # Se o Player derrotou as 3 presas:
+            self.jogo.next_phase()
+            
+
 
         # --- Player colide com a frutas:
         hits = pygame.sprite.spritecollide (self, self.jogo.fruits, False, pygame.sprite.collide_mask)
@@ -324,6 +327,10 @@ class Snake(pygame.sprite.Sprite):
             self.score += FRUIT_SCORE
             if self.stamine >= PLAYER_MAX_STAMINE:
                 self.stamine = PLAYER_MAX_STAMINE
+                self.health += 10
+            if self.health >= self.max_health:
+                self.health = self.max_health
+                # se a Stamine está cheia, passa a enxer um pouco de vida. 
 
          # --- Player colide com pássaros
         now = pygame.time.get_ticks()
@@ -372,24 +379,24 @@ class Snake(pygame.sprite.Sprite):
         self.jogo.player_level +=1
         self.current_xp = 0
         self.jogo.sound_effects['levelup'].play()
+        # Atributos específicos para alguns níveis:
         if self.jogo.player_level <= 3:
             self.next_level_xp = 1000
         elif self.jogo.player_level <= 5:
             self.next_level_xp = 2000
-        self.speed += 2
         if self.jogo.player_level == 2:
             self.max_health += 50
-            self.health += 50
         elif self.jogo.player_level == 4:
             self.max_health += 50
-            self.health += 50
+            self.health += 50 
         elif self.jogo.player_level == 6:
-            self.max_health += 50
-            self.health += 50
+            self.max_health += 50 
         elif self.jogo.player_level == 8:
             self.max_health += 50
             self.health += 50
-
+        # level max = lv. 10
+        # Atributos para cada level_up
+        self.speed += 2
         self.player_vision += 10
         self.snake_width += 4
         self.snake_height += 4

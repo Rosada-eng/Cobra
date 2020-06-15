@@ -34,7 +34,7 @@ def stamine_player_bar (surf, x, y, stamina):
     preench = stamina * BAR_WIDTH
     contorno_rect = pygame.Rect (x, y, BAR_WIDTH, BAR_HEIGHT)
     preench_rect = pygame.Rect (x, y, preench, BAR_HEIGHT)
-    color = BLUE
+    color = (0,191,255)
     pygame.draw.rect(surf, color, preench_rect) 
     pygame.draw.rect(surf, BLACK, contorno_rect, 3)
 
@@ -71,7 +71,7 @@ Fase3 = False
 
 
 class Game:
-    def __init__(self, Fase1, Fase2, Fase3):
+    def __init__(self):
         # Inicializador de Biblioteca Pygame e pygame mixer (áudio)
         pygame.init()
         pygame.mixer.init()
@@ -81,14 +81,15 @@ class Game:
         self.clock.tick(60) 
         pygame.display.set_caption ("The Snake is gonna Smoke! ~ by G & J ") #muda o título da screen
         pygame.key.set_repeat(500,100) # Inicia a função de repetir (tempo de espera, tempo para repetir cada ação)
-        # Chama função Load para carregar arquivos do jogo:
-        self.load_data()
         # Variável para determinar a fase do player
-        self.Fase1 = Fase1
-        self.Fase2 = Fase2
-        self.Fase3 = Fase3
+        self.Fase1 = True
+        self.Fase2 = False
+        self.init_load = False
+        #self.lista_fases = [self.Fase1, self.Fase2]
+        self.count_fase = 0 # contador para indicar em qual fase o player está
+        
 
-        self.tempo_fase = 5000
+        self.tempo_fase = 2*60*1000
         self.mostrador = " " # vai exibir o tempo na tela
         self.player_level = 1
         self.player_xp = 0
@@ -106,16 +107,18 @@ class Game:
         self.total_score = 0
         self.last_sec = 0
 
+        # Chama função Load para carregar arquivos do jogo:
+        self.load_data()
         
         
     def load_data(self):
         # cria mapa
-        if Fase1:       
+        if self.Fase1:       
             self.map = TiledMap((path.join(MAP_DIR, 'mapa1.tmx')))
             self.map_img = self.map.make_map()
             self.map_rect = self.map_img.get_rect()
 
-        elif Fase2:
+        elif self.Fase2:
             self.map = TiledMap((path.join(MAP_DIR, 'Fase1.tmx')))
             self.map_img = self.map.make_map()
             self.map_rect = self.map_img.get_rect()
@@ -262,7 +265,13 @@ class Game:
         self.screen.blit(text_surface, text_rect)
     
         
-    def new(self):   
+    def new(self): 
+        while self.init_load: # carrega o Load novamente, cada vez q mudar de fase
+            self.load_data()
+            self.tempo_fase = TEMPO_FASES[self.count_fase]
+            self.init_load = False
+            self.last_spawn = pygame.time.get_ticks() # reseta o tempo base em que a fruta dá respawn
+        
         #cria os grupos:
         self.all_sprites = pygame.sprite.LayeredUpdates()
         self.walls = pygame.sprite.Group()
@@ -282,6 +291,7 @@ class Game:
                 Object(self, tile_object.x, tile_object.y, tile_object.width, tile_object.height, 'MATO')
             if tile_object.name == 'fruit':
                 Fruit (self, choice(self.fruit_images), tile_object.x, tile_object.y)
+            
             # if tile_object.name == 'Passaro':
             #     Bird (self, tile_object.x, tile_object.y)    
             if tile_object.name == 'presa1':
@@ -318,8 +328,11 @@ class Game:
                 posy = randint (-300, -100)
                 speedy = choice(BIRD_SPEEDS)
                 CrazyBirds(self, self.bird_down_img['down000.png'], randint(0, self.map.width), posy, 0, speedy)     
-        # cria câmera
-        self.camera = Camera(self.map.width, self.map.height)
+    
+            # cria câmera
+            self.camera = Camera(self.map.width, self.map.height)
+
+            self.playing = True
 
     def respawn(self, type):
         if type == 'fruit':
@@ -345,6 +358,8 @@ class Game:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     self.paused = not self.paused
+                if event.key == pygame.K_m:
+                    self.next_phase()
             if event.type == pygame.QUIT:
                 self.quit()
 
@@ -414,6 +429,26 @@ class Game:
     #    score = "{:06d}".format(self.total_score)
     #    return score
        
+    def next_phase(self):
+        if self.count_fase == 0: # se estava na fase inicial
+            self.Fase1 = False
+            self.playing = False
+            self.Fase2 = True
+            self.init_load = True
+            self.count_fase = 1 # Muda o contador para 1 (próximo mapa)
+            
+      
+
+        elif self.count_fase == 1: # se estava na última fase
+            self.Fase2 = False
+            self.playing = False
+            self.Fase1 = True
+            self.count_fase = 0 # volta para a fase inicial
+            self.init_load = True
+         
+
+
+            
                
     def draw(self):
         self.screen.blit(self.map_img, self.camera.apply_rect(self.map_rect))
@@ -477,37 +512,38 @@ class Game:
         sys.exit()
 
     def game_over (self):
-        waiting = True
-        while waiting:
-            self.clock.tick(30) # reduz o clock 
-            pygame.mixer.music.stop() # para a música de fundo
-            # Tela de Game Over
-            self.screen.blit(self.gameover_screen, (0,0))
-            self.draw_text("GAME OVER!", self.romulus_80, (149,165,166), WIDTH/2, HEIGHT*0.3)
-            self.draw_text("Aperte ESPACO para TENTAR NOVAMENTE", self.romulus_40, (149,165,166), WIDTH/2, HEIGHT*0.6)
-            
-            if self.LOSER: # configuração para tocar o som somente uma vez
-                self.sound_effects['gameover'].play()
-                self.LOSER = False
+        if self.GAMEOVER:
+            waiting = True
+            while waiting:
+                self.clock.tick(30) # reduz o clock 
+                pygame.mixer.music.stop() # para a música de fundo
+                # Tela de Game Over
+                self.screen.blit(self.gameover_screen, (0,0))
+                self.draw_text("GAME OVER!", self.romulus_80, (149,165,166), WIDTH/2, HEIGHT*0.3)
+                self.draw_text("Aperte ESPACO para TENTAR NOVAMENTE", self.romulus_40, (149,165,166), WIDTH/2, HEIGHT*0.6)
+                
+                if self.LOSER: # configuração para tocar o som somente uma vez
+                    self.sound_effects['gameover'].play()
+                    self.LOSER = False
 
-            pygame.display.flip()
-            # Analisa eventos: Se fechar a tela, sai do jogo. Se apertar espaço, inicia um novo jogo
-            for event in pygame.event.get():
-                print (event)
-                if event.type == pygame.QUIT:
-                    waiting = False
-                    self.quit()
-
-                if event.type == pygame.KEYUP:
-                    if event.key == pygame.K_SPACE:
+                pygame.display.flip()
+                # Analisa eventos: Se fechar a tela, sai do jogo. Se apertar espaço, inicia um novo jogo
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
                         waiting = False
-                        self.GAMEOVER = False
-                        self.playing = True
-                        Fase1 = True
-                        jogo.__init__(Fase1, Fase2, Fase3)
+                        self.quit()
+
+                    if event.type == pygame.KEYUP:
+                        if event.key == pygame.K_SPACE:
+                            waiting = False
+                            self.GAMEOVER = False
+                            self.playing = True
+                            Fase1 = True
+                            jogo.__init__()
+       
     
 
-    def init_screen (self):
+    #def init_screen (self):
         #waiting = True
         #while waiting:
         #    self.clock.tick(30)
@@ -540,15 +576,15 @@ class Game:
         
 
 
-
-jogo = Game(Fase1, Fase2, Fase3)
+jogo = Game()
 
 # ========== LOOPING DE COMANDO ==========
 while True:
-    while Fase1:
+    while jogo.Fase1:
         jogo.new()
         jogo.run()
         jogo.game_over()
+        print ("passou")
         
         # Se o jogador passou da fase 1...
         #if jogo.Fase2 == True: # a 1° condição é quando dá o bote
@@ -560,7 +596,9 @@ while True:
         #elif jogo.player.health <= 0:
         #    Fase1 = False
         #    OPEN_GAME = False # '''Esse tem que ser configurado pra só quando o jogador encerrar'''
-    #while Fase2:
-    #    jogo.new()
-    #    jogo.run()
+    while jogo.Fase2:
+        print ("entrou")
+        jogo.new()
+        jogo.run()
+        jogo.game_over()
 
