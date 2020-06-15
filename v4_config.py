@@ -68,6 +68,7 @@ ATACK_RANGE = 100
 # Pontuação
 FRUTAS_STAMINA = 10 # quantidade de stamina que a fruta fornece
 FRUIT_SCORE = 10
+FRUIT_XP = 200
 
 # Sprites da Cobra
 SNAKE_WALK_LEFT = ['L0.png', 'L1.png', 'L2.png']
