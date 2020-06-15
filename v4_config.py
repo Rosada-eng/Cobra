@@ -135,4 +135,5 @@ https://opengameart.org/content/king-cobra # tile da cobrinha
 https://freesound.org/people/JanKoehl/sounds/85603/ # som de caminhada no mato
 https://opengameart.org/content/pixel-fonts-by-pix3m # fonte 
 https://opengameart.org/content/new-original-grafx2-font-collection # fonte Trio DX
+https://opengameart.org/content/random-rpg-icons-part-1 # simbolos de skill
 """

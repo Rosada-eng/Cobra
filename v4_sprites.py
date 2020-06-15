@@ -209,6 +209,11 @@ class Snake(pygame.sprite.Sprite):
             
             ## Consome STAMINA
             self.stamine = 0.8* self.stamine
+            ## Adiciona tempo
+            self.jogo.tempo_fase += 30000
+            # Adiciona XP:
+            self.current_xp += 300
+            
             now = pygame.time.get_ticks()
             delta_t = now - self.last_atack       
             if delta_t > 30:

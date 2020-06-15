@@ -56,7 +56,7 @@ def xp_bar (surf, x, y, charge):
     preench = charge
     contorno_rect = pygame.Rect (x, y, BAR_WIDTH, BAR_HEIGHT)
     preench_rect = pygame.Rect (x, y, preench, BAR_HEIGHT)
-    color = ORANGE
+    color = (128,0,0)
     pygame.draw.rect(surf, color, preench_rect) 
     pygame.draw.rect(surf, (46,64,83), contorno_rect, 3)
 
@@ -401,11 +401,11 @@ class Game:
         # - HP:
         self.draw_text ("HP:", self.romulus, 20, BLACK, 20, 20)
         health_player_bar(self.screen, 40, 10, self.player.health / self.player.max_health)
-        self.draw_text ("{0} / {1}".format(self.player.health, self.player.max_health), self.trioDX, 10, BLACK, 20 + 150/2, 18)
+        self.draw_text ("{0:.0f} / {1:.0f}".format(self.player.health, self.player.max_health), self.trioDX, 10, BLACK, 20 + 150/2, 18)
         # - SP:
         self.draw_text ("SP:", self.romulus, 20, BLACK, 20, 35)
         stamine_player_bar (self.screen, 40, 28, self.player.stamine / PLAYER_MAX_STAMINE)
-        self.draw_text ("{0} / {1}".format(self.player.stamine, self.player.max_stamine), self.trioDX, 10, BLACK, 20 + 150/2, 36)
+        self.draw_text ("{0:.0f} / {1:.0f}".format(self.player.stamine, self.player.max_stamine), self.trioDX, 10, BLACK, 20 + 150/2, 36)
         if self.player.stamine >= 0.2*self.player.max_stamine:
             self.screen.blit(self.blue_orb_img, (41 + 150, 28))
         # - Poison cooldown:
