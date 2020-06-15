@@ -224,11 +224,13 @@ class Game:
         # --- Veneno da cobra ---
         self.veneno_img = pygame.image.load(path.join(IMG_DIR, VENENO_IMG)).convert_alpha()
 
-        self.init_img = pygame.image.load(path.join(IMG_DIR, INIT_IMG)).convert()
+        self.init_img = pygame.image.load(path.join(IMG_DIR, INIT_IMG)).convert_alpha()
+        self.instruc_img = pygame.image.load(path.join(IMG_DIR, INSTRUC_IMG)).convert_alpha()
 
         # ==== FONTS ====
         self.romulus = path.join(FONT_DIR, 'romulus.TTF')
         self.romulus_20 = pygame.font.Font(self.romulus, 20)
+        self.romulus_30 = pygame.font.Font(self.romulus, 30)
         self.romulus_40 = pygame.font.Font(self.romulus, 40)
         self.romulus_80 = pygame.font.Font(self.romulus, 80)
 
@@ -521,6 +523,8 @@ class Game:
             self.screen.blit(self.image, self.image_rect)
             # Insere texto na tela
             self.draw_text("Pressione ENTER para começar", self.romulus_40, WHITE, WIDTH/2, HEIGHT/2)
+            self.draw_text("Pressione I para ver as instruções", self.romulus_30, WHITE, WIDTH/2, HEIGHT/2 + 30)
+            self.draw_text("Pressione ESC para pausar o jogo", self.romulus_20, WHITE, WIDTH/5, HEIGHT - 10)
             pygame.display.flip()
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -534,8 +538,15 @@ class Game:
                     if event.key == pygame.K_i:
                         self.information = not self.information
                         while self.information:
-                            self.screen.fill(BLUE)
-                            self.draw_text("INstruções aqui", self.romulus_40, WHITE, WIDTH/2, HEIGHT/2)
+                            self.screen.fill(GRAY)
+                            self.draw_text("INSTRUÇÕES", self.romulus_40, RED, WIDTH/2, 0.1*HEIGHT)
+
+                            self.image = self.instruc_img
+                            self.image = pygame.transform.scale(self.image, (600, 450))
+                            self.image_rect = self.image.get_rect()
+                            self.image_rect.center = (WIDTH/2, HEIGHT/2)
+                            self.screen.blit(self.image, self.image_rect)
+
                             pygame.display.flip()
                             # Fecha ou volta para o início
                             for event in pygame.event.get():
