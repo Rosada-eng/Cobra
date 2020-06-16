@@ -371,6 +371,7 @@ class Snake(pygame.sprite.Sprite):
                 self.ANALISE = False
                 self.health -= BIRD_DAMAGE
                 self.jogo.sound_effects['hit'].play()
+                
                 hit.speed = vect (0, 0)
                 if self.health <= 0:
                     self.playing = False

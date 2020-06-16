@@ -6,6 +6,19 @@ from os import path
 from v4_config import *
 from v4_sprites import *
 
+""" 
+THE SNAKE IS GONNA SMOKE!
+
+Jogo criado por: Guilherme Rosada e Jamesson Leandro Paiva Santos
+na disciplina de Design de Software
+
+Professor orientador: Andrew Toshiaki Nakayama Kurauchi,
+1B- ENG
+INSPER 2020.1
+
+
+p/ visualizar os CRÉDITOS, leia o arquivo 'README'
+"""
 # ========== HUD do jogo ==========
 # ----- Barra de vida do jogador
 def health_player_bar(surf, x, y, fracao): # Função para desenhar o HUD de Life (HP)
@@ -91,6 +104,7 @@ class Game:
         self.playing = True # utilizada para controlar o looping 'run'
         self.paused = False 
         self.GAMEOVER = False 
+        self.WINNER = False
         self.LOSER = False # utilizada para tocar o som de game over uma única vez
         self.ANALISE = True # analisa múltiplos hits dos pássaros na cobra
 
@@ -221,6 +235,8 @@ class Game:
         # --- música de fundo ---
         self.abertura = pygame.mixer.Channel(1)
         self.abertura.set_volume(0.3)
+        self.winner = pygame.mixer.Channel(2)
+        self.winner.set_volume(0.3)
         #abertura = pygame.mixer.music.load(path.join(MUSIC_DIR, 'happy.ogg'))
         pygame.mixer.music.load(path.join(MUSIC_DIR, 'sonarctica_v7.ogg'))
         pygame.mixer.music.set_volume(0.1)
@@ -235,6 +251,7 @@ class Game:
         self.sound_effects['levelup'] = pygame.mixer.Sound(path.join(EFFECTS_DIR,'blessing2.ogg'))
         self.sound_effects['gameover'] = pygame.mixer.Sound(path.join(EFFECTS_DIR,'gameover.ogg'))
         self.sound_effects['abertura'] = pygame.mixer.Sound(path.join(MUSIC_DIR, 'happy.ogg'))
+        self.sound_effects['winner'] = pygame.mixer.Sound(path.join(MUSIC_DIR, 'Winner.ogg'))
 
     def draw_text(self, text, font, color, x, y): # Função para imprimir textos na tela
         text_surface = font.render(text, True, color)
@@ -334,6 +351,8 @@ class Game:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE: # Configura a tela de Pause
                     self.paused = not self.paused
+                if event.key == pygame.K_m: # Configura a tela de Pause
+                    self.next_phase()
                 
             if event.type == pygame.QUIT: # Sai do jogo
                 self.quit()
@@ -395,8 +414,10 @@ class Game:
             self.Fase2 = False
             self.playing = False
             self.Fase1 = True
-            self.count_fase = 0 # volta para a fase inicial
-            self.init_load = True
+            self.count_fase = 0 # deixa ajustado para a fase inicial
+            self.init_load = False
+            self.GAMEOVER = False
+            self.WINNER = True
          
     
     def draw(self):
@@ -488,7 +509,7 @@ class Game:
                             waiting = False
                             self.GAMEOVER = False
                             self.playing = True
-                            Fase1 = True
+                            self.Fase1 = True
                             jogo.__init__()
 
 
@@ -541,6 +562,35 @@ class Game:
                                     if event.key == pygame.K_i:
                                         self.information = False
         self.abertura.stop()
+
+    def winner_screen(self): # Exibe a tela de Vencedor
+        if self.WINNER:
+            pygame.mixer.music.stop()
+            running = True # Configura o looping
+            self.winner.play(self.sound_effects['winner'])
+            while running:
+                self.clock.tick(30)
+                
+                self.screen.fill(BLACK)
+                # Chama imagem com nome do jogo
+                self.image = self.init_img
+                self.image_rect = self.image.get_rect()
+                self.image_rect.center = (WIDTH/2, self.image_rect.height/2)
+                self.screen.blit(self.image, self.image_rect)
+                # Insere texto na tela
+                self.draw_text("YOU WIN!", self.romulus_80, ORANGE, WIDTH/2, HEIGHT/2)
+                #self.draw_text("Pressione 'i' para ver as instruções", self.romulus_30, WHITE, WIDTH/2, HEIGHT/2 + 30)
+                self.draw_text("Pressione 'Enter' para reiniciar o jogo", self.romulus_20, WHITE, WIDTH/5 +20, HEIGHT - 15)
+                pygame.display.flip()
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        running = False
+                        self.quit()
+                    if event.type == pygame.KEYUP:
+                        if event.key == pygame.K_RETURN: # Se apertar Enter, entra no Jogo
+                            running = False       
+                    
+        self.winner.stop()
             
     
 
@@ -555,10 +605,12 @@ while True:
         jogo.run()
         jogo.game_over()
         
+        
 
     while jogo.Fase2:
         
         jogo.new()
         jogo.run()
         jogo.game_over()
+        jogo.winner_screen()
 

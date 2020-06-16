@@ -11,6 +11,8 @@ Instale as bibliotecas:
 - pygame
 - pytmx
 
+Execute o arquivo v4_main.py
+
 # - Como jogar
 
 Há uma página de Instruções de como jogar dentro do próprio jogo. 
