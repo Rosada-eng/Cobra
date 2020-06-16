@@ -114,7 +114,7 @@ BIRD_UP_IMG = ['up000.png', 'up001.png', 'up002.png', 'up003.png'] # cima
 BIRD_DOWN_IMG = ['down000.png', 'down001.png', 'down002.png', 'down003.png'] # baixo
 BIRD_DAMAGE = 10 # dano que o pássaro causa
 BIRD_SCORE_HIT = 20
-BIRD_SPEEDS = [40, 50, 30, 25]
+BIRD_SPEEDS = [48, 50, 55, 45]
 BIRD_HIT_RECT = pygame.Rect (0, 0, 30, 30) #ret. de colisão
 
 

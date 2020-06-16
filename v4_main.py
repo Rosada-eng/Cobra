@@ -235,6 +235,7 @@ class Game:
         self.sound_effects['levelup'] = pygame.mixer.Sound(path.join(EFFECTS_DIR,'blessing2.ogg'))
         self.sound_effects['gameover'] = pygame.mixer.Sound(path.join(EFFECTS_DIR,'gameover.ogg'))
         self.sound_effects['abertura'] = pygame.mixer.Sound(path.join(MUSIC_DIR, 'happy.ogg'))
+        self.sound_effects['ave_som'] = pygame.mixer.Sound(path.join(EFFECTS_DIR, 'ave_som.ogg'))
 
     def draw_text(self, text, font, color, x, y): # Função para imprimir textos na tela
         text_surface = font.render(text, True, color)
