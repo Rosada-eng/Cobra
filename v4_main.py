@@ -242,6 +242,9 @@ class Game:
         self.gameover_screen.fill((0,0,0, 220))
         # ==== SOUND ====
         # --- música de fundo ---
+        self.abertura = pygame.mixer.Channel(1)
+        self.abertura.set_volume(0.3)
+        #abertura = pygame.mixer.music.load(path.join(MUSIC_DIR, 'happy.ogg'))
         pygame.mixer.music.load(path.join(MUSIC_DIR, 'sonarctica_v7.ogg'))
         pygame.mixer.music.set_volume(0.1)
         # -- Dicionário com os efeitos
@@ -251,11 +254,10 @@ class Game:
         self.sound_effects['bite1'] = pygame.mixer.Sound(path.join(EFFECTS_DIR,'mastigando', 'bite1.ogg'))
         self.sound_effects['bite2'] = pygame.mixer.Sound(path.join(EFFECTS_DIR,'mastigando', 'bite2.ogg'))
         self.sound_effects['bite3'] = pygame.mixer.Sound(path.join(EFFECTS_DIR,'mastigando', 'bite3.ogg'))
-        self.sound_effects['in-grass'] = pygame.mixer.Sound(path.join(EFFECTS_DIR, 'grass_in_or_out.ogg'))
-        self.sound_effects['grass_walk'] = pygame.mixer.Sound(path.join(EFFECTS_DIR,'grass_walk.ogg'))
         self.sound_effects['1step_grass'] = pygame.mixer.Sound(path.join(EFFECTS_DIR,'1step - grass_walk.ogg'))
         self.sound_effects['levelup'] = pygame.mixer.Sound(path.join(EFFECTS_DIR,'blessing2.ogg'))
         self.sound_effects['gameover'] = pygame.mixer.Sound(path.join(EFFECTS_DIR,'gameover.ogg'))
+        self.sound_effects['abertura'] = pygame.mixer.Sound(path.join(MUSIC_DIR, 'happy.ogg'))
 
     def draw_text(self, text, font, color, x, y): # Função para imprimir textos na tela
         text_surface = font.render(text, True, color)
@@ -515,6 +517,7 @@ class Game:
 
     def init_screen(self): # Exibe a tela inicial do jogo
         running = True # Configura o looping
+        self.abertura.play(self.sound_effects['abertura'])
         while running:
             self.clock.tick(30)
             self.information = False # Configura se exibe ou não a janela de informações
@@ -525,9 +528,9 @@ class Game:
             self.image_rect.center = (WIDTH/2, self.image_rect.height/2)
             self.screen.blit(self.image, self.image_rect)
             # Insere texto na tela
-            self.draw_text("Pressione ENTER para começar", self.romulus_40, WHITE, WIDTH/2, HEIGHT/2)
-            self.draw_text("Pressione I para ver as instruções", self.romulus_30, WHITE, WIDTH/2, HEIGHT/2 + 30)
-            self.draw_text("Pressione ESC para pausar o jogo", self.romulus_20, WHITE, WIDTH/5, HEIGHT - 10)
+            self.draw_text("Pressione 'ENTER' para começar", self.romulus_40, WHITE, WIDTH/2, HEIGHT/2)
+            self.draw_text("Pressione 'i' para ver as instruções", self.romulus_30, WHITE, WIDTH/2, HEIGHT/2 + 30)
+            self.draw_text("Pressione 'ESC' para pausar o jogo", self.romulus_20, WHITE, WIDTH/5 +5, HEIGHT - 15)
             pygame.display.flip()
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -560,6 +563,7 @@ class Game:
                                 if event.type == pygame.KEYUP:
                                     if event.key == pygame.K_i:
                                         self.information = False
+        self.abertura.stop()
             
     
 
