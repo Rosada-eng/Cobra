@@ -352,9 +352,7 @@ class Game:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE: # Configura a tela de Pause
                     self.paused = not self.paused
-                if event.key == pygame.K_m: # Configura a tela de Pause
-                    self.next_phase()
-                
+
             if event.type == pygame.QUIT: # Sai do jogo
                 self.quit()
 
@@ -378,11 +376,8 @@ class Game:
             return self.mostrador # o mostrador será "blitado" depois         
 
     def update(self):
-        #score_now = self.player.score
+       
         self.all_sprites.update()
-        #if self.player.score != score_now:
-        #self.total_score += self.player.score - score_now
-
         self.camera.update(self.player)
         # Delay e looping para tirar 1 segundo do Timer
         now = pygame.time.get_ticks()
@@ -397,18 +392,14 @@ class Game:
             self.GAMEOVER = True
             self.LOSER = True
 
- 
-    #def score_show(self):
-
-    #    score = "{:06d}".format(self.total_score)
-    #    return score
-       
     def next_phase(self):
         if self.count_fase == 0: # se estava na fase inicial
             self.Fase1 = False
             self.playing = False
             self.Fase2 = True
             self.init_load = True
+            self.player_level = 1
+            self.player_xp = 0
             self.count_fase = 1 # Muda o contador para 1 (próximo mapa)
             
         elif self.count_fase == 1: # se estava na última fase
@@ -471,10 +462,6 @@ class Game:
             self.draw_text("GAME OVER!", self.romulus_80, (149,165,166), WIDTH/2, HEIGHT/2)
         # -- Timer --
         self.draw_text(self.timer(), self.romulus_40, WHITE, WIDTH/2 , 20)
-
-        # -- SCORE
-
-        #self.draw_text(self.score_show(), self.romulus, 30, WHITE, 7*WIDTH/8, 20)
 
         pygame.display.flip()
 

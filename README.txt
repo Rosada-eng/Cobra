@@ -1,5 +1,7 @@
 # The Snake is Gonna Smoke!
 
+Video do jogo rodando: https://youtu.be/DYfpiZ1EjD4
+
 Jogo criado pelos alunos: Guilherme Rosada e Jamesson Leandro Paiva Santos
 na disciplina de Design de Software, do Insper 2020.1, 1B - Eng
 
