@@ -133,23 +133,23 @@ class Snake(pygame.sprite.Sprite):
                 
                 # Ajusta posição do disparo dependendo da movimentação que a cobra tava
                 if self.LEFT:
-                    pos = self.posic + VENENO_DESLOC_LEFT
+                    pos = self.posic + vect(-self.rect.width/2, self.rect.height/9)
                 elif self.RIGHT:
-                    pos = self.posic + VENENO_DESLOC_RIGHT
+                    pos = self.posic + vect(self.rect.width, self.rect.height/9)
                 elif self.UP:
-                    pos = self.posic + VENENO_DESLOC_UP
+                    pos = self.posic + vect(self.rect.width/2, 0)
                 elif self.DOWN:
-                    pos = self.posic + VENENO_DESLOC_DOWN
+                    pos = self.posic + vect(self.rect.width/2, self.rect.height)
                 else:
                     # Ajusta posição do tiro quando a cobra tava parada
                     if self.last_dir == vect (1, 0):
-                        pos = self.posic + VENENO_DESLOC_RIGHT            
+                        pos = self.posic + vect(self.rect.width, self.rect.height/9)            
                     elif self.last_dir == vect (-1, 0):
-                        pos = self.posic + VENENO_DESLOC_LEFT            
+                        pos = self.posic + vect(-self.rect.width/2, self.rect.height/9)           
                     elif self.last_dir == vect (0, -1):
-                        pos = self.posic + VENENO_DESLOC_UP            
+                        pos = self.posic + vect(self.rect.width/2, 0)           
                     else: 
-                        pos = self.posic + VENENO_DESLOC_DOWN            
+                        pos = self.posic + vect(self.rect.width/2, self.rect.height)         
                 dir = self.last_dir  
                 # Posição do tiro: tem que ajustar à boca da cobra quando anda na horizontal
                 Veneno (self.jogo, pos, dir)
@@ -288,12 +288,14 @@ class Snake(pygame.sprite.Sprite):
                         # Retorna à imagem da cobra
                         self.image = self.jogo.snake_down['D{}.png'.format(self.snake_count)]
                         self.image = pygame.transform.scale(self.image, (self.snake_width, self.snake_height))
+
                         
             # Se não aumentou level up, apenas atualiza imagem conforme sentido
             # Esquerda
             elif self.LEFT:
                 self.image = self.jogo.snake_left['L{}.png'.format(self.snake_count)]
                 self.image = pygame.transform.scale(self.image, (self.snake_width, self.snake_height))
+
                 if delta_t > 150:
                     delta_t = 0
                     self.last_update = now
@@ -305,6 +307,7 @@ class Snake(pygame.sprite.Sprite):
             elif self.RIGHT:
                 self.image = self.jogo.snake_right['R{}.png'.format(self.snake_count)]
                 self.image = pygame.transform.scale(self.image, (self.snake_width, self.snake_height))
+
                 if delta_t > 150:
                     delta_t = 0
                     self.last_update = now
@@ -316,6 +319,7 @@ class Snake(pygame.sprite.Sprite):
             elif self.DOWN:
                 self.image = self.jogo.snake_down['D{}.png'.format(self.snake_count)]
                 self.image = pygame.transform.scale(self.image, (self.snake_width, self.snake_height))
+
                 if delta_t > 150:
                     delta_t = 0
                     self.last_update = now
@@ -327,6 +331,7 @@ class Snake(pygame.sprite.Sprite):
             elif self.UP:
                 self.image = self.jogo.snake_up['U{}.png'.format(self.snake_count)]
                 self.image = pygame.transform.scale(self.image, (self.snake_width, self.snake_height))
+
                 if delta_t > 150:
                     delta_t = 0
                     self.last_update = now
@@ -370,8 +375,8 @@ class Snake(pygame.sprite.Sprite):
             for hit in hits:
                 self.ANALISE = False
                 self.health -= BIRD_DAMAGE
-                self.jogo.sound_effects['hit'].play()
-                
+                channel2 = self.jogo.sound_effects['hit'].play() 
+                channel2.queue(self.jogo.sound_effects['ave_som'])  
                 hit.speed = vect (0, 0)
                 if self.health <= 0:
                     self.playing = False

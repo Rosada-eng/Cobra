@@ -252,6 +252,7 @@ class Game:
         self.sound_effects['gameover'] = pygame.mixer.Sound(path.join(EFFECTS_DIR,'gameover.ogg'))
         self.sound_effects['abertura'] = pygame.mixer.Sound(path.join(MUSIC_DIR, 'happy.ogg'))
         self.sound_effects['winner'] = pygame.mixer.Sound(path.join(MUSIC_DIR, 'Winner.ogg'))
+        self.sound_effects['ave_som'] = pygame.mixer.Sound(path.join(EFFECTS_DIR, 'ave_som.ogg'))
 
     def draw_text(self, text, font, color, x, y): # Função para imprimir textos na tela
         text_surface = font.render(text, True, color)
@@ -294,9 +295,9 @@ class Game:
         # - Aves migratórias
         # Estabelece a quantidade de passaros para cada fase   
         if self.Fase1:
-            qtde_birds = 30
+            qtde_birds = 45
         if self.Fase2:
-            qtde_birds = 50
+            qtde_birds = 75
         
         for i in range (qtde_birds):
             # sorteio pra deixar aleatório a qtde de pássaros que vem de um lado e do outro
