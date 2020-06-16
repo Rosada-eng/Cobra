@@ -117,7 +117,8 @@ class Game:
             self.map_rect = self.map_img.get_rect()
 
         # Tela inicial
-        self.init_img = pygame.image.load(path.join(IMG_DIR, INIT_IMG)).convert()
+        self.init_img = pygame.image.load(path.join(IMG_DIR, 'init_teste.png')).convert()
+        self.instruc_img = pygame.image.load(path.join(IMG_DIR, 'instrucoes.png')).convert()
          
         # imagens para o HUD:
         self.see_img = pygame.image.load(path.join(IMG_DIR, 'now_you_see.png')).convert_alpha()
@@ -567,6 +568,7 @@ jogo = Game()
 
 # ========== LOOPING DE COMANDO ==========
 while True:
+    jogo.init_screen()
     while jogo.Fase1:
         jogo.new()
         jogo.run()

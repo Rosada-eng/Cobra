@@ -43,8 +43,8 @@ QUIT = 2
 LAYERS = {'PLAYER': 3, 'FRUIT': 2, 'BIRD': 4, 'OBJECT': 1, 'WALL': 1, 'MATO': 1, 'DETECT': 1}
 
 # ============ CONFIGURAÇÕES DAS FASES ============
-FASE1 = (2*60 + 00)*1000 # tempo em milisseg
-FASE2 = (4*60 + 00)*1000
+FASE1 = (0*60 + 5)*1000 # tempo em milisseg
+FASE2 = (0*60 + 5)*1000
 TEMPO_FASES =[FASE1, FASE2]
 
 # Configuração do MHS:
@@ -138,9 +138,6 @@ OWL_WIDTH = 50
 # ====== CONFIG SOM =======
 MASTIGANDO = {'bite1':'bite1.wav', 'bite2':'bite2.wav', 'bite3':'bite3.wav'}
 
-
-INIT_IMG = 'init_teste.png'
-INSTRUC_IMG = 'instrucoes.png'
 
 
 # REFERÊNCIAS
