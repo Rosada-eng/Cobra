@@ -16,10 +16,10 @@ class Snake(pygame.sprite.Sprite):
         self.speed = PLAYER_SPEED
         self.health = PLAYER_HEALTH
         self.max_health = PLAYER_HEALTH
-        #self.max_stamine = PLAYER_MAX_STAMINE
         self.player_vision = PLAYER_VISION
         self.snake_width = SNAKE_WIDTH
         self.snake_height = SNAKE_HEIGHT
+        
         # LEVEL UP:
         self.next_level_xp = 1000
         self.current_xp = 0
@@ -27,10 +27,11 @@ class Snake(pygame.sprite.Sprite):
         self.LEVELUP = False
         self.snake_count_lvl = 0
         self.last_image = 0
+        
         # Atributos da Fruta 
         self.fruit_xp = 20
         self.fruit_stamine = 10
-        # Condições do
+
         # configurações gerais do sprite
         self.jogo = jogo       
         self.image = img
@@ -50,25 +51,26 @@ class Snake(pygame.sprite.Sprite):
         self.DOWN = False
         self.last_shoot = 0 # no começo, não houve disparos
         self.last_dir = self.dir
+        
         # configurações para o ataque
         self.ATACK = False
-        self.last_atack = 0
-        #self.current_position = vect (0,0)
+        self.last_atack = 0        
         self.target = 0 # variável que guardará quem é o target mais próximo
         self.to_target = vect (0,0)
         self.dist_to_target = 0
         self.count_step = 0
-        self.INGRASS = False
+        self.INGRASS = False # não está camuflado
         self.last_hit = 0 # último hit do pássaro na cobra
         self.ANALISE = True # analisa múltiplos hits do pássaro na cobra
         self.score = 0
         
-        
+    # Verifica pressionamento de teclas    
     def get_keys(self):
         self.veloc = vect (0, 0)
         self.interactive_objects()
         CHANCE = 0.005
         keys = pygame.key.get_pressed() #Salva uma dicionario de keys q estão sendo pressionadas
+        # Movimento para a esquerda
         if keys[pygame.K_LEFT]:
             self.veloc.x = -self.speed
             self.dir = vect (-1, 0)
@@ -79,7 +81,8 @@ class Snake(pygame.sprite.Sprite):
             if self.INGRASS:
                 if random() < CHANCE:
                     channel2 = self.jogo.sound_effects['1step_grass'].play() 
-                    """ configurar para não repetir tantas vezes """
+        
+        # Movimento para direita
         elif keys[pygame.K_RIGHT]:
             self.veloc.x = self.speed
             self.dir = vect (1, 0)
@@ -90,6 +93,8 @@ class Snake(pygame.sprite.Sprite):
             if self.INGRASS:
                 if random() < CHANCE:
                     channel2 = self.jogo.sound_effects['1step_grass'].play()
+        
+        # Movimento para cima
         elif keys[pygame.K_UP]:
             self.veloc.y = -self.speed
             self.dir = vect (0, -1)
@@ -100,6 +105,8 @@ class Snake(pygame.sprite.Sprite):
             if self.INGRASS:
                 if random() < CHANCE:
                     channel2 = self.jogo.sound_effects['1step_grass'].play()
+        
+        # Movimento para baixo
         elif keys[pygame.K_DOWN]:
             self.veloc.y = self.speed
             self.dir = vect (0, 1)
@@ -116,12 +123,14 @@ class Snake(pygame.sprite.Sprite):
             self.LEFT = False
             self.RIGHT = False
         self.last_dir = self.dir # guarda última direção
+        
         # Configura disparo do veneno
         if keys[pygame.K_SPACE]:
             now_time = pygame.time.get_ticks() # grava instante atual           
             if now_time - self.last_shoot > VENENO_FREQUENCY:
                 self.last_shoot = now_time # se passou tempo mínimo, grava novo 'último tiro'
                 self.charge = 0
+                
                 # Ajusta posição do disparo dependendo da movimentação que a cobra tava
                 if self.LEFT:
                     pos = self.posic + VENENO_DESLOC_LEFT
@@ -157,13 +166,16 @@ class Snake(pygame.sprite.Sprite):
             dist_to_target_2 = to_target_2.magnitude() # distância inicial (em pixels) entre Player e Presa 2
             dist_to_target_3 = to_target_3.magnitude() # distância inicial (em pixels) entre Player e Presa 3
             
+            # Condição do ataque: distância mínima, presa viva e stamina necessária
+            # Presa 1
             if dist_to_target_1 <= ATACK_RANGE and self.jogo.presa1.alive and self.stamine >= 0.8*PLAYER_MAX_STAMINE: 
                 self.last_atack = pygame.time.get_ticks()
                 #self.current_position = vect(self.posic.x, self.posic.y) # guarda a posição inicial antes de dar o bote
                 self.ATACK = True # executa a animação de ataque qnd rodar o update
                 self.target = self.jogo.presa1
                 self.score += GUAXI_SCORE
-
+            
+            # Presa 2
             elif dist_to_target_2 <= ATACK_RANGE and self.jogo.presa2.alive and self.stamine >= 0.8*PLAYER_MAX_STAMINE : 
                 self.last_atack = pygame.time.get_ticks()
                 #self.current_position = vect(self.posic.x, self.posic.y) # guarda a posição inicial antes de dar o bote
@@ -171,6 +183,7 @@ class Snake(pygame.sprite.Sprite):
                 self.target = self.jogo.presa2
                 self.score += GUAXI_SCORE
 
+            # Presa 3
             elif dist_to_target_3 <= ATACK_RANGE and self.jogo.presa3.alive and self.stamine >= 0.8*PLAYER_MAX_STAMINE: 
                 self.last_atack = pygame.time.get_ticks()
                 #self.current_position = vect(self.posic.x, self.posic.y) # guarda a posição inicial antes de dar o bote
@@ -178,6 +191,7 @@ class Snake(pygame.sprite.Sprite):
                 self.target = self.jogo.presa3
                 self.score += GUAXI_SCORE
 
+    # Verifica colisões com barreiras
     def collide_with_walls (self, dir):
         if dir == 'x':
             hits = pygame.sprite.spritecollide (self, self.jogo.walls, False) # retorna uma lista com os elementos do grupo q colidiram
@@ -210,12 +224,14 @@ class Snake(pygame.sprite.Sprite):
 
     def update(self):
         self.get_keys()
+        # Se houve ataque, atualiza posição da cobra
         if self.ATACK and self.stamine >= 0.8*PLAYER_MAX_STAMINE:
             number_frames = 5 # numero de frames p/ animar o bote
+            # Direciona cobra para a presa
             self.to_target = vect (self.target.posic.x - self.posic.x, self.target.posic.y - self.posic.y)
             move_step = self.to_target / number_frames 
             
-            
+            # Verifica intervalo de tempo para animação            
             now = pygame.time.get_ticks()
             delta_t = now - self.last_atack       
             if delta_t > 30:
@@ -223,7 +239,9 @@ class Snake(pygame.sprite.Sprite):
                 self.posic.y += move_step.y
                 self.rect.center = (self.posic.x, self.posic.y)
                 self.count_step +=1
-                self.last_atack = now      
+                self.last_atack = now
+                
+                # Se foi todos os steps, mata presa      
                 if self.count_step >= number_frames:
                     self.target.kill()
                     channel1 = self.jogo.sound_effects['bite1'].play() 
@@ -231,15 +249,15 @@ class Snake(pygame.sprite.Sprite):
                     channel1.queue(self.jogo.sound_effects['bite3']) 
                     self.count_step = 0
                     self.ATACK = False
-                    self.target.alive = False
-
+                    self.target.alive = False # presa não está mais viva
                     ## Consome STAMINA
                     self.stamine -= 0.8* self.stamine
                     ## Adiciona tempo
                     self.jogo.tempo_fase += 30*1000
                     # Adiciona XP:
                     self.current_xp += 500
-    
+
+        # Se não houve ataque, atualiza posição    
         else:
             self.posic.x += self.veloc.x * dt #delta X = vx*deltaT
             self.posic.y += self.veloc.y * dt #delta Y = vy*deltaT
@@ -248,13 +266,15 @@ class Snake(pygame.sprite.Sprite):
             self.collide_with_walls ('x') #checa condições de colisao em X
             self.rect.y = self.posic.y
             self.collide_with_walls('y') #checa condições de colisao em Y
-
+            
+            # Atualiza carga do veneno
             now = pygame.time.get_ticks()
             delta_t = now - self.last_update   
             self.charge = (now - self.last_shoot)/VENENO_DURATION * VENENO_CHARGE
             if self.charge > VENENO_CHARGE:
                 self.charge = VENENO_CHARGE
 
+            # Verifica e atualiza level up e faz animação
             if self.LEVELUP:
                 self.image = self.jogo.snake_levelup['cloud{}.png'.format(self.snake_count_lvl)]
                 self.image = pygame.transform.scale(self.image, (self.snake_width, self.snake_height))
@@ -269,7 +289,8 @@ class Snake(pygame.sprite.Sprite):
                         self.image = self.jogo.snake_down['D{}.png'.format(self.snake_count)]
                         self.image = pygame.transform.scale(self.image, (self.snake_width, self.snake_height))
                         
-
+            # Se não aumentou level up, apenas atualiza imagem conforme sentido
+            # Esquerda
             elif self.LEFT:
                 self.image = self.jogo.snake_left['L{}.png'.format(self.snake_count)]
                 self.image = pygame.transform.scale(self.image, (self.snake_width, self.snake_height))
@@ -279,7 +300,8 @@ class Snake(pygame.sprite.Sprite):
                     self.snake_count +=1
                     if self.snake_count > 2:
                         self.snake_count = 0
-
+            
+            # Direita
             elif self.RIGHT:
                 self.image = self.jogo.snake_right['R{}.png'.format(self.snake_count)]
                 self.image = pygame.transform.scale(self.image, (self.snake_width, self.snake_height))
@@ -290,6 +312,7 @@ class Snake(pygame.sprite.Sprite):
                     if self.snake_count > 2:
                         self.snake_count = 0  
 
+            # Baixo
             elif self.DOWN:
                 self.image = self.jogo.snake_down['D{}.png'.format(self.snake_count)]
                 self.image = pygame.transform.scale(self.image, (self.snake_width, self.snake_height))
@@ -300,6 +323,7 @@ class Snake(pygame.sprite.Sprite):
                     if self.snake_count > 2:
                         self.snake_count = 0
 
+            # Cima
             elif self.UP:
                 self.image = self.jogo.snake_up['U{}.png'.format(self.snake_count)]
                 self.image = pygame.transform.scale(self.image, (self.snake_width, self.snake_height))
@@ -314,27 +338,29 @@ class Snake(pygame.sprite.Sprite):
             self.jogo.next_phase()
             
 
-
         # --- Player colide com a frutas:
         hits = pygame.sprite.spritecollide (self, self.jogo.fruits, False, pygame.sprite.collide_mask)
         for hit in hits:
             self.jogo.sound_effects['pick_fruit'].play()
-            self.current_xp += FRUIT_XP
-                       
+            self.current_xp += FRUIT_XP                       
             hit.kill()
+            
             # aumenta stamina e score
             self.stamine += FRUTAS_STAMINA
             self.score += FRUIT_SCORE
+            
+            # se a Stamine está cheia, passa a enxer um pouco de vida.
             if self.stamine >= PLAYER_MAX_STAMINE:
                 self.stamine = PLAYER_MAX_STAMINE
                 self.health += 10
             if self.health >= self.max_health:
                 self.health = self.max_health
-                # se a Stamine está cheia, passa a enxer um pouco de vida. 
+                 
 
          # --- Player colide com pássaros
         now = pygame.time.get_ticks()
         delay = now - self.last_hit
+        # Se passou o delay, já pode colidir novamente
         if delay > 2000:
             self.ANALISE = True
         if self.ANALISE and not self.INGRASS:
@@ -349,36 +375,19 @@ class Snake(pygame.sprite.Sprite):
                 if self.health <= 0:
                     self.playing = False
 
+        # Atualiza xp e level up
         if self.current_xp >= self.next_level_xp:
             if self.jogo.player_level < 10:
                 self.level_up()
             else:
                 self.current_xp == self.next_level_xp # Trava barra de XP no máximo
 
-
-        """ Arrumar para adequar o código de baixo para o Sprite"""
-            # if hits:
-            #     self.player.posic += vect (BIRD_KNOCKBACK, 0).rotate(90)
-
-        # hits = pygame.sprite.groupcollide(self.veneno, self.crazy_birds, True, True, pygame.sprite.collide_mask)
-        # for hit in hits:
-        #     self.player.stamine += 10
-        
-
-        # --- PLayer colide com pássaros
-        # hits = pygame.sprite.spritecollide (self.player, self.birds, False)
-        # for hit in hits:
-        #     self.player.health -= BIRD_DAMAGE
-        #     hit.speed = vect (0, 0)
-        #     if self.player.health <= 0:
-        #         self.playing = False
-        # if hits:
-        #     self.player.posic += vect (BIRD_KNOCKBACK, 0).rotate(-hits[0].angulo)
                 
     def level_up(self):
         self.jogo.player_level +=1
         self.current_xp = 0
         self.jogo.sound_effects['levelup'].play()
+        
         # Atributos específicos para alguns níveis:
         if self.jogo.player_level <= 3:
             self.next_level_xp = 1000
@@ -395,6 +404,7 @@ class Snake(pygame.sprite.Sprite):
             self.max_health += 50
             self.health += 50
         # level max = lv. 10
+        
         # Atributos para cada level_up
         self.speed += 2
         self.player_vision += 10
@@ -405,7 +415,6 @@ class Snake(pygame.sprite.Sprite):
 
         self.LEVELUP = True # ativa animação
  
-
 
 
 # ------------ VENENO DA COBRA ------------
@@ -437,85 +446,6 @@ class Veneno (pygame.sprite.Sprite):
             self.kill() # vida útil do disparo
 
 
-# ------------ PÁSSARO ------------
-# class Bird (pygame.sprite.Sprite):
-#     def __init__ (self, jogo, x, y):
-#         self.groups = jogo.all_sprites, jogo.birds
-#         pygame.sprite.Sprite.__init__(self, self.groups)
-#         self.jogo = jogo
-#         self.image = jogo.bird_img
-#         self.rect = self.image.get_rect()
-#         self.hit_rect = BIRD_HIT_RECT.copy() # faz cópia do ret. de col. pra cada pássaro
-#         self.hit_rect.center = self.rect.center
-#         self.posic = vect (x, y) # pos. inicial
-#         self.veloc = vect (0, 0) # vel. inicial
-#         self.acel = vect (0, 0) # acel. inicial
-#         self.rect.center = self.posic
-#         self.angulo = 0 # rotação inicial
-#         #self.health = BIRD_HEALTH
-#         self.speed = choice(BIRD_SPEEDS)
-#         self.last_update = pygame.time.get_ticks()
-#         self.bird_count = 0
-
-
-#     def dist_birds (self): # distância entre pássaros
-#         for bird in self.jogo.birds:
-#             if bird != self:
-#                 # mede distância
-#                 dist = self.posic - bird.posic
-#                 # Se está dentro do círculo, gera aceleração de repulsão
-#                 if 0 < dist.length() < BIRD_ZONE:
-#                     self.acel += dist.normalize()
-
-#     def update (self):
-#         # -- rotação --
-#         if self.jogo.player.posic != self.posic:
-#             self.angulo = (self.jogo.player.posic - self.posic).angle_to(vect(1, 0)) # subtração de vetores: pássaro sempre aponta pro player
-#         else:
-#             self.angulo = 0
-#         self.image = pygame.transform.rotate (self.jogo.bird_img, self.angulo) # gira imagem no ângulo acima
-#         # -- vetores --
-#         self.rect.center = self.posic
-#         self.acel = vect (1, 0).rotate(-self.angulo) # declara aceleração de modulo unitario
-#         self.dist_birds() # verifica distância de outros pássaros para ajustar a acel.
-#         self.acel.scale_to_length(choice(BIRD_SPEEDS))
-#         self.acel += self.veloc * (-1) # limita velocidade máxima
-#         self.veloc += self.acel * dt
-#         self.posic += self.veloc * dt + 0.5*self.acel*dt**2 # s = s0 + v*t + (1/2)*a*t**2
-        # -- colisão com barreiras (não tem)
-        # -- Saúde --
-        # if self.health <= 0:
-        #     self.kill()
-
-        # -- Animação --
-        #now = pygame.time.get_ticks()
-        #delta_t = now - self.last_update
-        #self.image = self.jogo.owl_up['U{}.png'.format(self.bird_count)]
-        #if delta_t > 150:
-        #    delta_t = 0
-        #    self.last_update = now
-        #    self.bird_count += 1
-        #    if self.bird_count >2:
-        #        self.bird_count = 0
-
-
-    # def draw_life_bar (self):
-    #     # -- Configura cor --
-    #     if self.health > 75 * BIRD_HEALTH / 100: # 75%
-    #         color = GREEN
-    #     elif self.health > 50 * BIRD_HEALTH / 100: # 50%
-    #         color = YELLOW
-    #     elif self.health > 25 * BIRD_HEALTH / 100: # 25%
-    #         color = ORANGE
-    #     else: 
-    #         color = RED
-    #     # -- Configura retângulo --
-    #     width_bar = int (self.rect.width * self.health / BIRD_HEALTH) # tamanho da barra proporcional à vida
-    #     self.health_bar = pygame.Rect (0, 0, width_bar, 6)
-    #     # Só desenha barra quando leva primeiro dano
-    #     if self.health < BIRD_HEALTH:
-    #         pygame.draw.rect (self.image, color, self.health_bar)
-
 
 # ------------ PRESAS ------------
 class Prey (pygame.sprite.Sprite):
@@ -532,10 +462,11 @@ class Prey (pygame.sprite.Sprite):
         self.dir = vect(1,0) # Versor da velocidade
         self.speed = GUAXI_SPEED
         self.veloc = self.dir * self.speed
-        self.alive = True
-
+        self.alive = True # Verifica se tá viva
         self.last_position = vect(x,y) # Ou trabalha com distancia ou com tempo
         self.distance = vect(0,0) # distância que percorre antes de mudar de direção
+        
+        
         # variáveis p/ guardar direção de movimento p/ animação
         self.RIGHT = False
         self.LEFT = False
@@ -553,9 +484,12 @@ class Prey (pygame.sprite.Sprite):
             #self.kill() -- está configurado no ataque
             
         else:
+            # Atualiza posição
             self.veloc = self.dir * self.speed
             self.posic += self.veloc * dt
             self.rect.center = self.posic
+
+            # Verifica se já é pra mudar de direção
             distance = self.posic - self.last_position
             D = distance.length()
             if D >= 4*32:
@@ -564,7 +498,8 @@ class Prey (pygame.sprite.Sprite):
                 self.last_position = (self.posic.x, self.posic.y)
                 D = 0
 
-            if self.dir == (1,0): #movendo para direita
+            # Movendo para direita
+            if self.dir == (1,0): 
                 self.image = self.jogo.guaxi_right['R{}.png'.format(self.guaxi_count)]
                 if delta_t > 150:
                     delta_t = 0
@@ -573,7 +508,8 @@ class Prey (pygame.sprite.Sprite):
                     if self.guaxi_count > 2:
                         self.guaxi_count = 0
             
-            elif self.dir == (-1,0): #movendo para esquerda
+            # Movendo para esquerda
+            elif self.dir == (-1,0): 
                 self.image = self.jogo.guaxi_left['L{}.png'.format(self.guaxi_count)]
                 if delta_t > 150:
                     delta_t = 0
@@ -582,7 +518,8 @@ class Prey (pygame.sprite.Sprite):
                     if self.guaxi_count > 2:
                         self.guaxi_count = 0
             
-            elif self.dir == (0,1): # movendo para baixo
+             # Movendo para baixo
+            elif self.dir == (0,1):
                 self.image = self.jogo.guaxi_down['D{}.png'.format(self.guaxi_count)]
                 if delta_t > 150:
                     delta_t = 0
@@ -591,7 +528,8 @@ class Prey (pygame.sprite.Sprite):
                     if self.guaxi_count > 2:
                         self.guaxi_count = 0
             
-            elif self.dir == (0,-1):  #movendo para cima
+            # Movendo para cima
+            elif self.dir == (0,-1):  
                 self.image = self.jogo.guaxi_up['U{}.png'.format(self.guaxi_count)]
                 if delta_t > 150:
                     delta_t = 0
@@ -600,7 +538,6 @@ class Prey (pygame.sprite.Sprite):
                     if self.guaxi_count > 2:
                         self.guaxi_count = 0
     
-    #def kill_prey(self):
         
         
 # ------------ FRUTA ------------
@@ -624,12 +561,15 @@ class Fruit(pygame.sprite.Sprite):
         self.argumento = 0
    
     def update(self):        
+        # Análise do tempo para criar efeito da fruta
         now = pygame.time.get_ticks()
-        delta_t = now - self.last_update # análise do tempo p/ criar efeito da fruta
+        delta_t = now - self.last_update 
         self.argumento = (OMEGA * delta_t + self.phi_0) 
         if delta_t > T:
             delta_t = 0  
             self.last_update = now              
+        
+        # Fruta realiza MHS
         self.pos.y = self.y_0 + A*sin(self.argumento)
         self.rect.center = self.pos
 
@@ -637,46 +577,6 @@ class Fruit(pygame.sprite.Sprite):
         if delta_respawn >= 90000: # respawn de 1,5 min:
             self.jogo.respawn('fruit')
             
-
-
-
-# ------------ ORBE ------------  
-class Orbe(pygame.sprite.Sprite):
-    def __init__(self, list_img):
-        # Construtor da classe mãe
-        pygame.sprite.Sprite.__init__(self)
-
-        # Armazena a animação dos orbes
-        self.anim = list_img
-        # Inicia a animação colocando a primeira imagem na tela
-        self.frame = 0                         # Guarda índice atual na animação
-        self.image = self.anim[self.frame]     # Pega a primeira imagem
-        self.rect = self.image.get_rect()
-        self.rect.x = randint(0, WIDTH - (OBJECT_WIDTH + 50))
-        self.rect.y = randint(0, HEIGHT - (OBJECT_HEIGHT + 50))
-        # Guarda o tick que a imagem foi mostrada
-        self.last_update = pygame.time.get_ticks()
-        # Próxima imagem da animação (intervalo)
-        self.frame_ticks = 100
-
-    def update(self):
-        # Verifica o tick atual
-        now = pygame.time.get_ticks()
-        # Verifica ticks decorridos desde a ultima mudança de frame
-        elapsed_ticks = now - self.last_update
-        # Verifica se já é hora de passar para a próxima:
-        if elapsed_ticks > self.frame_ticks:
-            # Marca o tick da nova imagem
-            self.last_update = now
-            # Avança um frame
-            self.frame += 1
-            # Verifica se a animação acabou
-            if self.frame == len(self.anim):
-                # Se terminou: começa de novo
-                self.frame = 0
-            else:
-             #Se não, passa para próxima imagem
-               self.image = self.anim[self.frame]
 
 
 # ------------ OBSTÁCULO ------------
@@ -706,13 +606,16 @@ class Camera:
         self.width = width
         self.height = height
 
-    def apply (self, entity): # Aplica a câmera p/ as coordenadas do sprite
+    # Aplica a câmera para as coordenadas do sprite
+    def apply (self, entity): 
         return entity.rect.move(self.camera.topleft)
 
-    def apply_rect (self, rect): # Aplica a câmera p/ as coordenadas do rect
+    # Aplica a câmera p/ as coordenadas do rect
+    def apply_rect (self, rect): 
         return rect.move(self.camera.topleft)
 
-    def update(self, target): # Faz o mapa mover ao contrário da câmera -- OFFSET
+    # Faz o mapa mover ao contrário da câmera -- OFFSET
+    def update(self, target): 
         x = -target.rect.x + int(WIDTH/2) #Salva na variável a posição do target em relação à cam
         y = -target.rect.y + int(HEIGHT/2)
 
@@ -775,24 +678,29 @@ class CrazyBirds(pygame.sprite.Sprite):
         self.posic += self.speed * dt
         self.rect.center = self.posic
         self.hit_rect.center = self.rect.center
+        
         # Verifica colisão com veneno
         hits = pygame.sprite.spritecollide (self, self.jogo.veneno, False, pygame.sprite.collide_mask)
         for hit in hits:
             self.kill()
             hit.kill()
             self.jogo.player.score += BIRD_SCORE_HIT
+        
         # Verifica se os que vão pra direita já atravessaram o mapa
         if self.posic.x > self.jogo.map.width and self.vx > 0:
             self.posic.x = -30
             self.posic.y = randint (OBJECT_HEIGHT, self.jogo.map.height - OBJECT_HEIGHT)
+        
         # Verifica se os que vão pra esquerda já atravessaram o mapa
         if self.posic.x < - OBJECT_WIDTH and self.vx < 0:
             self.posic.x = self.jogo.map.width + 30
             self.posic.y =  randint (OBJECT_HEIGHT, self.jogo.map.height - OBJECT_HEIGHT)
+        
         # Verifica se os que vão pra cima já atravessaram o mapa
         if self.posic.y < - OBJECT_HEIGHT and self.vy < 0:
             self.posic.y = self.jogo.map.height + 30
             self.posic.x =  randint (OBJECT_WIDTH, self.jogo.map.width - OBJECT_WIDTH)
+        
         # Verifica se os que vão pra baixo já atravessaram o mapa
         if (self.posic.y > OBJECT_HEIGHT + self.jogo.map.height) and self.vy > 0:
             self.posic.y = - 30
@@ -807,9 +715,11 @@ class CrazyBirds(pygame.sprite.Sprite):
             self.bird_horizon_count += 1
             if self.bird_horizon_count > 3:
                 self.bird_horizon_count = 0
+        
         # Carrega imagem dos que vão pra direita
         if self.vx > 0:
             self.image = self.jogo.bird_right_img['right00{}.png'.format(self.bird_horizon_count)]
+        
         # Carrega imagem dos que vão pra esquerda
         elif self.vx < 0:
             self.image = self.jogo.bird_left_img['left00{}.png'.format(self.bird_horizon_count)]
