@@ -277,9 +277,9 @@ class Game:
         # - Aves migratórias
         # Estabelece a quantidade de passaros para cada fase   
         if self.Fase1:
-            qtde_birds = 30
+            qtde_birds = 45
         if self.Fase2:
-            qtde_birds = 50
+            qtde_birds = 75
         
         for i in range (qtde_birds):
             # sorteio pra deixar aleatório a qtde de pássaros que vem de um lado e do outro

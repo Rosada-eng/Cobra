@@ -79,8 +79,7 @@ SNAKE_WALK_RIGHT = ['R0.png', 'R1.png', 'R2.png']
 SNAKE_WALK_UP = ['U0.png', 'U1.png', 'U2.png']
 SNAKE_WALK_DOWN = ['D0.png', 'D1.png', 'D2.png']
 SNAKE_LEVELUP = ['cloud0.png','cloud1.png', 'cloud2.png', 'cloud3.png', 'cloud4.png', 'cloud5.png'] #, 'cloud6.png', 'cloud7.png']
-# Lista de Presas:
-#LISTA_PRESAS = [guaxinim]
+
 
 # Configurações do mob Guaxinim
 GUAXI_WALK_LEFT = ['L0.png', 'L1.png', 'L2.png']
@@ -96,17 +95,13 @@ GUAXI_SCORE = 200
 
 # Configurações das frutas
 LISTA_FRUTAS = ['abacaxi.png', 'cereja.png', 'laranja.png', 'limao.png', 'maca.png', 'morango.png', 'uva.png']
+
 # Configurações do veneno da cobra
 VENENO_SPEED = 75
-#VENENO_ANIM = []
 VENENO_IMG = 'veneno0.png'
 VENENO_DURATION = 4000
 VENENO_FREQUENCY = 4000 # frequência de disparos
 VENENO_HIT_RECT = pygame.Rect (0, 0, 16, 16)
-VENENO_DESLOC_LEFT = vect (15, 10) 
-VENENO_DESLOC_RIGHT = vect (50, 10) 
-VENENO_DESLOC_UP = vect (32, 0) 
-VENENO_DESLOC_DOWN = vect (32, 64) 
 VENENO_DAMAGE = 10 # dano que o veneno causa
 KICKBACK = 75 # recuo de disparo no player
 VENENO_DESVIO = 5 # desvio aleatório do veneno
@@ -119,21 +114,9 @@ BIRD_UP_IMG = ['up000.png', 'up001.png', 'up002.png', 'up003.png'] # cima
 BIRD_DOWN_IMG = ['down000.png', 'down001.png', 'down002.png', 'down003.png'] # baixo
 BIRD_DAMAGE = 10 # dano que o pássaro causa
 BIRD_SCORE_HIT = 20
-
-
-BIRD_KNOCKBACK = 30 # repulsão quando atinge player
-BIRD_HIT_RECT = pygame.Rect (0, 0, 30, 30) #ret. de colisão
 BIRD_SPEEDS = [40, 50, 30, 25]
-BIRD_HEALTH = 100
-BIRD_ZONE = 100 # círculo que evita superposição de pássaros
+BIRD_HIT_RECT = pygame.Rect (0, 0, 30, 30) #ret. de colisão
 
-# CORUJA
-OWL_WALK_LEFT = ['L0.png', 'L1.png', 'L2.png']
-OWL_WALK_RIGHT = ['R0.png', 'R1.png', 'R2.png']
-OWL_WALK_UP = ['U0.png', 'U1.png', 'U2.png']
-OWL_WALK_DOWN = ['D0.png', 'D1.png', 'D2.png']
-OWL_HEIGHT = 40
-OWL_WIDTH = 50
 
 # ====== CONFIG SOM =======
 MASTIGANDO = {'bite1':'bite1.wav', 'bite2':'bite2.wav', 'bite3':'bite3.wav'}
