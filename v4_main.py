@@ -175,29 +175,6 @@ class Game:
         for img in GUAXI_WALK_DOWN:
             self.guaxi_down[img] =  pygame.image.load(path.join(IMG_DIR, 'guaxinim_cinza', img)).convert_alpha()
             self.guaxi_down[img] =  pygame.transform.scale(self.guaxi_down[img], (GUAXI_WIDTH, GUAXI_HEIGHT))
-       
-        # --- Coruja ---
-            # Esquerda
-        self.owl_left = {}
-        for img in OWL_WALK_LEFT:
-            self.owl_left[img] =  pygame.image.load(path.join(IMG_DIR, 'flying_owl', img)).convert_alpha()
-            self.owl_left[img] =  pygame.transform.scale(self.owl_left[img], (OWL_WIDTH, OWL_HEIGHT))
-            # Direita
-        self.owl_right = {}
-        for img in OWL_WALK_RIGHT:
-            self.owl_right[img] =  pygame.image.load(path.join(IMG_DIR, 'flying_owl', img)).convert_alpha()
-            self.owl_right[img] =  pygame.transform.scale(self.owl_right[img], (OWL_WIDTH, OWL_HEIGHT))
-            # Cima
-        self.owl_up = {}
-        for img in OWL_WALK_UP:
-            self.owl_up[img] =  pygame.image.load(path.join(IMG_DIR, 'flying_owl', img)).convert_alpha()
-            self.owl_up[img] =  pygame.transform.scale(self.owl_up[img], (OWL_WIDTH, OWL_HEIGHT))
-            # Baixo
-        self.owl_down = {}
-        for img in OWL_WALK_DOWN:
-            self.owl_down[img] =  pygame.image.load(path.join(IMG_DIR, 'flying_owl', img)).convert_alpha()
-            self.owl_down[img] =  pygame.transform.scale(self.owl_down[img], (OWL_WIDTH, OWL_HEIGHT))
-
         
         # --- Frutas ---
         self.fruit_images = []
