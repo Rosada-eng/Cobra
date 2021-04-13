@@ -1,6 +1,7 @@
 import pygame
 import pytmx
 import sys
+from abc import ABC, abstractmethod
 from random import *
 from os import path
 from v4_config import *
@@ -19,59 +20,116 @@ INSPER 2020.1
 
 p/ visualizar os CRÉDITOS, leia o arquivo 'README'
 """
-# ========== HUD do jogo ==========
-# ----- Barra de vida do jogador
-def health_player_bar(surf, x, y, fracao): # Função para desenhar o HUD de Life (HP)
-    if fracao < 0:
-        fracao = 0
-    BAR_WIDTH = 150
-    BAR_HEIGHT = 15
-    preench = fracao * BAR_WIDTH # preenchimento depende da porcentagem
-    contorno_rect = pygame.Rect (x, y, BAR_WIDTH, BAR_HEIGHT) # retangulo (contorno) da barra de vida 
-    preench_rect = pygame.Rect(x, y, preench, BAR_HEIGHT) # retangulo preenchimento
-    if fracao > 0.75:
-        color = GREEN
-    elif fracao > 0.5:
-        color = YELLOW
-    elif fracao > 0.25:
-        color = ORANGE
-    else: 
-        color = RED
-    pygame.draw.rect(surf, color, preench_rect) # desenha 
-    pygame.draw.rect(surf, BLACK, contorno_rect, 3)
 
-# ----- Barra de Stamina
-def stamine_player_bar (surf, x, y, stamina): # Função para desenhar o HUD de Stamina (SP)
-    BAR_WIDTH = 150
-    BAR_HEIGHT = 15
-    preench = stamina * BAR_WIDTH
-    contorno_rect = pygame.Rect (x, y, BAR_WIDTH, BAR_HEIGHT)
-    preench_rect = pygame.Rect (x, y, preench, BAR_HEIGHT)
-    color = (0,191,255)
-    pygame.draw.rect(surf, color, preench_rect) 
-    pygame.draw.rect(surf, BLACK, contorno_rect, 3)
+# ===== BARRAS DO HUD DO JOGO =====
+#$ Classe Abstrata: BARS
+class Bars(ABC):
+    def __init__(self, jogo, x, y):
+        self.jogo = jogo
+        self.bar_width = 150
+        self.slice = 1.0
+        self.surf = self.jogo.screen
+        self.x = x
+        self.y = y
+        self.border_color = BLACK
+        self.font_color = BLACK
+    
+    @abstractmethod
+    def drawBar(self, slice):
+        pass
 
-# ----- Barra de carga do disparo
-def poison_charge_bar (surf, x, y, charge): # Função para desenhar o HUD que indica o carregamento do veneno
-    BAR_WIDTH = 150
-    BAR_HEIGHT = 10
-    preench = charge
-    contorno_rect = pygame.Rect (x, y, BAR_WIDTH, BAR_HEIGHT)
-    preench_rect = pygame.Rect (x, y, preench, BAR_HEIGHT)
-    color = RED
-    pygame.draw.rect(surf, color, preench_rect) 
-    pygame.draw.rect(surf, BLACK, contorno_rect, 3)
+    def drawText (self, text, font, color, x, y):
+        text_surface = font.render(text, True, color)
+        text_rect = text_surface.get_rect()
+        text_rect.center = (x,y)
+        self.jogo.screen.blit(text_surface, text_rect)
 
-# ----- Barra de EXP:
-def xp_bar (surf, x, y, charge): # Função para desenhar o HUD que indica a barra de exp para upar de level
-    BAR_WIDTH = 150
-    BAR_HEIGHT = 5
-    preench = charge
-    contorno_rect = pygame.Rect (x, y, BAR_WIDTH, BAR_HEIGHT)
-    preench_rect = pygame.Rect (x, y, preench, BAR_HEIGHT)
-    color = (255,69,0)
-    pygame.draw.rect(surf, color, preench_rect) 
-    pygame.draw.rect(surf, (46,64,83), contorno_rect, 3)
+
+class HealthBar (Bars):
+    def __init__(self, jogo, x, y):
+        Bars.__init__(self, jogo, x, y)
+        self.bar_height = 15
+        self.color = GREEN
+        
+    def drawBackground (self):
+        background = pygame.Surface ((205, 90)).convert_alpha()
+        background.fill(CARMIN)
+        self.jogo.screen.blit(background, (5,5))
+
+    def drawBar (self, slice):
+        self.drawBackground()
+        self.slice = slice
+
+        preench = self.slice * self.bar_width
+        contorno_rect = pygame.Rect (self.x,self.y, self.bar_width, self.bar_height)
+        preench_rect = pygame.Rect(self.x,self.y, preench, self.bar_height)
+
+        if self.slice > 0.75:
+            self.color = GREEN
+        elif self.slice > 0.5:
+            self.color = YELLOW
+        elif self.slice > 0.25:
+            self.color = ORANGE
+        else: 
+            self.color = RED
+            pass
+
+        pygame.draw.rect(self.surf, self.color, preench_rect)
+        pygame.draw.rect(self.surf, self.border_color, contorno_rect, 3)
+        super(HealthBar, self).drawText ("HP:", self.jogo.romulus_20, self.font_color, self.x-20, self.y+10)
+        super(HealthBar, self).drawText ("{0:.0f} / {1:.0f}".format(self.jogo.player.health, self.jogo.player.max_health), self.jogo.trioDX_10, self.font_color, self.x + 150/2 -20, 18)
+
+
+class StamineBar (Bars):
+    def __init__(self, jogo, x, y):
+        Bars.__init__(self, jogo, x, y)
+        self.bar_height = 15
+        self.color = LIGHT_BLUE
+
+    def drawBiteIcon (self, slice):
+        if slice >= 0.8:
+            self.jogo.screen.blit(self.jogo.blue_orb_img, (self.bar_width + 41, 28))
+
+    def drawBar (self, slice):
+        self.slice = slice
+
+        preench = self.slice * self.bar_width
+        contorno_rect = pygame.Rect (self.x,self.y, self.bar_width, self.bar_height)
+        preench_rect = pygame.Rect(self.x,self.y, preench, self.bar_height)
+
+        pygame.draw.rect(self.surf, self.color, preench_rect)
+        pygame.draw.rect(self.surf, self.border_color, contorno_rect, 3)
+        super(StamineBar, self).drawText ("SP:", self.jogo.romulus_20, self.font_color, self.x-20, self.y+7)
+        super(StamineBar, self).drawText ("{0:.0f} / {1:.0f}".format(self.jogo.player.stamine, PLAYER_MAX_STAMINE), self.jogo.trioDX_10, self.font_color, self.x + 150/2 -20, 36)
+
+
+class PoissonBar(Bars):
+    def __init__(self, jogo, x, y):
+        Bars.__init__(self, jogo, x, y)
+        self.bar_height = 10
+        self.color = RED
+
+    def drawBar(self, charge):
+        preench = charge
+        contorno_rect = pygame.Rect (self.x, self.y, self.bar_width, self.bar_height)
+        preench_rect = pygame.Rect (self.x, self.y, preench, self.bar_height)
+        pygame.draw.rect(self.surf, self.color, preench_rect) 
+        pygame.draw.rect(self.surf, self.border_color, contorno_rect, 3)
+
+
+class XpBar(Bars):
+    def __init__(self, jogo, x, y):
+        Bars.__init__(self, jogo, x, y)
+        self.bar_height = 5
+        self.color = LIGHT_ORANGE
+        self.border_color = LIGHT_GRAY
+
+    def drawBar(self, charge):
+        preench = charge
+        contorno_rect = pygame.Rect (self.x, self.y, self.bar_width, self.bar_height)
+        preench_rect = pygame.Rect (self.x, self.y, preench, self.bar_height)
+        pygame.draw.rect(self.surf, self.color, preench_rect)
+        pygame.draw.rect(self.surf, self.border_color, contorno_rect, 3)
 
 
 # ========== CENTRAL DE COMANDO ==========
@@ -268,6 +326,10 @@ class Game:
             self.init_load = False
             self.last_spawn = pygame.time.get_ticks() # reseta o tempo base em que a fruta dá respawn
         
+        self.hpBar = HealthBar(self, 40, 10)
+        self.spBar = StamineBar(self, 40, 28)
+        self.poison_charge_bar = PoissonBar(self, 40, 45)
+        self.xp_bar = XpBar(self, 10, 85)
         #cria os grupos:
         self.all_sprites = pygame.sprite.LayeredUpdates()
         self.walls = pygame.sprite.Group()
@@ -424,23 +486,17 @@ class Game:
                     self.screen.blit(sprite.image, self.camera.apply(sprite))
             else:
                 self.screen.blit(sprite.image, self.camera.apply(sprite))
-        
+
         # --- HUD ---
-        background = pygame.Surface ((205, 90)).convert_alpha()
-        background.fill ((250, 215, 160))
-        self.screen.blit(background, (5,5))
-        # - HP:
-        self.draw_text ("HP:", self.romulus_20, BLACK, 20, 20)
-        health_player_bar(self.screen, 40, 10, self.player.health / self.player.max_health)
-        self.draw_text ("{0:.0f} / {1:.0f}".format(self.player.health, self.player.max_health), self.trioDX_10, BLACK, 20 + 150/2, 18)
+        self.hpBar.drawBar(self.player.health / self.player.max_health)
+
         # - SP:
-        self.draw_text ("SP:", self.romulus_20, BLACK, 20, 35)
-        stamine_player_bar (self.screen, 40, 28, self.player.stamine / PLAYER_MAX_STAMINE)
-        self.draw_text ("{0:.0f} / {1:.0f}".format(self.player.stamine, PLAYER_MAX_STAMINE), self.trioDX_10, BLACK, 20 + 150/2, 36)
-        if self.player.stamine >= 0.8*PLAYER_MAX_STAMINE:
-            self.screen.blit(self.blue_orb_img, (41 + 150, 28))
+        self.spBar.drawBar(self.player.stamine/ PLAYER_MAX_STAMINE)
+        self.spBar.drawBiteIcon(self.player.stamine/ PLAYER_MAX_STAMINE)
+
         # - Poison cooldown:
-        poison_charge_bar (self.screen, 40, 45, self.player.charge)
+        self.poison_charge_bar.drawBar(self.player.charge)
+
         # - LVL:
         self.draw_text ("Lvl:", self.romulus_20, BLACK, 20, 70)
         self.draw_text ("{}".format(self.player_level), self.romulus_40, RED, 50,70 )
@@ -449,9 +505,10 @@ class Game:
             self.screen.blit(self.not_see_img, (160,60))
         else:
             self.screen.blit(self.see_img, (160,60))
-        # - XP:
-        xp_bar(self.screen, 10, 85, self.player.current_xp / self.player.next_level_xp*100)
-
+        
+        # - XP: self.player.current_xp / self.player.next_level_xp*100
+        self.xp_bar.drawBar(self.player.current_xp / self.player.next_level_xp*100)
+        
         # -- PAUSE --
         if self.paused:
             self.screen.blit(self.cortina_screen, (0,0))
