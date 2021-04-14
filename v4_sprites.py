@@ -63,133 +63,141 @@ class Snake(pygame.sprite.Sprite):
         self.last_hit = 0 # último hit do pássaro na cobra
         self.ANALISE = True # analisa múltiplos hits do pássaro na cobra
         self.score = 0
+
+    def simular_barulho_grama(self):
+        if self.INGRASS:
+            if random() < 0.005:
+                self.jogo.sound_effects['1step_grass'].play() 
+
+    def move_left(self):
+        self.veloc.x = -self.speed
+        self.dir = vect (-1, 0)
+        self.LEFT = True
+        self.RIGHT = False
+        self.UP = False
+        self.DOWN = False
         
+    def move_right(self):
+        self.veloc.x = self.speed
+        self.dir = vect (1, 0)
+        self.LEFT = False
+        self.RIGHT = True
+        self.UP = False
+        self.DOWN = False
+
+    def move_up(self):
+        self.veloc.y = -self.speed
+        self.dir = vect (0, -1)
+        self.LEFT = False
+        self.RIGHT = False
+        self.UP = True
+        self.DOWN = False
+
+    def move_down(self):
+        self.veloc.y = self.speed
+        self.dir = vect (0, 1)
+        self.LEFT = False
+        self.RIGHT = False
+        self.UP = False
+        self.DOWN = True
+
+    def stand_still(self):
+        self.UP = False
+        self.DOWN = False
+        self.LEFT = False
+        self.RIGHT = False
+
+    def bite_pray(self):
+        # checa distância entre Player e a Presa:
+        dist_to_target_1 = vect (self.jogo.presa1.posic.x - self.posic.x,
+                                 self.jogo.presa1.posic.y - self.posic.y).magnitude() # Distância inicial p/ Presa 1
+        dist_to_target_2 = vect (self.jogo.presa2.posic.x - self.posic.x, 
+                                self.jogo.presa2.posic.y - self.posic.y).magnitude() # Distância inicial p/ Presa 2
+        dist_to_target_3 = vect (self.jogo.presa3.posic.x - self.posic.x, 
+                                self.jogo.presa3.posic.y - self.posic.y).magnitude() # Distância inicial p/ Presa 3
+
+        # Condição do ataque: distância mínima, presa viva e stamina necessária
+        # Presa 1
+        if dist_to_target_1 <= ATACK_RANGE and self.jogo.presa1.alive and self.stamine >= 0.8*PLAYER_MAX_STAMINE: 
+            self.last_atack = pygame.time.get_ticks()
+            self.ATACK = True # executa a animação de ataque qnd rodar o update
+            self.target = self.jogo.presa1
+            self.score += GUAXI_SCORE
+        
+        # Presa 2
+        elif dist_to_target_2 <= ATACK_RANGE and self.jogo.presa2.alive and self.stamine >= 0.8*PLAYER_MAX_STAMINE : 
+            self.last_atack = pygame.time.get_ticks()
+            self.ATACK = True # executa a animação de ataque qnd rodar o update
+            self.target = self.jogo.presa2
+            self.score += GUAXI_SCORE
+
+        # Presa 3
+        elif dist_to_target_3 <= ATACK_RANGE and self.jogo.presa3.alive and self.stamine >= 0.8*PLAYER_MAX_STAMINE: 
+            self.last_atack = pygame.time.get_ticks()
+            self.ATACK = True # executa a animação de ataque qnd rodar o update
+            self.target = self.jogo.presa3
+            self.score += GUAXI_SCORE
+
+    def throw_poison(self):
+        now_time = pygame.time.get_ticks() # grava instante atual           
+        if now_time - self.last_shoot > VENENO_FREQUENCY:
+            self.last_shoot = now_time # se passou tempo mínimo, grava novo 'último tiro'
+            self.charge = 0
+
+            # Ajusta posição do tiro 
+            if self.last_dir == vect (1, 0):
+                pos = self.posic + vect(self.rect.width, self.rect.height/9)            
+            elif self.last_dir == vect (-1, 0):
+                pos = self.posic + vect(-self.rect.width/2, self.rect.height/9)           
+            elif self.last_dir == vect (0, -1):
+                pos = self.posic + vect(self.rect.width/2, 0)           
+            else: 
+                pos = self.posic + vect(self.rect.width/2, self.rect.height) 
+
+            # Posição do tiro: tem que ajustar à boca da cobra quando anda na horizontal
+            Veneno (self.jogo, pos, self.dir)
+            # Pequeno impulso para trás do disparo
+            self.vel = vect (-KICKBACK, 0)
+
+
     # Verifica pressionamento de teclas    
-    def get_keys(self):
-        self.veloc = vect (0, 0)
-        self.interactive_objects()
-        CHANCE = 0.005
-        keys = pygame.key.get_pressed() #Salva uma dicionario de keys q estão sendo pressionadas
+    def get_keys(self): 
+        keys = pygame.key.get_pressed() # Salva uma dicionario de keys q estão sendo pressionadas
+        self.veloc = vect (0, 0)        # evita que se faça movimentos compostos (em x e y, simultaneamente)
+        
         # Movimento para a esquerda
-        if keys[pygame.K_LEFT]:
-            self.veloc.x = -self.speed
-            self.dir = vect (-1, 0)
-            self.LEFT = True
-            self.RIGHT = False
-            self.UP = False
-            self.DOWN = False
-            if self.INGRASS:
-                if random() < CHANCE:
-                    channel2 = self.jogo.sound_effects['1step_grass'].play() 
-        
+        if keys[pygame.K_LEFT]: 
+            self.move_left()
+            self.simular_barulho_grama()
+
         # Movimento para direita
-        elif keys[pygame.K_RIGHT]:
-            self.veloc.x = self.speed
-            self.dir = vect (1, 0)
-            self.LEFT = False
-            self.RIGHT = True
-            self.UP = False
-            self.DOWN = False
-            if self.INGRASS:
-                if random() < CHANCE:
-                    channel2 = self.jogo.sound_effects['1step_grass'].play()
-        
+        elif keys[pygame.K_RIGHT]:  
+            self.move_right()
+            self.simular_barulho_grama()
+
         # Movimento para cima
-        elif keys[pygame.K_UP]:
-            self.veloc.y = -self.speed
-            self.dir = vect (0, -1)
-            self.LEFT = False
-            self.RIGHT = False
-            self.UP = True
-            self.DOWN = False
-            if self.INGRASS:
-                if random() < CHANCE:
-                    channel2 = self.jogo.sound_effects['1step_grass'].play()
-        
+        elif keys[pygame.K_UP]:  
+            self.move_up()
+            self.simular_barulho_grama()
+
         # Movimento para baixo
-        elif keys[pygame.K_DOWN]:
-            self.veloc.y = self.speed
-            self.dir = vect (0, 1)
-            self.LEFT = False
-            self.RIGHT = False
-            self.UP = False
-            self.DOWN = True
-            if self.INGRASS:
-                if random() < CHANCE:
-                    channel2 = self.jogo.sound_effects['1step_grass'].play()
-        else:
-            self.UP = False
-            self.DOWN = False
-            self.LEFT = False
-            self.RIGHT = False
+        elif keys[pygame.K_DOWN]: 
+            self.move_down()
+            self.simular_barulho_grama()
+
+        else: 
+            self.stand_still()
+
         self.last_dir = self.dir # guarda última direção
         
-        # Configura disparo do veneno
-        if keys[pygame.K_SPACE]:
-            now_time = pygame.time.get_ticks() # grava instante atual           
-            if now_time - self.last_shoot > VENENO_FREQUENCY:
-                self.last_shoot = now_time # se passou tempo mínimo, grava novo 'último tiro'
-                self.charge = 0
-                
-                # Ajusta posição do disparo dependendo da movimentação que a cobra tava
-                if self.LEFT:
-                    pos = self.posic + vect(-self.rect.width/2, self.rect.height/9)
-                elif self.RIGHT:
-                    pos = self.posic + vect(self.rect.width, self.rect.height/9)
-                elif self.UP:
-                    pos = self.posic + vect(self.rect.width/2, 0)
-                elif self.DOWN:
-                    pos = self.posic + vect(self.rect.width/2, self.rect.height)
-                else:
-                    # Ajusta posição do tiro quando a cobra tava parada
-                    if self.last_dir == vect (1, 0):
-                        pos = self.posic + vect(self.rect.width, self.rect.height/9)            
-                    elif self.last_dir == vect (-1, 0):
-                        pos = self.posic + vect(-self.rect.width/2, self.rect.height/9)           
-                    elif self.last_dir == vect (0, -1):
-                        pos = self.posic + vect(self.rect.width/2, 0)           
-                    else: 
-                        pos = self.posic + vect(self.rect.width/2, self.rect.height)         
-                dir = self.last_dir  
-                # Posição do tiro: tem que ajustar à boca da cobra quando anda na horizontal
-                Veneno (self.jogo, pos, dir)
-                # Pequeno impulso para trás do disparo
-                self.vel = vect (-KICKBACK, 0)
-
-        if keys[pygame.K_x]:
-            # checa distância entre Player e a Presa:
-            to_target_1 = vect (self.jogo.presa1.posic.x - self.posic.x, self.jogo.presa1.posic.y - self.posic.y) # vetor Distância inicial p/ Presa 1
-            to_target_2 = vect (self.jogo.presa2.posic.x - self.posic.x, self.jogo.presa2.posic.y - self.posic.y) # vetor Distância inicial p/ Presa 2
-            to_target_3 = vect (self.jogo.presa3.posic.x - self.posic.x, self.jogo.presa3.posic.y - self.posic.y) # vetor Distância inicial p/ Presa 3
-
-            dist_to_target_1 = to_target_1.magnitude() # distância inicial (em pixels) entre Player e Presa 1
-            dist_to_target_2 = to_target_2.magnitude() # distância inicial (em pixels) entre Player e Presa 2
-            dist_to_target_3 = to_target_3.magnitude() # distância inicial (em pixels) entre Player e Presa 3
+        # Animação do disparo de veneno
+        if keys[pygame.K_SPACE]: 
+            self.throw_poison()
             
-            # Condição do ataque: distância mínima, presa viva e stamina necessária
-            # Presa 1
-            if dist_to_target_1 <= ATACK_RANGE and self.jogo.presa1.alive and self.stamine >= 0.8*PLAYER_MAX_STAMINE: 
-                self.last_atack = pygame.time.get_ticks()
-                #self.current_position = vect(self.posic.x, self.posic.y) # guarda a posição inicial antes de dar o bote
-                self.ATACK = True # executa a animação de ataque qnd rodar o update
-                self.target = self.jogo.presa1
-                self.score += GUAXI_SCORE
+        # Animação para realizar o bote da presa
+        if keys[pygame.K_x]: 
+            self.bite_pray()
             
-            # Presa 2
-            elif dist_to_target_2 <= ATACK_RANGE and self.jogo.presa2.alive and self.stamine >= 0.8*PLAYER_MAX_STAMINE : 
-                self.last_atack = pygame.time.get_ticks()
-                #self.current_position = vect(self.posic.x, self.posic.y) # guarda a posição inicial antes de dar o bote
-                self.ATACK = True # executa a animação de ataque qnd rodar o update
-                self.target = self.jogo.presa2
-                self.score += GUAXI_SCORE
-
-            # Presa 3
-            elif dist_to_target_3 <= ATACK_RANGE and self.jogo.presa3.alive and self.stamine >= 0.8*PLAYER_MAX_STAMINE: 
-                self.last_atack = pygame.time.get_ticks()
-                #self.current_position = vect(self.posic.x, self.posic.y) # guarda a posição inicial antes de dar o bote
-                self.ATACK = True # executa a animação de ataque qnd rodar o update
-                self.target = self.jogo.presa3
-                self.score += GUAXI_SCORE
 
     # Verifica colisões com barreiras
     def collide_with_walls (self, dir):
@@ -222,7 +230,9 @@ class Snake(pygame.sprite.Sprite):
             self.speed = 1.0*PLAYER_SPEED
             self.INGRASS = False
 
+    
     def update(self):
+        self.interactive_objects()      # analisa se o player está passando pelo Mato e ajusta velocidade
         self.get_keys()
         # Se houve ataque, atualiza posição da cobra
         if self.ATACK and self.stamine >= 0.8*PLAYER_MAX_STAMINE:
@@ -288,7 +298,6 @@ class Snake(pygame.sprite.Sprite):
                         # Retorna à imagem da cobra
                         self.image = self.jogo.snake_down['D{}.png'.format(self.snake_count)]
                         self.image = pygame.transform.scale(self.image, (self.snake_width, self.snake_height))
-
                         
             # Se não aumentou level up, apenas atualiza imagem conforme sentido
             # Esquerda
@@ -296,6 +305,7 @@ class Snake(pygame.sprite.Sprite):
                 self.image = self.jogo.snake_left['L{}.png'.format(self.snake_count)]
                 self.image = pygame.transform.scale(self.image, (self.snake_width, self.snake_height))
 
+                # self.atualiza_contador(delta_t)
                 if delta_t > 150:
                     delta_t = 0
                     self.last_update = now
@@ -308,6 +318,7 @@ class Snake(pygame.sprite.Sprite):
                 self.image = self.jogo.snake_right['R{}.png'.format(self.snake_count)]
                 self.image = pygame.transform.scale(self.image, (self.snake_width, self.snake_height))
 
+                # self.atualiza_contador(delta_t)
                 if delta_t > 150:
                     delta_t = 0
                     self.last_update = now
@@ -320,6 +331,7 @@ class Snake(pygame.sprite.Sprite):
                 self.image = self.jogo.snake_down['D{}.png'.format(self.snake_count)]
                 self.image = pygame.transform.scale(self.image, (self.snake_width, self.snake_height))
 
+                # self.atualiza_contador(delta_t)
                 if delta_t > 150:
                     delta_t = 0
                     self.last_update = now
@@ -332,6 +344,7 @@ class Snake(pygame.sprite.Sprite):
                 self.image = self.jogo.snake_up['U{}.png'.format(self.snake_count)]
                 self.image = pygame.transform.scale(self.image, (self.snake_width, self.snake_height))
 
+                # self.atualiza_contador(delta_t)
                 if delta_t > 150:
                     delta_t = 0
                     self.last_update = now
@@ -387,7 +400,6 @@ class Snake(pygame.sprite.Sprite):
                 self.level_up()
             else:
                 self.current_xp == self.next_level_xp # Trava barra de XP no máximo
-
                 
     def level_up(self):
         self.jogo.player_level +=1
@@ -480,7 +492,6 @@ class Prey (pygame.sprite.Sprite):
         self.DOWN = False
         self.last_update = pygame.time.get_ticks()
         self.guaxi_count = 0
-
 
     def update(self):
         now = pygame.time.get_ticks()

@@ -33,6 +33,10 @@ BROWN = (106, 55, 5)
 ORANGE = (255, 140, 0)
 BLUE = (0, 0, 255)
 GRAY = (192, 192, 192)
+LIGHT_GRAY = (46, 64, 83)
+LIGHT_BLUE = (0, 191, 255)
+LIGHT_ORANGE = (255, 69, 0)
+CARMIN = (250, 215, 160)
 
 # Estados para controle do fluxo
 INIT = 0
